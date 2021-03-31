@@ -52,6 +52,20 @@ LOCAL_EXPORT_C_INCLUDES := extern/questui
 LOCAL_SRC_FILES := extern/libquestui.so
 include $(PREBUILT_SHARED_LIBRARY)
 
+# libcurl
+include $(CLEAR_VARS)
+LOCAL_MODULE := libcurl
+LOCAL_EXPORT_C_INCLUDES := include/libcurl
+LOCAL_SRC_FILES := include/libcurl/libcurl.a
+include $(PREBUILT_STATIC_LIBRARY)
+
+# zip
+include $(CLEAR_VARS)
+LOCAL_MODULE := zip
+LOCAL_EXPORT_C_INCLUDES := include/zip/src
+LOCAL_SRC_FILES := $(call rwildcard,include/zip/src/,*.c)
+include $(BUILD_STATIC_LIBRARY)
+
 # If you would like to use more shared libraries (such as custom UI, utils, or more) add them here, following the format above. # In addition, ensure that you add them to the shared library build below. 
 include $(CLEAR_VARS) 
 LOCAL_MODULE := songdownloader
@@ -63,7 +77,9 @@ LOCAL_SHARED_LIBRARIES += beatsaber-hook_1_2_4
 LOCAL_SHARED_LIBRARIES += codegen_0_7_0
 LOCAL_SHARED_LIBRARIES += custom-types
 LOCAL_SHARED_LIBRARIES += questui
-LOCAL_LDLIBS += -llog 
+LOCAL_STATIC_LIBRARIES += libcurl
+LOCAL_STATIC_LIBRARIES += zip
+LOCAL_LDLIBS += -llog -lz
 LOCAL_CFLAGS += -I"include" -I"shared" -I"./extern/libil2cpp/il2cpp/libil2cpp" -I"extern" -I"extern/codegen/include" -DVERSION='"0.0.1"'
 LOCAL_C_INCLUDES += ./include ./src 
 LOCAL_CPP_FEATURES += exceptions
