@@ -51,6 +51,12 @@ LOCAL_MODULE := questui
 LOCAL_EXPORT_C_INCLUDES := extern/questui
 LOCAL_SRC_FILES := extern/libquestui.so
 include $(PREBUILT_SHARED_LIBRARY)
+# Creating prebuilt for dependency: songloader - version: 0.1.0
+include $(CLEAR_VARS)
+LOCAL_MODULE := songloader
+LOCAL_EXPORT_C_INCLUDES := extern/songloader
+LOCAL_SRC_FILES := extern/libsongloader.so
+include $(PREBUILT_SHARED_LIBRARY)
 
 # curl
 include $(CLEAR_VARS)
@@ -77,6 +83,7 @@ LOCAL_SHARED_LIBRARIES += beatsaber-hook_1_2_4
 LOCAL_SHARED_LIBRARIES += codegen_0_7_0
 LOCAL_SHARED_LIBRARIES += custom-types
 LOCAL_SHARED_LIBRARIES += questui
+LOCAL_STATIC_LIBRARIES += songloader
 LOCAL_STATIC_LIBRARIES += curl
 LOCAL_STATIC_LIBRARIES += zip
 LOCAL_LDLIBS += -llog -lz
