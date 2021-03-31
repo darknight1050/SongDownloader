@@ -52,11 +52,11 @@ LOCAL_EXPORT_C_INCLUDES := extern/questui
 LOCAL_SRC_FILES := extern/libquestui.so
 include $(PREBUILT_SHARED_LIBRARY)
 
-# libcurl
+# curl
 include $(CLEAR_VARS)
-LOCAL_MODULE := libcurl
-LOCAL_EXPORT_C_INCLUDES := include/libcurl
-LOCAL_SRC_FILES := include/libcurl/libcurl.a
+LOCAL_MODULE := curl
+LOCAL_EXPORT_C_INCLUDES := include/curl-android-ios/curl/include/curl
+LOCAL_SRC_FILES := include/curl-android-ios/prebuilt-with-ssl/android/arm64-v8a/libcurl.a
 include $(PREBUILT_STATIC_LIBRARY)
 
 # zip
@@ -77,7 +77,7 @@ LOCAL_SHARED_LIBRARIES += beatsaber-hook_1_2_4
 LOCAL_SHARED_LIBRARIES += codegen_0_7_0
 LOCAL_SHARED_LIBRARIES += custom-types
 LOCAL_SHARED_LIBRARIES += questui
-LOCAL_STATIC_LIBRARIES += libcurl
+LOCAL_STATIC_LIBRARIES += curl
 LOCAL_STATIC_LIBRARIES += zip
 LOCAL_LDLIBS += -llog -lz
 LOCAL_CFLAGS += -I"include" -I"shared" -I"./extern/libil2cpp/il2cpp/libil2cpp" -I"extern" -I"extern/codegen/include" -DVERSION='"0.0.1"'
