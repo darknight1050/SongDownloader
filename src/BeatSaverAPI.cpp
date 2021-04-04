@@ -2,7 +2,6 @@
 
 #include "CustomLogger.hpp"
 
-#include "Types/BeatSaver/Beatmap.hpp"
 #include "WebUtil.hpp"
 
 #include "zip.h"
@@ -14,27 +13,30 @@
 namespace BeatSaver::API {
 
     std::optional<BeatSaver::Beatmap> GetBeatmapByKey(std::string key) {
-        std::string data;
-        WebUtil::Get(BASE_URL + "/api/maps/detail/" + key, data);
-        rapidjson::Document document;
-        document.Parse(data);
-        if(document.HasParseError() || !document.IsObject())
+        auto json = WebUtil::GetJSON(BASE_URL + "/api/maps/detail/" + key);
+        if(!json.has_value())
             return std::nullopt;
         BeatSaver::Beatmap beatmap;
-        beatmap.Deserialize(document.GetObject());
+        beatmap.Deserialize(json.value().GetObject());
         return beatmap;
     }
 
     std::optional<BeatSaver::Beatmap> GetBeatmapByHash(std::string hash) {
-        std::string data;
-        WebUtil::Get(BASE_URL + "/api/maps/by-hash/" + hash, data);
-        rapidjson::Document document;
-        document.Parse(data);
-        if(document.HasParseError() || !document.IsObject())
+        auto json = WebUtil::GetJSON(BASE_URL + "/api/maps/by-hash/" + hash);
+        if(!json.has_value())
             return std::nullopt;
         BeatSaver::Beatmap beatmap;
-        beatmap.Deserialize(document.GetObject());
+        beatmap.Deserialize(json.value().GetObject());
         return beatmap;
+    }
+
+    std::optional<BeatSaver::Page> SearchPage(std::string query, int pageIndex) {
+        auto json = WebUtil::GetJSON(BASE_URL + "/api/search/text/" + std::to_string(pageIndex) + "?q=" + query);
+        if(!json.has_value())
+            return std::nullopt;
+        BeatSaver::Page page;
+        page.Deserialize(json.value().GetObject());
+        return page;
     }
 
     void DownloadBeatmap(const BeatSaver::Beatmap& beatmap) {

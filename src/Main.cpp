@@ -29,7 +29,7 @@ extern "C" void setup(ModInfo& info) {
 
 #include "HMUI/ViewController.hpp"
 void DidActivate(HMUI::ViewController* self, bool firstActivation, bool addedToHierarchy, bool screenSystemEnabling) {
-    BeatSaver::API::DownloadBeatmap(BeatSaver::API::GetBeatmapByHash("8a35a5f9141e1a12d27f51c63a5a7c1542ff9495"));
+    BeatSaver::API::DownloadBeatmap(BeatSaver::API::SearchPage("miroh").value().GetDocs().at(0));
 }
 
 extern "C" void load() {

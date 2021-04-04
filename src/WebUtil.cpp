@@ -20,6 +20,16 @@ std::size_t CurlWrite_CallbackFunc_StdString(void *contents, std::size_t size, s
     return newLength;
 }
 
+std::optional<rapidjson::Document> WebUtil::GetJSON(std::string_view url) {
+    std::string data;
+    Get(url, data);
+    rapidjson::Document document;
+    document.Parse(data);
+    if(document.HasParseError() || !document.IsObject())
+        return std::nullopt;
+    return document;
+}
+
 long WebUtil::Get(std::string_view url, std::string& val) {
     // Init curl
     auto* curl = curl_easy_init();
