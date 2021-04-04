@@ -28,8 +28,77 @@ extern "C" void setup(ModInfo& info) {
 }
 
 #include "HMUI/ViewController.hpp"
+
+#include "UnityEngine/RectOffset.hpp"
+#include "UnityEngine/RectTransform.hpp"
+#include "UnityEngine/Vector2.hpp"
+#include "UnityEngine/UI/Image.hpp"
+#include "UnityEngine/UI/Toggle.hpp"
+#include "UnityEngine/UI/Toggle_ToggleEvent.hpp"
+#include "UnityEngine/UI/LayoutElement.hpp"
+#include "UnityEngine/Events/UnityAction.hpp"
+#include "UnityEngine/Events/UnityAction_1.hpp"
+#include "HMUI/ScrollView.hpp"
+#include "HMUI/ModalView.hpp"
+#include "HMUI/Touchable.hpp"
+#include "HMUI/CurvedCanvasSettings.hpp"
+
+#include "questui/shared/BeatSaberUI.hpp"
+#include "questui/shared/CustomTypes/Components/ExternalComponents.hpp"
+#include "questui/shared/CustomTypes/Components/Backgroundable.hpp"
+
+using namespace QuestUI;
+using namespace UnityEngine;
+using namespace UnityEngine::UI;
+using namespace UnityEngine::Events;
+using namespace HMUI;
+using namespace TMPro;
+Transform* parent;
+
+void createEntry(BeatSaver::Beatmap map) {
+    auto entryLayout = BeatSaberUI::CreateHorizontalLayoutGroup(parent);
+    auto entryParent = entryLayout->get_transform();
+    entryLayout->set_padding(UnityEngine::RectOffset::New_ctor(2, 2, 2, 2));
+    entryLayout->get_gameObject()->AddComponent<Backgroundable*>()->ApplyBackground(il2cpp_utils::createcsstr("round-rect-panel"));
+    
+    auto textLayout = BeatSaberUI::CreateVerticalLayoutGroup(entryParent);
+    textLayout->GetComponent<LayoutElement*>()->set_preferredWidth(64.0f);
+    auto textLayoutParent = textLayout->get_transform();
+    auto songName = BeatSaberUI::CreateText(textLayoutParent, map.GetMetadata().GetSongName());
+    auto levelAuthorName = BeatSaberUI::CreateText(textLayoutParent, "Uploaded by " + map.GetMetadata().GetLevelAuthorName());
+    levelAuthorName->set_fontSize(3.0f);
+    auto button = BeatSaberUI::CreateUIButton(entryParent, "Download", 
+        [map] { 
+            BeatSaver::API::DownloadBeatmap(map);
+        }
+    );
+}
+
 void DidActivate(HMUI::ViewController* self, bool firstActivation, bool addedToHierarchy, bool screenSystemEnabling) {
-    BeatSaver::API::DownloadBeatmap(BeatSaver::API::SearchPage("miroh").value().GetDocs().at(0));
+    if(firstActivation) {
+        self->get_gameObject()->AddComponent<Touchable*>();
+
+        auto searchSetting = BeatSaberUI::CreateStringSetting(self->get_transform(), "Search", "", 
+            [] (std::string value) { 
+                if(value.empty())
+                    return;
+                getLogger().info(value);
+                while(parent->get_childCount() > 0){
+                    Object::DestroyImmediate(parent->GetChild(0)->get_gameObject());
+                }
+                auto search = BeatSaver::API::SearchPage(value);
+                getLogger().info("%d", search.has_value());
+                if(search.has_value()) {
+                    for(auto map : search.value().GetDocs()) {
+                        getLogger().info("map %s", map.GetMetadata().GetSongName().c_str());
+                        createEntry(map);
+                    }
+                }
+            }
+        );
+        auto container = BeatSaberUI::CreateScrollView(self->get_transform());
+        parent = container->get_transform();
+    }
 }
 
 extern "C" void load() {

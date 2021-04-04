@@ -23,6 +23,7 @@ std::size_t CurlWrite_CallbackFunc_StdString(void *contents, std::size_t size, s
 std::optional<rapidjson::Document> WebUtil::GetJSON(std::string_view url) {
     std::string data;
     Get(url, data);
+    getLogger().info("JSON: %s", data.c_str());
     rapidjson::Document document;
     document.Parse(data);
     if(document.HasParseError() || !document.IsObject())
@@ -34,8 +35,7 @@ long WebUtil::Get(std::string_view url, std::string& val) {
     // Init curl
     auto* curl = curl_easy_init();
     struct curl_slist *headers = NULL;
-    headers = curl_slist_append(headers, "Accept: application/json");
-    headers = curl_slist_append(headers, "Content-Type: application/json");
+    headers = curl_slist_append(headers, "Accept: */*");
     // Set headers
     curl_easy_setopt(curl, CURLOPT_HTTPHEADER, headers); 
 
@@ -76,7 +76,6 @@ long WebUtil::GetToFile(std::string_view url, const std::string& file) {
     auto* curl = curl_easy_init();
     struct curl_slist *headers = NULL;
     headers = curl_slist_append(headers, "Accept: */*");
-    headers = curl_slist_append(headers, "Content-Type: */*");
     // Set headers
     curl_easy_setopt(curl, CURLOPT_HTTPHEADER, headers); 
 
