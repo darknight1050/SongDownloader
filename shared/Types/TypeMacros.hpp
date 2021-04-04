@@ -1,7 +1,7 @@
 #pragma once
 #include "beatsaber-hook/shared/config/rapidjson-utils.hpp"
 
-#define DECLARE_CLASS(namespaze, name, impl) \
+#define DECLARE_JSON_CLASS(namespaze, name, impl) \
 namespace namespaze { \
     class name { \
     public: \

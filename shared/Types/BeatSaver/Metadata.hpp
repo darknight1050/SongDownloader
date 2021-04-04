@@ -5,7 +5,7 @@
 
 #include <vector>
 
-DECLARE_CLASS(BeatSaver, Metadata, 
+DECLARE_JSON_CLASS(BeatSaver, Metadata, 
     GETTER_VALUE(std::string, SongName);
     GETTER_VALUE(std::string, SongSubName);
     GETTER_VALUE(std::string, SongAuthorName);

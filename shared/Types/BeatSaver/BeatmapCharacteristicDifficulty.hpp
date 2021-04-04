@@ -1,7 +1,7 @@
 #pragma once
 #include "../TypeMacros.hpp"
 
-DECLARE_CLASS(BeatSaver, BeatmapCharacteristicDifficulty, 
+DECLARE_JSON_CLASS(BeatSaver, BeatmapCharacteristicDifficulty, 
     GETTER_VALUE(float, Duration);
     GETTER_VALUE(int, Length);
     GETTER_VALUE(int, Bombs);

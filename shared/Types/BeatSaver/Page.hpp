@@ -4,7 +4,7 @@
 
 #include <vector>
 
-DECLARE_CLASS(BeatSaver, Page, 
+DECLARE_JSON_CLASS(BeatSaver, Page, 
     GETTER_VALUE(std::vector<BeatSaver::Beatmap>, Docs);
     GETTER_VALUE(int, TotalDocs);
     GETTER_VALUE(int, LastPage);

@@ -4,7 +4,7 @@
 #include "Metadata.hpp"
 #include "Stats.hpp"
 
-DECLARE_CLASS(BeatSaver, Beatmap, 
+DECLARE_JSON_CLASS(BeatSaver, Beatmap, 
     GETTER_VALUE(std::string, Id);
     GETTER_VALUE(std::string, Key);
     GETTER_VALUE(std::string, Name);
