@@ -65,9 +65,9 @@ void createEntry(BeatSaver::Beatmap map) {
     textLayout->GetComponent<LayoutElement*>()->set_preferredWidth(64.0f);
     auto textLayoutParent = textLayout->get_transform();
     auto songName = BeatSaberUI::CreateText(textLayoutParent, map.GetMetadata().GetSongName());
-    auto levelAuthorName = BeatSaberUI::CreateText(textLayoutParent, "Uploaded by " + map.GetMetadata().GetLevelAuthorName());
+    auto levelAuthorName = BeatSaberUI::CreateText(textLayoutParent, "<color=#CCCCCCFF>Uploaded by " + map.GetMetadata().GetLevelAuthorName() + "</color>");
     levelAuthorName->set_fontSize(3.0f);
-    auto button = BeatSaberUI::CreateUIButton(entryParent, "Download", 
+    auto button = BeatSaberUI::CreateUIButton(entryParent, "Download", UnityEngine::Vector2(0.0f, 0.0f), UnityEngine::Vector2(24.0f, 10.0f),  
         [map] { 
             BeatSaver::API::DownloadBeatmap(map);
         }
@@ -83,20 +83,22 @@ void DidActivate(HMUI::ViewController* self, bool firstActivation, bool addedToH
                 if(value.empty())
                     return;
                 getLogger().info(value);
-                while(parent->get_childCount() > 0){
+                while(parent->get_childCount() > 0) {
                     Object::DestroyImmediate(parent->GetChild(0)->get_gameObject());
                 }
                 auto search = BeatSaver::API::SearchPage(value);
-                getLogger().info("%d", search.has_value());
                 if(search.has_value()) {
                     for(auto map : search.value().GetDocs()) {
-                        getLogger().info("map %s", map.GetMetadata().GetSongName().c_str());
                         createEntry(map);
                     }
                 }
             }
         );
         auto container = BeatSaberUI::CreateScrollView(self->get_transform());
+        ExternalComponents* externalComponents = container->GetComponent<ExternalComponents*>();
+        RectTransform* scrollTransform = externalComponents->Get<RectTransform*>();
+        scrollTransform->set_anchoredPosition(UnityEngine::Vector2(0.0f, -4.0f));
+        scrollTransform->set_sizeDelta(UnityEngine::Vector2(-54.0f, -8.0f));
         parent = container->get_transform();
     }
 }
