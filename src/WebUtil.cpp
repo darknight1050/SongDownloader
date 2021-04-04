@@ -6,7 +6,8 @@
 #include "easy.h"
 
 #define TIMEOUT 10
-
+#define USER_AGENT (std::string("QuestSongDownloader/") + VERSION + " (+https://github.com/darknight1050/SongDownloader)").c_str()
+    
 std::size_t CurlWrite_CallbackFunc_StdString(void *contents, std::size_t size, std::size_t nmemb, std::string *s)
 {
     std::size_t newLength = size * nmemb;
@@ -53,7 +54,6 @@ long WebUtil::Get(std::string_view url, std::string& val) {
     long httpCode(0);
 
     curl_easy_setopt(curl, CURLOPT_WRITEDATA, reinterpret_cast<void*>(&val));
-    static const char* USER_AGENT = (std::string("QuestSongDownloader/") + VERSION + " (+https://github.com/darknight1050/SongDownloader)").c_str();
     curl_easy_setopt(curl, CURLOPT_USERAGENT, USER_AGENT);
     curl_easy_setopt(curl, CURLOPT_SSL_VERIFYPEER, false);
 
@@ -93,7 +93,6 @@ long WebUtil::GetToFile(std::string_view url, const std::string& file) {
     long httpCode(0);
 
     curl_easy_setopt(curl, CURLOPT_WRITEDATA, reinterpret_cast<void*>(fileStream));
-    static const char* USER_AGENT = (std::string("QuestSongDownloader/") + VERSION + " (+https://github.com/darknight1050/SongDownloader)").c_str();
     curl_easy_setopt(curl, CURLOPT_USERAGENT, USER_AGENT);
     curl_easy_setopt(curl, CURLOPT_SSL_VERIFYPEER, false);
 
