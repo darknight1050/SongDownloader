@@ -8,7 +8,9 @@ namespace WebUtil {
     std::optional<rapidjson::Document> GetJSON(std::string_view url);
 
     long Get(std::string_view url, std::string& val);
-    
-    long GetToFile(std::string_view url, const std::string& file);
+
+    void GetAsync(std::string url, std::function<void(long, std::string)> finished, std::function<void(float)> progressUpdate = nullptr);
+
+    void GetJSONAsync(std::string url, std::function<void(long, bool, rapidjson::Document&)> finished);
 
 }

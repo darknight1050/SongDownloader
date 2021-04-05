@@ -24,7 +24,6 @@ std::size_t CurlWrite_CallbackFunc_StdString(void *contents, std::size_t size, s
 std::optional<rapidjson::Document> WebUtil::GetJSON(std::string_view url) {
     std::string data;
     Get(url, data);
-    getLogger().info("JSON: %s", data.c_str());
     rapidjson::Document document;
     document.Parse(data);
     if(document.HasParseError() || !document.IsObject())
@@ -70,41 +69,76 @@ long WebUtil::Get(std::string_view url, std::string& val) {
     return httpCode;
 }
 
-long WebUtil::GetToFile(std::string_view url, const std::string& file) {
-    auto fileStream = fopen(file.c_str(), "w");
-    // Init curl
-    auto* curl = curl_easy_init();
-    struct curl_slist *headers = NULL;
-    headers = curl_slist_append(headers, "Accept: */*");
-    // Set headers
-    curl_easy_setopt(curl, CURLOPT_HTTPHEADER, headers); 
+struct ProgressUpdateWrapper {
+    std::function<void(float)> progressUpdate;
+};
 
-    curl_easy_setopt(curl, CURLOPT_URL, url.data());
+void WebUtil::GetAsync(std::string url, std::function<void(long, std::string)> finished, std::function<void(float)> progressUpdate) {
+    std::thread t (
+        [url, progressUpdate, finished] {
+            std::string val;
+            // Init curl
+            auto* curl = curl_easy_init();
+            struct curl_slist *headers = NULL;
+            headers = curl_slist_append(headers, "Accept: */*");
+            // Set headers
+            curl_easy_setopt(curl, CURLOPT_HTTPHEADER, headers); 
 
-    // Don't wait forever, time out after TIMEOUT seconds.
-    curl_easy_setopt(curl, CURLOPT_TIMEOUT, TIMEOUT);
+            curl_easy_setopt(curl, CURLOPT_URL, url.data());
 
-    // Follow HTTP redirects if necessary.
-    curl_easy_setopt(curl, CURLOPT_FOLLOWLOCATION, 1L);
+            // Don't wait forever, time out after TIMEOUT seconds.
+            curl_easy_setopt(curl, CURLOPT_TIMEOUT, TIMEOUT);
 
-    curl_easy_setopt(curl, CURLOPT_CUSTOMREQUEST, "GET");
-    curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, fwrite);
+            // Follow HTTP redirects if necessary.
+            curl_easy_setopt(curl, CURLOPT_FOLLOWLOCATION, 1L);
 
-    long httpCode(0);
+            curl_easy_setopt(curl, CURLOPT_CUSTOMREQUEST, "GET");
+            curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, CurlWrite_CallbackFunc_StdString);
 
-    curl_easy_setopt(curl, CURLOPT_WRITEDATA, reinterpret_cast<void*>(fileStream));
-    curl_easy_setopt(curl, CURLOPT_USERAGENT, USER_AGENT);
-    curl_easy_setopt(curl, CURLOPT_SSL_VERIFYPEER, false);
+            ProgressUpdateWrapper* wrapper = new ProgressUpdateWrapper { progressUpdate };
+            if(progressUpdate) {
+                // Internal CURL progressmeter must be disabled if we provide our own callback
+                curl_easy_setopt(curl, CURLOPT_NOPROGRESS, false);
+                curl_easy_setopt(curl, CURLOPT_XFERINFODATA, wrapper);
+                // Install the callback function
+                curl_easy_setopt(curl, CURLOPT_XFERINFOFUNCTION, 
+                    +[] (void* clientp, curl_off_t dltotal, curl_off_t dlnow, curl_off_t ultotal, curl_off_t ulnow) {
+                        float percentage = (float)dlnow / (float)dltotal * 100.0f;
+                        if(isnan(percentage))
+                            percentage = 0.0f;
+                        reinterpret_cast<ProgressUpdateWrapper*>(clientp)->progressUpdate(percentage);
+                        return 0;
+                    }
+                );
+            }
 
-    curl_easy_setopt(curl, CURLOPT_VERBOSE, 1L);
- 
-    auto res = curl_easy_perform(curl);
-    /* Check for errors */ 
-    if (res != CURLE_OK) {
-        getLogger().critical("curl_easy_perform() failed: %u: %s", res, curl_easy_strerror(res));
-    }
-    curl_easy_getinfo(curl, CURLINFO_RESPONSE_CODE, &httpCode);
-    curl_easy_cleanup(curl);
-    fclose(fileStream);
-    return httpCode;
+            long httpCode(0);
+            curl_easy_setopt(curl, CURLOPT_WRITEDATA, &val);
+            curl_easy_setopt(curl, CURLOPT_USERAGENT, USER_AGENT);
+            curl_easy_setopt(curl, CURLOPT_SSL_VERIFYPEER, false);
+
+            curl_easy_setopt(curl, CURLOPT_VERBOSE, 1L);
+        
+            auto res = curl_easy_perform(curl);
+            /* Check for errors */ 
+            if (res != CURLE_OK) {
+                getLogger().critical("curl_easy_perform() failed: %u: %s", res, curl_easy_strerror(res));
+            }
+            curl_easy_getinfo(curl, CURLINFO_RESPONSE_CODE, &httpCode);
+            curl_easy_cleanup(curl);
+            delete wrapper;
+            finished(httpCode, val);
+        }
+    );
+    t.detach();
+}
+
+void WebUtil::GetJSONAsync(std::string url, std::function<void(long, bool, rapidjson::Document&)> finished) {
+    GetAsync(url,
+        [finished] (long httpCode, std::string data) { 
+            rapidjson::Document document;
+            document.Parse(data);
+            finished(httpCode, document.HasParseError() || !document.IsObject(), document);
+        }
+    );
 }

@@ -30,7 +30,7 @@ namespace BeatSaver::API {
         return beatmap;
     }
 
-    std::optional<BeatSaver::Page> SearchPage(std::string query, int pageIndex) {
+    std::optional<BeatSaver::Page> SearchPaged(std::string query, int pageIndex) {
         auto json = WebUtil::GetJSON(BASE_URL + "/api/search/text/" + std::to_string(pageIndex) + "?q=" + query);
         if(!json.has_value())
             return std::nullopt;
@@ -40,15 +40,69 @@ namespace BeatSaver::API {
     }
 
     void DownloadBeatmap(const BeatSaver::Beatmap& beatmap) {
-        auto tmpFile = RuntimeSongLoader::API::GetCustomLevelsPath() + beatmap.GetKey() + " (" + beatmap.GetMetadata().GetSongName() + " - " + beatmap.GetMetadata().GetLevelAuthorName() + ")" + ".zip";
         auto targetFolder = RuntimeSongLoader::API::GetCustomLevelsPath() + beatmap.GetKey() + " (" + beatmap.GetMetadata().GetSongName() + " - " + beatmap.GetMetadata().GetLevelAuthorName() + ")";
-        WebUtil::GetToFile(BASE_URL + beatmap.GetDownloadURL(), tmpFile);
+        std::string data;
+        WebUtil::Get(BASE_URL + beatmap.GetDownloadURL(), data);
         int args = 2;
-        zip_extract(tmpFile.c_str(), targetFolder.c_str(), +[](const char *name, void *arg) -> int {
+        zip_stream_extract(data.data(), data.length(), targetFolder.c_str(), +[](const char *name, void *arg) -> int {
             return 0;
         }, &args);
-        deletefile(tmpFile);
-        RuntimeSongLoader::API::RefreshSongs(false);
+    }
+    
+
+    void GetBeatmapByKeyAsync(std::string key, std::function<void(std::optional<BeatSaver::Beatmap>)> finished) {
+        WebUtil::GetJSONAsync(BASE_URL + "/api/maps/detail/" + key,
+            [finished] (long httpCode, bool error, rapidjson::Document& document) {
+                if(error) {
+                    finished(std::nullopt);
+                } else {
+                    BeatSaver::Beatmap beatmap;
+                    beatmap.Deserialize(document.GetObject());
+                    finished(beatmap);
+                }
+            }
+        );
+    }
+
+    void GetBeatmapByHashAsync(std::string hash, std::function<void(std::optional<BeatSaver::Beatmap>)> finished) {
+        WebUtil::GetJSONAsync(BASE_URL + "/api/maps/by-hash/" + hash,
+            [finished] (long httpCode, bool error, rapidjson::Document& document) {
+                if(error) {
+                    finished(std::nullopt);
+                } else {
+                    BeatSaver::Beatmap beatmap;
+                    beatmap.Deserialize(document.GetObject());
+                    finished(beatmap);
+                }
+            }
+        );
+    }
+
+    void SearchPagedAsync(std::string query, int pageIndex, std::function<void(std::optional<BeatSaver::Page>)> finished) {
+        WebUtil::GetJSONAsync(BASE_URL + "/api/search/text/" + std::to_string(pageIndex) + "?q=" + query,
+            [finished] (long httpCode, bool error, rapidjson::Document& document) {
+                if(error) {
+                    finished(std::nullopt);
+                } else {
+                    BeatSaver::Page page;
+                    page.Deserialize(document.GetObject());
+                    finished(page);
+                }
+            }
+        );
+    }
+
+    void DownloadBeatmapAsync(const BeatSaver::Beatmap& beatmap, std::function<void(bool)> finished, std::function<void(float)> progressUpdate) {
+        WebUtil::GetAsync(BASE_URL + beatmap.GetDownloadURL(),
+            [beatmap, finished] (long httpCode, std::string data) {
+                auto targetFolder = RuntimeSongLoader::API::GetCustomLevelsPath() + beatmap.GetKey() + " (" + beatmap.GetMetadata().GetSongName() + " - " + beatmap.GetMetadata().GetLevelAuthorName() + ")";
+                int args = 2;
+                int statusCode = zip_stream_extract(data.data(), data.length(), targetFolder.c_str(), +[](const char *name, void *arg) -> int {
+                    return 0;
+                }, &args);
+                finished(statusCode);
+            }, progressUpdate
+        );
     }
 
 }
