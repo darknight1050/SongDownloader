@@ -32,6 +32,10 @@ std::optional<rapidjson::Document> WebUtil::GetJSON(std::string_view url) {
 }
 
 long WebUtil::Get(std::string_view url, std::string& val) {
+    return Get(url, TIMEOUT, val);
+}
+
+long WebUtil::Get(std::string_view url, long timeout, std::string& val) {
     // Init curl
     auto* curl = curl_easy_init();
     struct curl_slist *headers = NULL;
@@ -42,7 +46,7 @@ long WebUtil::Get(std::string_view url, std::string& val) {
     curl_easy_setopt(curl, CURLOPT_URL, url.data());
 
     // Don't wait forever, time out after TIMEOUT seconds.
-    curl_easy_setopt(curl, CURLOPT_TIMEOUT, TIMEOUT);
+    curl_easy_setopt(curl, CURLOPT_TIMEOUT, timeout);
 
     // Follow HTTP redirects if necessary.
     curl_easy_setopt(curl, CURLOPT_FOLLOWLOCATION, 1L);
@@ -74,8 +78,12 @@ struct ProgressUpdateWrapper {
 };
 
 void WebUtil::GetAsync(std::string url, std::function<void(long, std::string)> finished, std::function<void(float)> progressUpdate) {
+    GetAsync(url, TIMEOUT, finished, progressUpdate);
+}
+
+void WebUtil::GetAsync(std::string url, long timeout, std::function<void(long, std::string)> finished, std::function<void(float)> progressUpdate) {
     std::thread t (
-        [url, progressUpdate, finished] {
+        [url, timeout, progressUpdate, finished] {
             std::string val;
             // Init curl
             auto* curl = curl_easy_init();
@@ -87,7 +95,7 @@ void WebUtil::GetAsync(std::string url, std::function<void(long, std::string)> f
             curl_easy_setopt(curl, CURLOPT_URL, url.data());
 
             // Don't wait forever, time out after TIMEOUT seconds.
-            curl_easy_setopt(curl, CURLOPT_TIMEOUT, TIMEOUT);
+            curl_easy_setopt(curl, CURLOPT_TIMEOUT, timeout);
 
             // Follow HTTP redirects if necessary.
             curl_easy_setopt(curl, CURLOPT_FOLLOWLOCATION, 1L);

@@ -16,8 +16,6 @@
 LOCAL_PATH := $(call my-dir)
 TARGET_ARCH_ABI := $(APP_ABI)
 
-include $(CLEAR_VARS)
-LOCAL_MODULE := hook
 rwildcard=$(wildcard $1$2) $(foreach d,$(wildcard $1*),$(call rwildcard,$d/,$2))
 
 # Creating prebuilt for dependency: codegen - version: 0.7.0
@@ -61,8 +59,8 @@ include $(PREBUILT_SHARED_LIBRARY)
 # curl
 include $(CLEAR_VARS)
 LOCAL_MODULE := curl
-LOCAL_EXPORT_C_INCLUDES := include/curl-android-ios/curl/include/curl
-LOCAL_SRC_FILES := include/curl-android-ios/prebuilt-with-ssl/android/arm64-v8a/libcurl.a
+LOCAL_EXPORT_C_INCLUDES := include/curl/curl/include/curl
+LOCAL_SRC_FILES := include/curl/prebuilt/libcurl.a
 include $(PREBUILT_STATIC_LIBRARY)
 
 # zip
@@ -83,7 +81,7 @@ LOCAL_SHARED_LIBRARIES += beatsaber-hook_1_2_4
 LOCAL_SHARED_LIBRARIES += codegen_0_7_0
 LOCAL_SHARED_LIBRARIES += custom-types
 LOCAL_SHARED_LIBRARIES += questui
-LOCAL_STATIC_LIBRARIES += songloader
+LOCAL_SHARED_LIBRARIES += songloader
 LOCAL_STATIC_LIBRARIES += curl
 LOCAL_STATIC_LIBRARIES += zip
 LOCAL_LDLIBS += -llog -lz

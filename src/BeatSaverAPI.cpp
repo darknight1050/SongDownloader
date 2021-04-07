@@ -10,6 +10,8 @@
 
 #define BASE_URL std::string("https://beatsaver.com")
 
+#define FILE_DOWNLOAD_TIMEOUT 64
+
 namespace BeatSaver::API {
 
     std::optional<BeatSaver::Beatmap> GetBeatmapByKey(std::string key) {
@@ -93,7 +95,7 @@ namespace BeatSaver::API {
     }
 
     void DownloadBeatmapAsync(const BeatSaver::Beatmap& beatmap, std::function<void(bool)> finished, std::function<void(float)> progressUpdate) {
-        WebUtil::GetAsync(BASE_URL + beatmap.GetDownloadURL(),
+        WebUtil::GetAsync(BASE_URL + beatmap.GetDownloadURL(), FILE_DOWNLOAD_TIMEOUT,
             [beatmap, finished] (long httpCode, std::string data) {
                 auto targetFolder = RuntimeSongLoader::API::GetCustomLevelsPath() + beatmap.GetKey() + " (" + beatmap.GetMetadata().GetSongName() + " - " + beatmap.GetMetadata().GetLevelAuthorName() + ")";
                 int args = 2;

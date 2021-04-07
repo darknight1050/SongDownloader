@@ -109,7 +109,9 @@
 			"cuchar": "cpp",
 			"numbers": "cpp",
 			"shared_mutex": "cpp",
-			"__memory": "cpp"
+			"__memory": "cpp",
+			"hash_map": "cpp",
+			"hash_set": "cpp"
 		}
 	}
 }

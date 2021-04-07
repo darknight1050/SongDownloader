@@ -2,8 +2,6 @@
 
 #include "CustomLogger.hpp"
 
-#include "Types/BeatSaver/Beatmap.hpp"
-
 #include "BeatSaverAPI.hpp"
 
 #include "songloader/shared/API.hpp"
@@ -26,6 +24,7 @@
 #include "questui/shared/CustomTypes/Components/ExternalComponents.hpp"
 #include "questui/shared/CustomTypes/Components/Backgroundable.hpp"
 
+#include <iomanip>
 #include <sstream>
 #include <string>
 #include <vector>
@@ -37,57 +36,109 @@ using namespace UnityEngine::Events;
 using namespace HMUI;
 using namespace TMPro;
 
-DEFINE_CLASS(SongDownloader::DownloadSongsViewController);
+using namespace SongDownloader;
 
-Transform* parent;
+SearchEntry::SearchEntry(GameObject* _gameObject, TextMeshProUGUI* _line1Component, TextMeshProUGUI* _line2Component, Button* _downloadButton) : gameObject(_gameObject), line1Component(_line1Component), line2Component(_line2Component), downloadButton(_downloadButton) {
 
-static bool refresh = false;
-
-void createEntry(BeatSaver::Beatmap map) {
-    auto entryLayout = BeatSaberUI::CreateHorizontalLayoutGroup(parent);
-    auto entryParent = entryLayout->get_transform();
-    entryLayout->set_padding(UnityEngine::RectOffset::New_ctor(2, 2, 2, 2));
-    entryLayout->get_gameObject()->AddComponent<Backgroundable*>()->ApplyBackground(il2cpp_utils::createcsstr("round-rect-panel"));
-    
-    auto textLayout = BeatSaberUI::CreateVerticalLayoutGroup(entryParent);
-    textLayout->GetComponent<LayoutElement*>()->set_preferredWidth(64.0f);
-    auto textLayoutParent = textLayout->get_transform();
-    auto songName = BeatSaberUI::CreateText(textLayoutParent, map.GetMetadata().GetSongName());
-    auto levelAuthorName = BeatSaberUI::CreateText(textLayoutParent, "<color=#CCCCCCFF>Uploaded by " + map.GetMetadata().GetLevelAuthorName() + "</color>");
-    levelAuthorName->set_fontSize(3.0f);
-    auto button = BeatSaberUI::CreateUIButton(entryParent, "Download", UnityEngine::Vector2(0.0f, 0.0f), UnityEngine::Vector2(24.0f, 10.0f),
-        [map] { 
-            BeatSaver::API::DownloadBeatmapAsync(map, 
-                [] (bool error) {
-                    LOG_INFO("Download Finished: %d", error);
-                    refresh = !error;
-                }, 
-                [] (float percentage) {
-                    LOG_INFO("Downloading: %f", percentage);
-                }
-            );
-        }
-    );
 }
 
-void SongDownloader::DownloadSongsViewController::DidActivate(bool firstActivation, bool addedToHierarchy, bool screenSystemEnabling) {
+const BeatSaver::Beatmap& SearchEntry::GetBeatmap() {
+    return map;
+}
+
+void SearchEntry::SetBeatmap(const BeatSaver::Beatmap& _map) {
+    map = _map;
+    gameObject->SetActive(true);
+    line1Component->SetText(il2cpp_utils::createcsstr(map.GetMetadata().GetSongName()));
+    line2Component->SetText(il2cpp_utils::createcsstr(map.GetMetadata().GetSongAuthorName() + " <color=#CCCCCCFF>[" + map.GetMetadata().GetLevelAuthorName() + "]</color>"));
+    downloadProgress = -1.0f;
+    auto hash = _map.GetHash();
+    std::transform(hash.begin(), hash.end(), hash.begin(), toupper);
+    for(auto song : LoadedSongs) {
+        if(to_utf8(csstrtostr(song->levelID)).ends_with(hash)) {
+            downloadProgress = 100.0f;
+            break;
+        }
+    }
+}
+
+void SearchEntry::UpdateDownloadProgress() {
+    if(downloadProgress == -1.0f) {
+        BeatSaberUI::SetButtonText(downloadButton, "Download");
+        downloadButton->set_interactable(true);
+    } else if(downloadProgress >= 100.0f) {
+        BeatSaberUI::SetButtonText(downloadButton, "Owned");
+        downloadButton->set_interactable(false);
+    } else {
+        BeatSaberUI::SetButtonText(downloadButton, string_format("%.0f%%", downloadProgress));
+        downloadButton->set_interactable(false);
+    }
+}
+
+void SearchEntry::Disable() {
+    gameObject->SetActive(false);
+}
+
+DEFINE_CLASS(DownloadSongsViewController);
+
+void DownloadSongsViewController::CreateEntries(Transform* parent) {
+    auto prefabEntryLayout = BeatSaberUI::CreateHorizontalLayoutGroup(parent);
+    auto prefabEntryParent = prefabEntryLayout->get_transform();
+    prefabEntryLayout->set_padding(UnityEngine::RectOffset::New_ctor(2, 2, 2, 2));
+    prefabEntryLayout->get_gameObject()->AddComponent<Backgroundable*>()->ApplyBackground(il2cpp_utils::createcsstr("round-rect-panel"));
+    
+    auto prefabTextLayout = BeatSaberUI::CreateVerticalLayoutGroup(prefabEntryParent);
+    prefabTextLayout->GetComponent<LayoutElement*>()->set_preferredWidth(64.0f);
+    auto prefabTextLayoutParent = prefabTextLayout->get_transform();
+    BeatSaberUI::CreateText(prefabTextLayoutParent, "");
+    auto prefabLine2Component = BeatSaberUI::CreateText(prefabTextLayoutParent, "");
+    prefabLine2Component->set_fontSize(3.0f);
+    BeatSaberUI::CreateUIButton(prefabEntryParent, "Download", UnityEngine::Vector2(0.0f, 0.0f), UnityEngine::Vector2(24.0f, 10.0f), nullptr);
+
+    auto prefabGameObject = prefabEntryLayout->get_gameObject();
+    prefabGameObject->SetActive(false);
+    
+    for(int i = 0; i < ENTRIES_PER_PAGE; i++) {
+        auto copy = Object::Instantiate(prefabGameObject, parent);
+        auto textLayout = copy->GetComponentInChildren<VerticalLayoutGroup*>();
+        auto textComponents = textLayout->get_gameObject()->GetComponentsInChildren<TextMeshProUGUI*>();
+        auto downloadButton = copy->GetComponentInChildren<Button*>();
+        searchEntries[i] = SearchEntry(copy, textComponents->values[0], textComponents->values[1], downloadButton);
+        auto entry = &searchEntries[i];
+        downloadButton->get_onClick()->AddListener(il2cpp_utils::MakeDelegate<UnityAction*>(classof(UnityAction*), 
+            (std::function<void()>) [this, entry] {
+                BeatSaver::API::DownloadBeatmapAsync(entry->GetBeatmap(), 
+                    [this] (bool error) {
+                        songsRefresh = !error;
+                    },
+                    [entry] (float percentage) {
+                        entry->downloadProgress = percentage;
+                    }
+                );
+            }
+        ));
+    }
+    Object::Destroy(prefabGameObject);
+    
+}
+
+void DownloadSongsViewController::DidActivate(bool firstActivation, bool addedToHierarchy, bool screenSystemEnabling) {
     if(firstActivation) {
         get_gameObject()->AddComponent<Touchable*>();
 
         auto searchSetting = BeatSaberUI::CreateStringSetting(get_transform(), "Search", "", 
-            [] (std::string value) { 
-                if(value.empty())
+            [this] (std::string value) { 
+                if(value.empty()) {
+                    currentPage = std::nullopt;
+                    pageChanged = true;
                     return;
-                getLogger().info(value);
-                while(parent->get_childCount() > 0) {
-                    Object::DestroyImmediate(parent->GetChild(0)->get_gameObject());
                 }
-                auto search = BeatSaver::API::SearchPaged(value);
-                if(search.has_value()) {
-                    for(auto map : search.value().GetDocs()) {
-                        createEntry(map);
+                BeatSaver::API::SearchPagedAsync(value, 0,
+                    [this] (std::optional<BeatSaver::Page> page) {
+                        currentPage = page;
+                        pageChanged = true;
                     }
-                }
+                );
             }
         );
         auto container = BeatSaberUI::CreateScrollView(get_transform());
@@ -95,15 +146,36 @@ void SongDownloader::DownloadSongsViewController::DidActivate(bool firstActivati
         RectTransform* scrollTransform = externalComponents->Get<RectTransform*>();
         scrollTransform->set_anchoredPosition(UnityEngine::Vector2(0.0f, -4.0f));
         scrollTransform->set_sizeDelta(UnityEngine::Vector2(-54.0f, -8.0f));
-        parent = container->get_transform();
+        CreateEntries(container->get_transform());
     }
 }
 
-void SongDownloader::DownloadSongsViewController::Update() {
-    if(refresh)
-    {
+void DownloadSongsViewController::Update() {
+    for(int i = 0; i < ENTRIES_PER_PAGE; i++) {
+        searchEntries[i].UpdateDownloadProgress();
+    }
+    if(pageChanged) {
+        pageChanged = false;
+        if(currentPage.has_value()) {
+            auto maps = currentPage.value().GetDocs();
+            auto mapsSize = maps.size();
+            for(int i = 0; i < ENTRIES_PER_PAGE; i++) {
+                auto& searchEntry = searchEntries[i];
+                if(i < mapsSize) {
+                    searchEntry.SetBeatmap(maps.at(i));
+                } else {
+                    searchEntry.Disable();
+                }
+            }
+        } else {
+            for(int i = 0; i < ENTRIES_PER_PAGE; i++) {
+                searchEntries[i].Disable();
+            }
+        }
+    }
+    if(songsRefresh) {
         LOG_INFO("RefreshSongs");
-        refresh = false;
+        songsRefresh = false;
         RuntimeSongLoader::API::RefreshSongs(false);
     }
 }

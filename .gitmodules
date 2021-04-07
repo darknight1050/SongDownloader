@@ -1,6 +1,6 @@
 [submodule "include/zip"]
 	path = include/zip
 	url = https://github.com/kuba--/zip.git
-[submodule "include/curl-android-ios"]
-	path = include/curl-android-ios
-	url = https://github.com/gcesarmza/curl-android-ios
+[submodule "include/curl"]
+	path = include/curl
+	url = https://github.com/darknight1050/openssl-curl-android
