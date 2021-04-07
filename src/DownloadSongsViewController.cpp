@@ -63,11 +63,11 @@ void SearchEntry::SetBeatmap(const BeatSaver::Beatmap& _map) {
 }
 
 void SearchEntry::UpdateDownloadProgress() {
-    if(downloadProgress == -1.0f) {
+    if(downloadProgress <= -1.0f) {
         BeatSaberUI::SetButtonText(downloadButton, "Download");
         downloadButton->set_interactable(true);
     } else if(downloadProgress >= 100.0f) {
-        BeatSaberUI::SetButtonText(downloadButton, "Owned");
+        BeatSaberUI::SetButtonText(downloadButton, "Loaded");
         downloadButton->set_interactable(false);
     } else {
         BeatSaberUI::SetButtonText(downloadButton, string_format("%.0f%%", downloadProgress));
