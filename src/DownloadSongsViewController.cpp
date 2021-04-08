@@ -72,7 +72,7 @@ void SearchEntry::Disable() {
     gameObject->SetActive(false);
 }
 
-DEFINE_CLASS(DownloadSongsViewController);
+DEFINE_TYPE(DownloadSongsViewController);
 
 void DownloadSongsViewController::CreateEntries(Transform* parent) {
     auto prefabEntryLayout = BeatSaberUI::CreateHorizontalLayoutGroup(parent);

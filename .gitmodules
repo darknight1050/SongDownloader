@@ -3,4 +3,5 @@
 	url = https://github.com/kuba--/zip.git
 [submodule "include/curl"]
 	path = include/curl
+	branch = quest_prebuilt
 	url = https://github.com/darknight1050/openssl-curl-android
