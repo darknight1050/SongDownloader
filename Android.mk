@@ -85,7 +85,7 @@ LOCAL_SHARED_LIBRARIES += songloader
 LOCAL_STATIC_LIBRARIES += curl
 LOCAL_STATIC_LIBRARIES += zip
 LOCAL_LDLIBS += -llog -lz
-LOCAL_CFLAGS += -I"include" -I"shared" -I"./extern/libil2cpp/il2cpp/libil2cpp" -I"extern" -I"extern/codegen/include" -DVERSION='"0.0.1"'
-LOCAL_C_INCLUDES += ./include ./src 
+LOCAL_CFLAGS += -DVERSION='"0.0.1"'
+LOCAL_C_INCLUDES += ./include ./shared ./src ./extern ./extern/libil2cpp/il2cpp/libil2cpp ./extern/codegen/include
 LOCAL_CPP_FEATURES += exceptions
 include $(BUILD_SHARED_LIBRARY)
