@@ -32,7 +32,6 @@ using namespace TMPro;
 using namespace SongDownloader;
 
 SearchEntry::SearchEntry(GameObject* _gameObject, TextMeshProUGUI* _line1Component, TextMeshProUGUI* _line2Component, Button* _downloadButton) : gameObject(_gameObject), line1Component(_line1Component), line2Component(_line2Component), downloadButton(_downloadButton) {
-
 }
 
 const BeatSaver::Beatmap& SearchEntry::GetBeatmap() {
@@ -102,7 +101,8 @@ void DownloadSongsViewController::CreateEntries(Transform* parent) {
             (std::function<void()>) [this, entry] {
                 BeatSaver::API::DownloadBeatmapAsync(entry->GetBeatmap(), 
                     [this] (bool error) {
-                        songsRefresh = !error;
+                        if(!error)
+                            RuntimeSongLoader::API::RefreshSongsThreadSafe(false);
                     },
                     [entry] (float percentage) {
                         entry->downloadProgress = percentage;
@@ -165,10 +165,5 @@ void DownloadSongsViewController::Update() {
                 searchEntries[i].Disable();
             }
         }
-    }
-    if(songsRefresh) {
-        LOG_INFO("RefreshSongs");
-        songsRefresh = false;
-        RuntimeSongLoader::API::RefreshSongs(false);
     }
 }

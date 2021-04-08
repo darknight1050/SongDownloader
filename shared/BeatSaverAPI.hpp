@@ -10,7 +10,7 @@ namespace BeatSaver::API {
 
     std::optional<BeatSaver::Beatmap> GetBeatmapByHash(std::string hash);
 
-    std::optional<BeatSaver::Page> SearchPaged(std::string query, int pageIndex = 0);
+    std::optional<BeatSaver::Page> SearchPaged(std::string query, int pageIndex);
 
     void DownloadBeatmap(const BeatSaver::Beatmap& beatmap);
     

@@ -45,8 +45,6 @@ namespace SongDownloader {
 
 DECLARE_CLASS_CODEGEN(SongDownloader, DownloadSongsViewController, HMUI::ViewController,
 
-    bool songsRefresh = false;
-    
     std::optional<BeatSaver::Page> currentPage = std::nullopt;
     bool pageChanged = false;
 
