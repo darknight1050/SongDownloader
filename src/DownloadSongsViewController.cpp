@@ -46,7 +46,7 @@ void SearchEntry::SetBeatmap(const BeatSaver::Beatmap& _map) {
     downloadProgress = -1.0f;
     auto hash = _map.GetHash();
     std::transform(hash.begin(), hash.end(), hash.begin(), toupper);
-    for(auto song : LoadedSongs) {
+    for(auto& song : RuntimeSongLoader::API::GetLoadedSongs()) {
         if(to_utf8(csstrtostr(song->levelID)).ends_with(hash)) {
             downloadProgress = 100.0f;
             break;

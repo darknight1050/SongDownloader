@@ -15,8 +15,6 @@
 
 #define ENTRIES_PER_PAGE 25
 
-extern std::vector<GlobalNamespace::CustomPreviewBeatmapLevel*> LoadedSongs;
-
 namespace SongDownloader {
     
     class SearchEntry {
