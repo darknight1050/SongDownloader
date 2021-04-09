@@ -41,14 +41,22 @@ namespace BeatSaver::API {
         return page;
     }
 
-    void DownloadBeatmap(const BeatSaver::Beatmap& beatmap) {
+    bool DownloadBeatmap(const BeatSaver::Beatmap& beatmap) {
         auto targetFolder = RuntimeSongLoader::API::GetCustomLevelsPath() + beatmap.GetKey() + " (" + beatmap.GetMetadata().GetSongName() + " - " + beatmap.GetMetadata().GetLevelAuthorName() + ")";
         std::string data;
-        WebUtil::Get(BASE_URL + beatmap.GetDownloadURL(), data);
+        WebUtil::Get(BASE_URL + beatmap.GetDownloadURL(), FILE_DOWNLOAD_TIMEOUT, data);
         int args = 2;
-        zip_stream_extract(data.data(), data.length(), targetFolder.c_str(), +[](const char *name, void *arg) -> int {
+        int statusCode = zip_stream_extract(data.data(), data.length(), targetFolder.c_str(), +[](const char *name, void *arg) -> int {
             return 0;
         }, &args);
+        return statusCode;
+    }
+
+    std::vector<uint8_t> GetCoverImage(const BeatSaver::Beatmap& beatmap) {
+        std::string data;
+        WebUtil::Get(BASE_URL + beatmap.GetCoverURL(), FILE_DOWNLOAD_TIMEOUT, data);
+        std::vector<uint8_t> bytes(data.begin(), data.end());
+        return bytes;
     }
     
 
@@ -103,6 +111,15 @@ namespace BeatSaver::API {
                     return 0;
                 }, &args);
                 finished(statusCode);
+            }, progressUpdate
+        );
+    }
+
+    void GetCoverImageAsync(const BeatSaver::Beatmap& beatmap, std::function<void(std::vector<uint8_t>)> finished, std::function<void(float)> progressUpdate) {
+        WebUtil::GetAsync(BASE_URL + beatmap.GetCoverURL(), FILE_DOWNLOAD_TIMEOUT,
+            [beatmap, finished] (long httpCode, std::string data) {
+                std::vector<uint8_t> bytes(data.begin(), data.end());
+                finished(bytes);
             }, progressUpdate
         );
     }
