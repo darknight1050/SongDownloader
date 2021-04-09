@@ -26,7 +26,6 @@ namespace SongDownloader {
         UnityEngine::UI::Button* downloadButton;
 
     public:
-        static int searchesIndex;
 
         float downloadProgress = -1.0f;
 
@@ -46,21 +45,16 @@ namespace SongDownloader {
 
 DECLARE_CLASS_CODEGEN(SongDownloader, DownloadSongsViewController, HMUI::ViewController,
 
+
     void CreateEntries(UnityEngine::Transform* parent);
 
-    std::optional<BeatSaver::Page> currentPage = std::nullopt;
-    bool pageChanged = false;
+    static int searchIndex;
 
     SearchEntry searchEntries[ENTRIES_PER_PAGE];
     
     DECLARE_OVERRIDE_METHOD(void, DidActivate, il2cpp_utils::FindMethodUnsafe("HMUI", "ViewController", "DidActivate", 3), bool firstActivation, bool addedToHierarchy, bool screenSystemEnabling);
 
-    DECLARE_METHOD(void, Update);
-
     REGISTER_FUNCTION(DownloadSongsViewController,
         REGISTER_METHOD(DidActivate);
-        
-        REGISTER_METHOD(Update);
-
     )
 )
