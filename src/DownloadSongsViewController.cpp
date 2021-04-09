@@ -111,9 +111,19 @@ void DownloadSongsViewController::CreateEntries(Transform* parent) {
     GameObject* levelBarPrefab = UnityEngine::GameObject::Instantiate(existingLevelBar, parent);
 
     LevelBar* levelBar = levelBarPrefab->GetComponent<LevelBar*>();
+    levelBar->songNameText->set_fontSize(4.0f);
+    levelBar->songNameText->set_overflowMode(TextOverflowModes::Ellipsis);
+        
+    levelBar->authorNameText->set_richText(true);
+    levelBar->authorNameText->set_fontSize(3.0f);
+    levelBar->authorNameText->set_overflowMode(TextOverflowModes::Ellipsis);
+
     static auto bgName = il2cpp_utils::newcsstr<il2cpp_utils::CreationType::Manual>("BG");
     Transform* backgroundTransform = levelBarPrefab->get_transform()->Find(bgName);
     backgroundTransform->set_localScale(Vector3(1.5f, 1.0f, 1.0f));
+
+    static auto songArtworkName = il2cpp_utils::newcsstr<il2cpp_utils::CreationType::Manual>("SongArtwork");
+    levelBar->get_transform()->Find(songArtworkName)->set_localScale(Vector3(0.95f, 0.95f, 0.95f));
 
     Button* prefabDownloadButton = BeatSaberUI::CreateUIButton(levelBarPrefab->get_transform(), "Download", nullptr);
 
@@ -134,17 +144,8 @@ void DownloadSongsViewController::CreateEntries(Transform* parent) {
         auto copy = Object::Instantiate(levelBarPrefab, levelBarLayout->get_transform());
         LevelBar* copyLevelBar = copy->GetComponent<LevelBar*>();
         Button* downloadButton = copy->GetComponentInChildren<Button*>();
-        static auto songArtworkName = il2cpp_utils::newcsstr<il2cpp_utils::CreationType::Manual>("SongArtwork");
         Transform* artworkTransform = copyLevelBar->get_transform()->Find(songArtworkName);
-        artworkTransform->set_localScale(Vector3(0.95f, 0.95f, 0.95f));
         HMUI::ImageView* artwork = artworkTransform->GetComponent<HMUI::ImageView*>();
-
-        copyLevelBar->songNameText->set_fontSize(4.0f);
-        copyLevelBar->songNameText->set_overflowMode(TextOverflowModes::Ellipsis);
-        
-        copyLevelBar->authorNameText->set_richText(true);
-        copyLevelBar->authorNameText->set_fontSize(3.0f);
-        copyLevelBar->authorNameText->set_overflowMode(TextOverflowModes::Ellipsis);
 
         searchEntries[i] = SearchEntry(copy, copyLevelBar->songNameText, copyLevelBar->authorNameText, artwork, downloadButton);
         auto entry = &searchEntries[i];
