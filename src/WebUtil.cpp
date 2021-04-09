@@ -7,7 +7,75 @@
 
 #define TIMEOUT 10
 #define USER_AGENT (std::string("QuestSongDownloader/") + VERSION + " (+https://github.com/darknight1050/SongDownloader)").c_str()
-    
+
+//https://stackoverflow.com/a/55660581
+std::string query_encode(const std::string& s)
+{
+    std::string ret;
+
+    #define IS_BETWEEN(ch, low, high) (ch >= low && ch <= high)
+    #define IS_ALPHA(ch) (IS_BETWEEN(ch, 'A', 'Z') || IS_BETWEEN(ch, 'a', 'z'))
+    #define IS_DIGIT(ch) IS_BETWEEN(ch, '0', '9')
+    #define IS_HEXDIG(ch) (IS_DIGIT(ch) || IS_BETWEEN(ch, 'A', 'F') || IS_BETWEEN(ch, 'a', 'f'))
+
+    for(size_t i = 0; i < s.size();)
+    {
+        char ch = s[i++];
+
+        if (IS_ALPHA(ch) || IS_DIGIT(ch))
+        {
+            ret += ch;
+        }
+        else if ((ch == '%') && IS_HEXDIG(s[i+0]) && IS_HEXDIG(s[i+1]))
+        {
+            ret += s.substr(i-1, 3);
+            i += 2;
+        }
+        else
+        {
+            switch (ch)
+            {
+                case '-':
+                case '.':
+                case '_':
+                case '~':
+                case '!':
+                case '$':
+                case '&':
+                case '\'':
+                case '(':
+                case ')':
+                case '*':
+                case '+':
+                case ',':
+                case ';':
+                case '=':
+                case ':':
+                case '@':
+                case '/':
+                case '?':
+                case '[':
+                case ']':
+                    ret += ch;
+                    break;
+
+                default:
+                {
+                    static const char hex[] = "0123456789ABCDEF";
+                    char pct[] = "%  ";
+                    pct[1] = hex[(ch >> 4) & 0xF];
+                    pct[2] = hex[ch & 0xF];
+                    ret.append(pct, 3);
+                    break;
+                }
+            }
+        }
+    }
+
+    return ret;
+}
+
+
 std::size_t CurlWrite_CallbackFunc_StdString(void *contents, std::size_t size, std::size_t nmemb, std::string *s)
 {
     std::size_t newLength = size * nmemb;
@@ -21,7 +89,7 @@ std::size_t CurlWrite_CallbackFunc_StdString(void *contents, std::size_t size, s
     return newLength;
 }
 
-std::optional<rapidjson::Document> WebUtil::GetJSON(std::string_view url) {
+std::optional<rapidjson::Document> WebUtil::GetJSON(std::string url) {
     std::string data;
     Get(url, data);
     rapidjson::Document document;
@@ -31,11 +99,11 @@ std::optional<rapidjson::Document> WebUtil::GetJSON(std::string_view url) {
     return document;
 }
 
-long WebUtil::Get(std::string_view url, std::string& val) {
+long WebUtil::Get(std::string url, std::string& val) {
     return Get(url, TIMEOUT, val);
 }
 
-long WebUtil::Get(std::string_view url, long timeout, std::string& val) {
+long WebUtil::Get(std::string url, long timeout, std::string& val) {
     // Init curl
     auto* curl = curl_easy_init();
     struct curl_slist *headers = NULL;
@@ -43,7 +111,7 @@ long WebUtil::Get(std::string_view url, long timeout, std::string& val) {
     // Set headers
     curl_easy_setopt(curl, CURLOPT_HTTPHEADER, headers); 
 
-    curl_easy_setopt(curl, CURLOPT_URL, url.data());
+    curl_easy_setopt(curl, CURLOPT_URL, query_encode(url).c_str());
 
     // Don't wait forever, time out after TIMEOUT seconds.
     curl_easy_setopt(curl, CURLOPT_TIMEOUT, timeout);
@@ -92,7 +160,7 @@ void WebUtil::GetAsync(std::string url, long timeout, std::function<void(long, s
             // Set headers
             curl_easy_setopt(curl, CURLOPT_HTTPHEADER, headers); 
 
-            curl_easy_setopt(curl, CURLOPT_URL, url.data());
+            curl_easy_setopt(curl, CURLOPT_URL, query_encode(url).c_str());
 
             // Don't wait forever, time out after TIMEOUT seconds.
             curl_easy_setopt(curl, CURLOPT_TIMEOUT, timeout);
