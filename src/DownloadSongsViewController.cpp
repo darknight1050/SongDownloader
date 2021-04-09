@@ -90,6 +90,7 @@ void SearchEntry::SetBeatmap(const BeatSaver::Beatmap& _map) {
             break;
         }
     }
+    UpdateDownloadProgress();
 }
 
 void SearchEntry::UpdateDownloadProgress() {
