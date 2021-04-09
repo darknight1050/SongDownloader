@@ -62,17 +62,15 @@ void SearchEntry::SetBeatmap(const BeatSaver::Beatmap& _map) {
     line2Component->SetText(il2cpp_utils::createcsstr(map.GetMetadata().GetSongAuthorName() + " <color=#ADADADFF>[" + map.GetMetadata().GetLevelAuthorName() + "]</color>"));
 
     BeatSaver::API::GetCoverImageAsync(_map, [this](std::vector<uint8_t> bytes){
-        LOG_DEBUG("Downloaded cover image. Length: %d", bytes.size());
+        LOG_DEBUG("Downloaded cover image. Length %d bytes", bytes.size());
 
         MainThreadScheduler::Schedule([this, bytes] {
             std::vector<uint8_t> data = bytes;
-
-            LOG_INFO("Setting cover image on main thread.");
+            
             Array<uint8_t>* spriteArray = il2cpp_utils::vectorToArray(data);
             Sprite* sprite = BeatSaberUI::ArrayToSprite(spriteArray);
 
-            this->coverImageView->get_gameObject()->SetActive(true);
-            this->coverImageView->set_sprite(sprite);
+            coverImageView->set_sprite(sprite);
         });
     });
 
@@ -111,12 +109,16 @@ void DownloadSongsViewController::CreateEntries(Transform* parent) {
     GameObject* levelBarPrefab = UnityEngine::GameObject::Instantiate(existingLevelBar, parent);
 
     LevelBar* levelBar = levelBarPrefab->GetComponent<LevelBar*>();
-    levelBar->songNameText->set_fontSize(4.0f);
-    levelBar->songNameText->set_overflowMode(TextOverflowModes::Ellipsis);
-        
-    levelBar->authorNameText->set_richText(true);
-    levelBar->authorNameText->set_fontSize(3.0f);
-    levelBar->authorNameText->set_overflowMode(TextOverflowModes::Ellipsis);
+    auto songNameTextComponent = levelBar->songNameText;
+    songNameTextComponent->set_fontSize(4.0f);
+    songNameTextComponent->set_overflowMode(TextOverflowModes::Ellipsis);
+    songNameTextComponent->set_margin(Vector4(-2.0f, 0.0f, 9.0f, 0.0f));
+
+    auto authorNameTextComponent = levelBar->authorNameText;
+    authorNameTextComponent->set_richText(true);
+    authorNameTextComponent->set_fontSize(3.0f);
+    authorNameTextComponent->set_overflowMode(TextOverflowModes::Ellipsis);
+    authorNameTextComponent->set_margin(Vector4(-2.0f, 0.0f, 9.0f, 0.0f));
 
     static auto bgName = il2cpp_utils::newcsstr<il2cpp_utils::CreationType::Manual>("BG");
     Transform* backgroundTransform = levelBarPrefab->get_transform()->Find(bgName);
