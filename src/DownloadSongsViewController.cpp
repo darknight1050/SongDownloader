@@ -19,6 +19,7 @@
 #include "UnityEngine/Networking/DownloadHandlerTexture.hpp"
 #include "UnityEngine/Networking/UnityWebRequest.hpp"
 #include "UnityEngine/Events/UnityAction.hpp"
+#include "UnityEngine/Resources.hpp"
 #include "HMUI/ScrollView.hpp"
 #include "HMUI/Touchable.hpp"
 
@@ -46,7 +47,7 @@ using namespace GlobalNamespace;
 
 using namespace SongDownloader;
 
-int DownloadSongsViewController::searchIndex = 0;
+int SearchEntry::spriteCount = 0;
 
 SearchEntry::SearchEntry(GameObject* _gameObject, TextMeshProUGUI* _line1Component, TextMeshProUGUI* _line2Component, HMUI::ImageView* _coverImageView, Button* _downloadButton) : gameObject(_gameObject), line1Component(_line1Component), line2Component(_line2Component), coverImageView(_coverImageView), downloadButton(_downloadButton) {
 }
@@ -63,6 +64,8 @@ void SearchEntry::SetBeatmap(const BeatSaver::Beatmap& _map) {
 
     line2Component->SetText(il2cpp_utils::createcsstr(map.GetMetadata().GetSongAuthorName() + " <color=#ADADADFF>[" + map.GetMetadata().GetLevelAuthorName() + "]</color>"));
     int currentSearchIndex = DownloadSongsViewController::searchIndex;
+    
+    coverImageView->set_sprite(nullptr);
     BeatSaver::API::GetCoverImageAsync(map, [this, currentSearchIndex](std::vector<uint8_t> bytes) {
         if(currentSearchIndex == DownloadSongsViewController::searchIndex) {
             MainThreadScheduler::Schedule([this, currentSearchIndex, bytes] {
@@ -71,8 +74,8 @@ void SearchEntry::SetBeatmap(const BeatSaver::Beatmap& _map) {
                     
                     Array<uint8_t>* spriteArray = il2cpp_utils::vectorToArray(data);
                     Sprite* sprite = BeatSaberUI::ArrayToSprite(spriteArray);
-
                     coverImageView->set_sprite(sprite);
+                    SearchEntry::spriteCount++;
                 }
             });
         }
@@ -107,6 +110,8 @@ void SearchEntry::Disable() {
 }
 
 DEFINE_TYPE(DownloadSongsViewController);
+
+int DownloadSongsViewController::searchIndex = 0;
 
 void DownloadSongsViewController::CreateEntries(Transform* parent) {
     HorizontalLayoutGroup* levelBarLayout = BeatSaberUI::CreateHorizontalLayoutGroup(parent);
@@ -210,6 +215,10 @@ void DownloadSongsViewController::DidActivate(bool firstActivation, bool addedTo
                                                     searchEntries[i].Disable();
                                                 }
                                             }
+                                            if(SearchEntry::spriteCount > MAX_SPRITES) {
+                                                SearchEntry::spriteCount = 0;
+                                                Resources::UnloadUnusedAssets();
+                                            }
                                         }
                                     }
                                 );
@@ -225,5 +234,12 @@ void DownloadSongsViewController::DidActivate(bool firstActivation, bool addedTo
         scrollTransform->set_anchoredPosition(UnityEngine::Vector2(0.0f, -4.0f));
         scrollTransform->set_sizeDelta(UnityEngine::Vector2(-54.0f, -8.0f));
         CreateEntries(container->get_transform());
+    }
+}
+
+void DownloadSongsViewController::DidDeactivate(bool removedFromHierarchy, bool screenSystemDisabling) {
+    if(SearchEntry::spriteCount > 0) {
+        SearchEntry::spriteCount = 0;
+        Resources::UnloadUnusedAssets();
     }
 }

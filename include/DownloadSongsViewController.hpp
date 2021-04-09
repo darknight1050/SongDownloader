@@ -14,8 +14,9 @@
 
 #include <vector>
 
-#define ENTRIES_PER_PAGE 25
+#define MAX_SPRITES 150
 
+#define ENTRIES_PER_PAGE 25
 namespace SongDownloader {
     class SearchEntry {
         BeatSaver::Beatmap map;
@@ -26,6 +27,8 @@ namespace SongDownloader {
         UnityEngine::UI::Button* downloadButton;
 
     public:
+
+        static int spriteCount;
 
         float downloadProgress = -1.0f;
 
@@ -53,8 +56,11 @@ DECLARE_CLASS_CODEGEN(SongDownloader, DownloadSongsViewController, HMUI::ViewCon
     SearchEntry searchEntries[ENTRIES_PER_PAGE];
     
     DECLARE_OVERRIDE_METHOD(void, DidActivate, il2cpp_utils::FindMethodUnsafe("HMUI", "ViewController", "DidActivate", 3), bool firstActivation, bool addedToHierarchy, bool screenSystemEnabling);
+    
+    DECLARE_OVERRIDE_METHOD(void, DidDeactivate, il2cpp_utils::FindMethodUnsafe("HMUI", "ViewController", "DidDeactivate", 2), bool removedFromHierarchy, bool screenSystemDisabling);
 
     REGISTER_FUNCTION(DownloadSongsViewController,
         REGISTER_METHOD(DidActivate);
+        REGISTER_METHOD(DidDeactivate);
     )
 )
