@@ -46,6 +46,8 @@ using namespace GlobalNamespace;
 
 using namespace SongDownloader;
 
+int SearchEntry::searchesIndex = 0;
+
 SearchEntry::SearchEntry(GameObject* _gameObject, TextMeshProUGUI* _line1Component, TextMeshProUGUI* _line2Component, HMUI::ImageView* _coverImageView, Button* _downloadButton) : gameObject(_gameObject), line1Component(_line1Component), line2Component(_line2Component), coverImageView(_coverImageView), downloadButton(_downloadButton) {
 }
 
@@ -60,22 +62,23 @@ void SearchEntry::SetBeatmap(const BeatSaver::Beatmap& _map) {
     line1Component->SetText(il2cpp_utils::createcsstr(map.GetMetadata().GetSongName()));
 
     line2Component->SetText(il2cpp_utils::createcsstr(map.GetMetadata().GetSongAuthorName() + " <color=#ADADADFF>[" + map.GetMetadata().GetLevelAuthorName() + "]</color>"));
-
-    BeatSaver::API::GetCoverImageAsync(_map, [this](std::vector<uint8_t> bytes){
+    int currentSearchesIndex = searchesIndex;
+    BeatSaver::API::GetCoverImageAsync(map, [this, currentSearchesIndex](std::vector<uint8_t> bytes) {
         LOG_DEBUG("Downloaded cover image. Length %d bytes", bytes.size());
+        if(currentSearchesIndex == SearchEntry::searchesIndex) {
+            MainThreadScheduler::Schedule([this, bytes] {
+                std::vector<uint8_t> data = bytes;
+                
+                Array<uint8_t>* spriteArray = il2cpp_utils::vectorToArray(data);
+                Sprite* sprite = BeatSaberUI::ArrayToSprite(spriteArray);
 
-        MainThreadScheduler::Schedule([this, bytes] {
-            std::vector<uint8_t> data = bytes;
-            
-            Array<uint8_t>* spriteArray = il2cpp_utils::vectorToArray(data);
-            Sprite* sprite = BeatSaberUI::ArrayToSprite(spriteArray);
-
-            coverImageView->set_sprite(sprite);
-        });
+                coverImageView->set_sprite(sprite);
+            });
+        }
     });
 
     downloadProgress = -1.0f;
-    auto hash = _map.GetHash();
+    auto hash = map.GetHash();
     std::transform(hash.begin(), hash.end(), hash.begin(), toupper);
     for(auto& song : RuntimeSongLoader::API::GetLoadedSongs()) {
         if(to_utf8(csstrtostr(song->levelID)).ends_with(hash)) {
@@ -202,6 +205,7 @@ void DownloadSongsViewController::Update() {
     }
     if(pageChanged) {
         pageChanged = false;
+        SearchEntry::searchesIndex++;
         if(currentPage.has_value()) {
             auto maps = currentPage.value().GetDocs();
             auto mapsSize = maps.size();

@@ -26,6 +26,8 @@ namespace SongDownloader {
         UnityEngine::UI::Button* downloadButton;
 
     public:
+        static int searchesIndex;
+
         float downloadProgress = -1.0f;
 
         SearchEntry(UnityEngine::GameObject* _gameObject, TMPro::TextMeshProUGUI* _line1Component, TMPro::TextMeshProUGUI* _line2Component, HMUI::ImageView* _coverImageView, UnityEngine::UI::Button* _downloadButton);
@@ -43,6 +45,7 @@ namespace SongDownloader {
 }
 
 DECLARE_CLASS_CODEGEN(SongDownloader, DownloadSongsViewController, HMUI::ViewController,
+
     void CreateEntries(UnityEngine::Transform* parent);
 
     std::optional<BeatSaver::Page> currentPage = std::nullopt;
