@@ -16,9 +16,7 @@
 
 #define ENTRIES_PER_PAGE 25
 
-extern std::vector<GlobalNamespace::CustomPreviewBeatmapLevel*> LoadedSongs;
-
-namespace SongDownloader {    
+namespace SongDownloader {
     class SearchEntry {
         BeatSaver::Beatmap map;
         UnityEngine::GameObject* gameObject;

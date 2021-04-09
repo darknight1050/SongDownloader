@@ -29,18 +29,11 @@ extern "C" void setup(ModInfo& info) {
     info = modInfo;
 }
 
-std::vector<GlobalNamespace::CustomPreviewBeatmapLevel*> LoadedSongs;
-
 extern "C" void load() {
     LOG_INFO("Starting SongDownloader installation...");
     il2cpp_functions::Init();
     QuestUI::Init();
     custom_types::Register::RegisterTypes<SongDownloader::DownloadSongsViewController>();
     QuestUI::Register::RegisterModSettingsViewController<SongDownloader::DownloadSongsViewController*>(modInfo);
-    RuntimeSongLoader::API::AddSongsLoadedEvent(
-        [] (const std::vector<GlobalNamespace::CustomPreviewBeatmapLevel*>& loadedSongs) {
-            LoadedSongs = loadedSongs;
-        }
-    );
     LOG_INFO("Successfully installed SongDownloader!");
 }
