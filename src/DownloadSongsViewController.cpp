@@ -108,47 +108,45 @@ void SearchEntry::Disable() {
 DEFINE_TYPE(DownloadSongsViewController);
 
 void DownloadSongsViewController::CreateEntries(Transform* parent) {
-    GameObject* existingLevelBar = Resources::FindObjectsOfTypeAll<LevelBar*>()->values[0]->get_gameObject();
-    GameObject* levelBarPrefab = UnityEngine::GameObject::Instantiate(existingLevelBar, parent);
+    HorizontalLayoutGroup* levelBarLayout = BeatSaberUI::CreateHorizontalLayoutGroup(parent);
+    GameObject* prefab = levelBarLayout->get_gameObject();
+    levelBarLayout->set_childControlWidth(false);
+    levelBarLayout->set_childForceExpandWidth(true);
 
-    LevelBar* levelBar = levelBarPrefab->GetComponent<LevelBar*>();
+    LayoutElement* levelBarLayoutElement = levelBarLayout->GetComponent<LayoutElement*>();
+    levelBarLayoutElement->set_minHeight(15.0f);
+    levelBarLayoutElement->set_minWidth(90.0f);
+
+    GameObject* existingLevelBar = Resources::FindObjectsOfTypeAll<LevelBar*>()->values[0]->get_gameObject();
+    GameObject* levelBarGameObject = UnityEngine::GameObject::Instantiate(existingLevelBar, levelBarLayout->get_transform());
+    auto levelBarTransform = levelBarGameObject->get_transform();
+    LevelBar* levelBar = levelBarGameObject->GetComponent<LevelBar*>();
     auto songNameTextComponent = levelBar->songNameText;
-    songNameTextComponent->set_fontSize(4.0f);
+    songNameTextComponent->set_fontSize(4.2f);
     songNameTextComponent->set_overflowMode(TextOverflowModes::Ellipsis);
     songNameTextComponent->set_margin(Vector4(-2.0f, 0.0f, 9.0f, 0.0f));
 
     auto authorNameTextComponent = levelBar->authorNameText;
     authorNameTextComponent->set_richText(true);
-    authorNameTextComponent->set_fontSize(3.0f);
+    authorNameTextComponent->set_fontSize(3.4f);
     authorNameTextComponent->set_overflowMode(TextOverflowModes::Ellipsis);
     authorNameTextComponent->set_margin(Vector4(-2.0f, 0.0f, 9.0f, 0.0f));
 
     static auto bgName = il2cpp_utils::newcsstr<il2cpp_utils::CreationType::Manual>("BG");
-    Transform* backgroundTransform = levelBarPrefab->get_transform()->Find(bgName);
+    Transform* backgroundTransform = levelBarTransform->Find(bgName);
     backgroundTransform->set_localScale(Vector3(1.5f, 1.0f, 1.0f));
 
     static auto songArtworkName = il2cpp_utils::newcsstr<il2cpp_utils::CreationType::Manual>("SongArtwork");
-    levelBar->get_transform()->Find(songArtworkName)->set_localScale(Vector3(0.95f, 0.95f, 0.95f));
+    levelBar->get_transform()->Find(songArtworkName)->set_localScale(Vector3(0.96f, 0.96f, 0.96f));
 
-    Button* prefabDownloadButton = BeatSaberUI::CreateUIButton(levelBarPrefab->get_transform(), "Download", nullptr);
+    Button* prefabDownloadButton = BeatSaberUI::CreateUIButton(levelBarTransform, "Download", nullptr);
+    prefab->SetActive(false);
 
-    LOG_INFO("Using background: %s", (levelBar->useArtworkBackground ? "true" : "false"));
-    prefabDownloadButton->get_transform()->set_localPosition(Vector3(36.5f, -7.0f, 0.0f));
-    levelBarPrefab->SetActive(false);
-    
     for(int i = 0; i < ENTRIES_PER_PAGE; i++) {
-        // Jank to make it fit
-        HorizontalLayoutGroup* levelBarLayout = BeatSaberUI::CreateHorizontalLayoutGroup(parent);
-        levelBarLayout->set_childControlWidth(false);
-        levelBarLayout->set_childForceExpandWidth(true);
-
-        LayoutElement* levelBarLayoutElement = levelBarLayout->GetComponent<LayoutElement*>();
-        levelBarLayoutElement->set_minHeight(15.0f);
-        levelBarLayoutElement->set_minWidth(90.0f);
-
-        auto copy = Object::Instantiate(levelBarPrefab, levelBarLayout->get_transform());
-        LevelBar* copyLevelBar = copy->GetComponent<LevelBar*>();
+        auto copy = Object::Instantiate(prefab, parent);
+        LevelBar* copyLevelBar = copy->GetComponentInChildren<LevelBar*>();
         Button* downloadButton = copy->GetComponentInChildren<Button*>();
+        downloadButton->get_transform()->set_localPosition(Vector3(36.5f, -7.0f, 0.0f));
         Transform* artworkTransform = copyLevelBar->get_transform()->Find(songArtworkName);
         HMUI::ImageView* artwork = artworkTransform->GetComponent<HMUI::ImageView*>();
 
@@ -168,7 +166,7 @@ void DownloadSongsViewController::CreateEntries(Transform* parent) {
             }
         ));
     }
-    Object::Destroy(levelBarPrefab);
+    Object::Destroy(prefab);
 }
 
 void DownloadSongsViewController::DidActivate(bool firstActivation, bool addedToHierarchy, bool screenSystemEnabling) {
