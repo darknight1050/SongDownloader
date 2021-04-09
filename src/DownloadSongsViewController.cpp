@@ -3,7 +3,6 @@
 #include "CustomLogger.hpp"
 
 #include "BeatSaverAPI.hpp"
-#include "WebUtil.hpp"
 
 #include "songloader/shared/API.hpp"
 
@@ -22,7 +21,6 @@
 #include "UnityEngine/Events/UnityAction.hpp"
 #include "HMUI/ScrollView.hpp"
 #include "HMUI/Touchable.hpp"
-#include "System/Action_1.hpp"
 
 #include "GlobalNamespace/LevelBar.hpp"
 
@@ -60,24 +58,16 @@ void SearchEntry::SetBeatmap(const BeatSaver::Beatmap& _map) {
     gameObject->SetActive(true);
 
     line1Component->SetText(il2cpp_utils::createcsstr(map.GetMetadata().GetSongName()));
-    line1Component->set_fontSize(4.0f);
-    line2Component->set_overflowMode(TextOverflowModes::Ellipsis);
 
-    line2Component->SetText(il2cpp_utils::createcsstr(map.GetMetadata().GetSongAuthorName() + " <color=#CCCCCCFF>[" + map.GetMetadata().GetLevelAuthorName() + "]</color>"));
-    line2Component->set_richText(true);
-    line2Component->set_fontSize(2.5f);
-    line2Component->set_overflowMode(TextOverflowModes::Ellipsis);
+    line2Component->SetText(il2cpp_utils::createcsstr(map.GetMetadata().GetSongAuthorName() + " <color=#ADADADFF>[" + map.GetMetadata().GetLevelAuthorName() + "]</color>"));
 
-    std::string coverURLFull = "https://beatsaver.com" + map.GetCoverURL();
-    LOG_DEBUG("Downloading cover image from " + coverURLFull);
     BeatSaver::API::GetCoverImageAsync(_map, [this](std::vector<uint8_t> bytes){
         LOG_DEBUG("Downloaded cover image. Length: %d", bytes.size());
-        LOG_DEBUG("Scheduling cover image update on main thread");
 
         MainThreadScheduler::Schedule([this, bytes] {
             std::vector<uint8_t> data = bytes;
 
-            LOG_INFO("Setting cover image on main thread . . .");
+            LOG_INFO("Setting cover image on main thread.");
             Array<uint8_t>* spriteArray = il2cpp_utils::vectorToArray(data);
             Sprite* sprite = BeatSaberUI::ArrayToSprite(spriteArray);
 
@@ -117,19 +107,19 @@ void SearchEntry::Disable() {
 DEFINE_TYPE(DownloadSongsViewController);
 
 void DownloadSongsViewController::CreateEntries(Transform* parent) {
-GameObject* existingLevelBar = Resources::FindObjectsOfTypeAll<LevelBar*>()->values[0]->get_gameObject();
-GameObject* levelBarPrefab = UnityEngine::GameObject::Instantiate(existingLevelBar, parent);
+    GameObject* existingLevelBar = Resources::FindObjectsOfTypeAll<LevelBar*>()->values[0]->get_gameObject();
+    GameObject* levelBarPrefab = UnityEngine::GameObject::Instantiate(existingLevelBar, parent);
 
-LevelBar* levelBar = levelBarPrefab->GetComponent<LevelBar*>();
+    LevelBar* levelBar = levelBarPrefab->GetComponent<LevelBar*>();
+    static auto bgName = il2cpp_utils::newcsstr<il2cpp_utils::CreationType::Manual>("BG");
+    Transform* backgroundTransform = levelBarPrefab->get_transform()->Find(bgName);
+    backgroundTransform->set_localScale(Vector3(1.5f, 1.0f, 1.0f));
 
-Transform* backgroundTransform = levelBarPrefab->get_transform()->Find(il2cpp_utils::createcsstr("BG"));
-backgroundTransform->set_localScale(Vector3(1.5f, 1.0f, 1.0f));
+    Button* prefabDownloadButton = BeatSaberUI::CreateUIButton(levelBarPrefab->get_transform(), "Download", nullptr);
 
-Button* prefabDownloadButton = BeatSaberUI::CreateUIButton(levelBarPrefab->get_transform(), "Download", nullptr);
-
-LOG_INFO("Using background: %s", (levelBar->useArtworkBackground ? "true" : "false"));
-prefabDownloadButton->get_transform()->set_localPosition(Vector3(35.0f, -7.5f, 0.0f));
-levelBarPrefab->SetActive(false);
+    LOG_INFO("Using background: %s", (levelBar->useArtworkBackground ? "true" : "false"));
+    prefabDownloadButton->get_transform()->set_localPosition(Vector3(36.5f, -7.0f, 0.0f));
+    levelBarPrefab->SetActive(false);
     
     for(int i = 0; i < ENTRIES_PER_PAGE; i++) {
         // Jank to make it fit
@@ -144,14 +134,22 @@ levelBarPrefab->SetActive(false);
         auto copy = Object::Instantiate(levelBarPrefab, levelBarLayout->get_transform());
         LevelBar* copyLevelBar = copy->GetComponent<LevelBar*>();
         Button* downloadButton = copy->GetComponentInChildren<Button*>();
-        Transform* artworkTransform = copyLevelBar->get_transform()->Find(il2cpp_utils::createcsstr("SongArtwork"));
+        static auto songArtworkName = il2cpp_utils::newcsstr<il2cpp_utils::CreationType::Manual>("SongArtwork");
+        Transform* artworkTransform = copyLevelBar->get_transform()->Find(songArtworkName);
+        artworkTransform->set_localScale(Vector3(0.95f, 0.95f, 0.95f));
         HMUI::ImageView* artwork = artworkTransform->GetComponent<HMUI::ImageView*>();
+
+        copyLevelBar->songNameText->set_fontSize(4.0f);
+        copyLevelBar->songNameText->set_overflowMode(TextOverflowModes::Ellipsis);
+        
+        copyLevelBar->authorNameText->set_richText(true);
+        copyLevelBar->authorNameText->set_fontSize(3.0f);
+        copyLevelBar->authorNameText->set_overflowMode(TextOverflowModes::Ellipsis);
 
         searchEntries[i] = SearchEntry(copy, copyLevelBar->songNameText, copyLevelBar->authorNameText, artwork, downloadButton);
         auto entry = &searchEntries[i];
         downloadButton->get_onClick()->AddListener(il2cpp_utils::MakeDelegate<UnityAction*>(classof(UnityAction*), 
             (std::function<void()>) [this, entry] {
-                LOG_INFO("Download button clicked");
                 BeatSaver::API::DownloadBeatmapAsync(entry->GetBeatmap(), 
                     [this] (bool error) {
                         if(!error)
@@ -196,7 +194,7 @@ void DownloadSongsViewController::DidActivate(bool firstActivation, bool addedTo
 }
 
 void DownloadSongsViewController::Update() {
-    for(int i = 0; i < ENTRIES_PER_PAGE; i++) {        
+    for(int i = 0; i < ENTRIES_PER_PAGE; i++) {
         searchEntries[i].UpdateDownloadProgress();
     }
     if(pageChanged) {

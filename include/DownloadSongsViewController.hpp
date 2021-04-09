@@ -22,8 +22,8 @@ namespace SongDownloader {
         UnityEngine::GameObject* gameObject;
         TMPro::TextMeshProUGUI* line1Component;
         TMPro::TextMeshProUGUI* line2Component;
-        UnityEngine::UI::Button* downloadButton;
         HMUI::ImageView* coverImageView;
+        UnityEngine::UI::Button* downloadButton;
 
     public:
         float downloadProgress = -1.0f;
