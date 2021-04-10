@@ -36,3 +36,6 @@ if(jsonValue[#jsonName].Is##type()) { \
 } else { \
     name = std::nullopt; \
 }
+
+#define DESERIALIZE_CLASS(name, jsonName) \
+name.Deserialize(jsonValue[#jsonName]);

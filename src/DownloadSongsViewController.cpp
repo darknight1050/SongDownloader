@@ -60,9 +60,9 @@ void SearchEntry::SetBeatmap(const BeatSaver::Beatmap& _map) {
     map = _map;
     gameObject->SetActive(true);
 
-    line1Component->SetText(il2cpp_utils::createcsstr(map.GetMetadata().GetSongName()));
+    line1Component->SetText(il2cpp_utils::newcsstr(map.GetMetadata().GetSongName()));
 
-    line2Component->SetText(il2cpp_utils::createcsstr(map.GetMetadata().GetSongAuthorName() + " <color=#ADADADFF>[" + map.GetMetadata().GetLevelAuthorName() + "]</color>"));
+    line2Component->SetText(il2cpp_utils::newcsstr(map.GetMetadata().GetSongAuthorName() + " <color=#ADADADFF>[" + map.GetMetadata().GetLevelAuthorName() + "]</color>"));
     int currentSearchIndex = DownloadSongsViewController::searchIndex;
     
     coverImageView->set_sprite(nullptr);
@@ -146,7 +146,7 @@ void DownloadSongsViewController::CreateEntries(Transform* parent) {
     static auto songArtworkName = il2cpp_utils::newcsstr<il2cpp_utils::CreationType::Manual>("SongArtwork");
     levelBar->get_transform()->Find(songArtworkName)->set_localScale(Vector3(0.96f, 0.96f, 0.96f));
 
-    Button* prefabDownloadButton = BeatSaberUI::CreateUIButton(levelBarTransform, "Download", nullptr);
+    Button* prefabDownloadButton = BeatSaberUI::CreateUIButton(levelBarTransform, "Download");
     prefab->SetActive(false);
 
     for(int i = 0; i < ENTRIES_PER_PAGE; i++) {
@@ -185,7 +185,7 @@ void DownloadSongsViewController::DidActivate(bool firstActivation, bool addedTo
     if(firstActivation) {
         get_gameObject()->AddComponent<Touchable*>();
 
-        auto searchSetting = BeatSaberUI::CreateStringSetting(get_transform(), "Search", "", 
+        auto searchSetting = BeatSaberUI::CreateStringSetting(get_transform(), "Search", "", UnityEngine::Vector2(0.0f, 0.0f), UnityEngine::Vector3(0.0f, -38.0f, 0.0f),
             [this] (std::string value) {
                 DownloadSongsViewController::searchIndex++;
                 int currentSearchIndex = DownloadSongsViewController::searchIndex;

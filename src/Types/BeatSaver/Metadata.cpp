@@ -8,7 +8,7 @@ DESERIALIZE_METHOD(BeatSaver, Metadata,
     DESERIALIZE_VALUE(Duration, duration, Int)
     DESERIALIZE_VALUE(BPM, bpm, Float)
     DESERIALIZE_VALUE_OPTIONAL(Automapper, automapper, String)
-    Difficulties.Deserialize(jsonValue["difficulties"]);
+    DESERIALIZE_CLASS(Difficulties, difficulties)
 
     auto& characteristics = jsonValue["characteristics"];
     if(characteristics.IsArray()) {
