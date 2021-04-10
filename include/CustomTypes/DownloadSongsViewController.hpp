@@ -17,6 +17,7 @@
 #define MAX_SPRITES 150
 
 #define ENTRIES_PER_PAGE 25
+
 namespace SongDownloader {
     class SearchEntry {
         BeatSaver::Beatmap map;
@@ -48,7 +49,6 @@ namespace SongDownloader {
 
 DECLARE_CLASS_CODEGEN(SongDownloader, DownloadSongsViewController, HMUI::ViewController,
 
-
     void CreateEntries(UnityEngine::Transform* parent);
 
     static int searchIndex;
@@ -59,7 +59,7 @@ DECLARE_CLASS_CODEGEN(SongDownloader, DownloadSongsViewController, HMUI::ViewCon
     
     DECLARE_OVERRIDE_METHOD(void, DidDeactivate, il2cpp_utils::FindMethodUnsafe("HMUI", "ViewController", "DidDeactivate", 2), bool removedFromHierarchy, bool screenSystemDisabling);
 
-    REGISTER_FUNCTION(DownloadSongsViewController,
+    REGISTER_FUNCTION(
         REGISTER_METHOD(DidActivate);
         REGISTER_METHOD(DidDeactivate);
     )

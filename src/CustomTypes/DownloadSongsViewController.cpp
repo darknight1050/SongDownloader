@@ -1,4 +1,4 @@
-#include "DownloadSongsViewController.hpp"
+#include "CustomTypes/DownloadSongsViewController.hpp"
 
 #include "CustomLogger.hpp"
 

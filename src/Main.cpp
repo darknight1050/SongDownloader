@@ -10,7 +10,7 @@
 
 #include "CustomLogger.hpp"
 
-#include "DownloadSongsViewController.hpp"
+#include "CustomTypes/DownloadSongsViewController.hpp"
 
 #include "WebUtil.hpp"
 
