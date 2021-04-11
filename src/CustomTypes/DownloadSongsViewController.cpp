@@ -164,8 +164,14 @@ void DownloadSongsViewController::CreateEntries(Transform* parent) {
             (std::function<void()>) [this, entry] {
                 BeatSaver::API::DownloadBeatmapAsync(entry->GetBeatmap(), 
                     [this] (bool error) {
-                        if(!error)
-                            RuntimeSongLoader::API::RefreshSongsThreadSafe(false);
+                        if(!error) {
+                            QuestUI::MainThreadScheduler::Schedule(
+                                [] {
+                                    RuntimeSongLoader::API::RefreshSongs(false);
+                                }
+                            );
+                        }
+                            
                     },
                     [entry] (float percentage) {
                         entry->downloadProgress = percentage;
