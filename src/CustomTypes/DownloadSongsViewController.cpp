@@ -31,6 +31,8 @@
 #include "questui/shared/CustomTypes/Components/MainThreadScheduler.hpp"
 #include "questui/shared/QuestUI.hpp"
 
+#include "beatsaber-hook/shared/utils/typedefs-array.hpp"
+
 #include <iomanip>
 #include <sstream>
 #include <string>
@@ -56,6 +58,9 @@ const BeatSaver::Beatmap& SearchEntry::GetBeatmap() {
     return map;
 }
 
+// Sprite with a 1x1 white texture
+static Sprite* blankSprite = nullptr;
+
 void SearchEntry::SetBeatmap(const BeatSaver::Beatmap& _map) {
     map = _map;
     gameObject->SetActive(true);
@@ -65,7 +70,20 @@ void SearchEntry::SetBeatmap(const BeatSaver::Beatmap& _map) {
     line2Component->SetText(il2cpp_utils::newcsstr(map.GetMetadata().GetSongAuthorName() + " <color=#ADADADFF>[" + map.GetMetadata().GetLevelAuthorName() + "]</color>"));
     int currentSearchIndex = DownloadSongsViewController::searchIndex;
     
-    coverImageView->set_sprite(nullptr);
+    // Create a simple sprite with a 1x1 white (blank) texture, only if we haven't already
+    if(!blankSprite) {
+        Array<Color>* colors = Array<Color>::New(Color{1.0f, 1.0f, 1.0f, 1.0f});
+
+        Texture2D* blankTexture = Texture2D::New_ctor(1, 1, TextureFormat::RGB24, false);
+        blankTexture->SetPixels(0, 0, 1, 1, colors); // Make the texture white
+        blankSprite = Sprite::Create(blankTexture, UnityEngine::Rect(0.0f, 0.0f, 1.0f, 1.0f), UnityEngine::Vector2(0.5f,0.5f), 1024.0f, 1u, SpriteMeshType::FullRect, UnityEngine::Vector4(0.0f, 0.0f, 0.0f, 0.0f), false);
+    }
+
+    // Set a blank sprite while the actual cover image is downloaded
+    // Otherwise the previous image (or the default OST 1(?) image) shows up instead and looks bad
+    // We used to just set this to nullptr, but that makes it not line up correctly (not slanted), so we make a blank white texture instead.
+    coverImageView->set_sprite(blankSprite);
+
     BeatSaver::API::GetCoverImageAsync(map, [this, currentSearchIndex](std::vector<uint8_t> bytes) {
         if(currentSearchIndex == DownloadSongsViewController::searchIndex) {
             MainThreadScheduler::Schedule([this, currentSearchIndex, bytes] {
