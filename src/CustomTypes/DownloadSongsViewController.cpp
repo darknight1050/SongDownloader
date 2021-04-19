@@ -81,20 +81,21 @@ void SearchEntry::SetBeatmap(const BeatSaver::Beatmap& _map) {
             });
         }
     });
-
-    downloadProgress = -1.0f;
-    auto hash = map.GetHash();
-    std::transform(hash.begin(), hash.end(), hash.begin(), toupper);
-    for(auto& song : RuntimeSongLoader::API::GetLoadedSongs()) {
-        if(to_utf8(csstrtostr(song->levelID)).ends_with(hash)) {
-            downloadProgress = 100.0f;
-            break;
-        }
-    }
-    UpdateDownloadProgress();
+    UpdateDownloadProgress(true);
 }
 
-void SearchEntry::UpdateDownloadProgress() {
+void SearchEntry::UpdateDownloadProgress(bool checkLoaded) {
+    if(checkLoaded) {
+        downloadProgress = -1.0f;
+        auto hash = map.GetHash();
+        std::transform(hash.begin(), hash.end(), hash.begin(), toupper);
+        for(auto& song : RuntimeSongLoader::API::GetLoadedSongs()) {
+            if(to_utf8(csstrtostr(song->levelID)).ends_with(hash)) {
+                downloadProgress = 100.0f;
+                break;
+            }
+        }
+    }
     if(downloadProgress <= -1.0f) {
         BeatSaberUI::SetButtonText(downloadButton, "Download");
         downloadButton->set_interactable(true);
@@ -109,6 +110,10 @@ void SearchEntry::UpdateDownloadProgress() {
 
 void SearchEntry::Disable() {
     gameObject->SetActive(false);
+}
+
+bool SearchEntry::IsEnabled() {
+    return gameObject->get_activeSelf();
 }
 
 DEFINE_TYPE(DownloadSongsViewController);
@@ -177,7 +182,7 @@ void DownloadSongsViewController::CreateEntries(Transform* parent) {
                         entry->downloadProgress = percentage;
                         QuestUI::MainThreadScheduler::Schedule(
                             [entry] {
-                                entry->UpdateDownloadProgress();
+                                entry->UpdateDownloadProgress(false);
                             }
                         );
                     }
@@ -242,6 +247,11 @@ void DownloadSongsViewController::DidActivate(bool firstActivation, bool addedTo
         scrollTransform->set_anchoredPosition(UnityEngine::Vector2(0.0f, -4.0f));
         scrollTransform->set_sizeDelta(UnityEngine::Vector2(-54.0f, -8.0f));
         CreateEntries(container->get_transform());
+    } else {
+        for(int i = 0; i < ENTRIES_PER_PAGE; i++) {
+            if(searchEntries[i].IsEnabled())
+                searchEntries[i].UpdateDownloadProgress(true);
+        }
     }
 }
 

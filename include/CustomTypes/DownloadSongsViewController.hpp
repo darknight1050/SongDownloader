@@ -39,9 +39,11 @@ namespace SongDownloader {
         
         void SetBeatmap(const BeatSaver::Beatmap& _map);
         
-        void UpdateDownloadProgress();
+        void UpdateDownloadProgress(bool checkLoaded);
 
         void Disable();
+
+        bool IsEnabled();
 
     }; 
 
