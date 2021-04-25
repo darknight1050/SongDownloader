@@ -9,8 +9,9 @@
 #include "songloader/shared/API.hpp"
 
 #include "CustomLogger.hpp"
+#include "ModConfig.hpp"
 
-#include "CustomTypes/DownloadSongsViewController.hpp"
+#include "CustomTypes/DownloadSongsFlowCoordinator.hpp"
 
 #include "WebUtil.hpp"
 
@@ -23,17 +24,20 @@ Logger& getLogger() {
     return *logger; 
 }
 
+DEFINE_CONFIG(ModConfig);
+
 extern "C" void setup(ModInfo& info) {
     modInfo.id = "SongDownloader";
     modInfo.version = VERSION;
     info = modInfo;
+    getModConfig().Init(modInfo);
 }
 
 extern "C" void load() {
     LOG_INFO("Starting SongDownloader installation...");
     il2cpp_functions::Init();
     QuestUI::Init();
-    custom_types::Register::RegisterTypes<SongDownloader::DownloadSongsViewController>();
-    QuestUI::Register::RegisterModSettingsViewController<SongDownloader::DownloadSongsViewController*>(modInfo);
+    custom_types::Register::RegisterTypes<SongDownloader::DownloadSongsOptionsViewController, SongDownloader::DownloadSongsSearchViewController, SongDownloader::DownloadSongsFlowCoordinator>();
+    QuestUI::Register::RegisterModSettingsFlowCoordinator<SongDownloader::DownloadSongsFlowCoordinator*>(modInfo);
     LOG_INFO("Successfully installed SongDownloader!");
 }

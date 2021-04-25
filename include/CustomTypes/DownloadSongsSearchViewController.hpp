@@ -49,7 +49,7 @@ namespace SongDownloader {
 
 }
 
-DECLARE_CLASS_CODEGEN(SongDownloader, DownloadSongsViewController, HMUI::ViewController,
+DECLARE_CLASS_CODEGEN(SongDownloader, DownloadSongsSearchViewController, HMUI::ViewController,
 
     void CreateEntries(UnityEngine::Transform* parent);
 

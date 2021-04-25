@@ -15,6 +15,11 @@
       "id": "songloader",
       "versionRange": "^0.2.3",
       "additionalData": {}
+    },
+    {
+      "id": "config-utils",
+      "versionRange": "^0.4.0",
+      "additionalData": {}
     }
   ],
   "additionalData": {}
