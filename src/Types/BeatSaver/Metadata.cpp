@@ -9,13 +9,5 @@ DESERIALIZE_METHOD(BeatSaver, Metadata,
     DESERIALIZE_VALUE(BPM, bpm, Float)
     DESERIALIZE_VALUE_OPTIONAL(Automapper, automapper, String)
     DESERIALIZE_CLASS(Difficulties, difficulties)
-
-    auto& characteristics = jsonValue["characteristics"];
-    if(characteristics.IsArray()) {
-        for (auto it = characteristics.Begin(); it != characteristics.End(); ++it) {
-            BeatmapCharacteristic characteristic;
-            characteristic.Deserialize(*it);
-            Characteristics.push_back(characteristic);
-        }
-    }
+    DESERIALIZE_VECTOR(Characteristics, characteristics, BeatmapCharacteristic)
 )

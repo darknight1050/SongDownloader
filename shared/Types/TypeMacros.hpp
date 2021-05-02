@@ -39,3 +39,15 @@ if(jsonValue[#jsonName].Is##type()) { \
 
 #define DESERIALIZE_CLASS(name, jsonName) \
 name.Deserialize(jsonValue[#jsonName]);
+
+
+#define DESERIALIZE_VECTOR(name, jsonName, type) \
+name.clear(); \
+auto& jsonName = jsonValue[#jsonName]; \
+if(jsonName.IsArray()) { \
+    for (auto it = jsonName.Begin(); it != jsonName.End(); ++it) { \
+        type value; \
+        value.Deserialize(*it); \
+        name.push_back(value); \
+    } \
+}
