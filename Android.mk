@@ -43,13 +43,13 @@ LOCAL_MODULE := custom-types
 LOCAL_EXPORT_C_INCLUDES := extern/custom-types
 LOCAL_SRC_FILES := extern/libcustom-types.so
 include $(PREBUILT_SHARED_LIBRARY)
-# Creating prebuilt for dependency: questui - version: 0.6.10
+# Creating prebuilt for dependency: questui - version: 0.6.11
 include $(CLEAR_VARS)
 LOCAL_MODULE := questui
 LOCAL_EXPORT_C_INCLUDES := extern/questui
 LOCAL_SRC_FILES := extern/libquestui.so
 include $(PREBUILT_SHARED_LIBRARY)
-# Creating prebuilt for dependency: songloader - version: 0.2.5
+# Creating prebuilt for dependency: songloader - version: 0.2.6
 include $(CLEAR_VARS)
 LOCAL_MODULE := songloader
 LOCAL_EXPORT_C_INCLUDES := extern/songloader
