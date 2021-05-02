@@ -168,6 +168,7 @@ void DownloadSongsSearchViewController::CreateEntries(Transform* parent) {
         auto entry = &searchEntries[i];
         downloadButton->get_onClick()->AddListener(il2cpp_utils::MakeDelegate<UnityAction*>(classof(UnityAction*), 
             (std::function<void()>) [this, entry] {
+                auto hash = entry->GetBeatmap().GetHash();
                 BeatSaver::API::DownloadBeatmapAsync(entry->GetBeatmap(), 
                     [this] (bool error) {
                         if(!error) {
@@ -177,15 +178,16 @@ void DownloadSongsSearchViewController::CreateEntries(Transform* parent) {
                                 }
                             );
                         }
-                            
                     },
-                    [entry] (float percentage) {
-                        entry->downloadProgress = percentage;
-                        QuestUI::MainThreadScheduler::Schedule(
-                            [entry] {
-                                entry->UpdateDownloadProgress(false);
-                            }
-                        );
+                    [entry, hash] (float percentage) {
+                        if(entry->GetBeatmap().GetHash() == hash) {
+                            entry->downloadProgress = percentage;
+                            QuestUI::MainThreadScheduler::Schedule(
+                                [entry] {
+                                    entry->UpdateDownloadProgress(false);
+                                }
+                            );
+                        }
                     }
                 );
             }
