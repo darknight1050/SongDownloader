@@ -31,7 +31,7 @@ void namespaze::name::Deserialize(const rapidjson::Value& jsonValue) { \
 name = jsonValue[#jsonName].Get##type();
 
 #define DESERIALIZE_VALUE_OPTIONAL(name, jsonName, type) \
-if(jsonValue[#jsonName].Is##type()) { \
+if(jsonValue.HasMember(#jsonName) && jsonValue[#jsonName].Is##type()) { \
     name = jsonValue[#jsonName].Get##type(); \
 } else { \
     name = std::nullopt; \
