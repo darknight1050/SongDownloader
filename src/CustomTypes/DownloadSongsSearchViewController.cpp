@@ -209,53 +209,82 @@ void DownloadSongsSearchViewController::DidActivate(bool firstActivation, bool a
                         searchEntries[i].Disable();
                     }
                 } else {
-                    BeatSaver::API::SearchPagedAsync(value, 0,
-                        [this, currentSearchIndex] (std::optional<BeatSaver::Page> page) {
-                            if(currentSearchIndex == DownloadSongsSearchViewController::searchIndex) {
-                                QuestUI::MainThreadScheduler::Schedule(
-                                    [this, currentSearchIndex, page] {
-                                        if(currentSearchIndex == DownloadSongsSearchViewController::searchIndex) {
-                                            if(page.has_value()) {
-                                                auto maps = page.value().GetDocs();
-                                                auto mapsSize = maps.size();
-                                                int mapIndex = 0;
-                                                for(int i = 0; i < ENTRIES_PER_PAGE; i++) {
-                                                    auto& searchEntry = searchEntries[i];
-                                                    if(mapIndex < mapsSize) {
-                                                        auto& map = maps.at(mapIndex);
-                                                        if(getModConfig().AutoMapper.GetValue()) {
-                                                            searchEntry.SetBeatmap(map);
-                                                        } else {
-                                                            while(map.GetMetadata().GetAutomapper().has_value()) {
-                                                                mapIndex++;
-                                                                if(mapIndex >= mapsSize) {
-                                                                    break;
-                                                                }
-                                                                map = maps.at(mapIndex);
-                                                            }
-                                                            if(!map.GetMetadata().GetAutomapper().has_value())
-                                                                searchEntry.SetBeatmap(map);
-                                                        }
-                                                    } else {
-                                                        searchEntry.Disable();
+                    if(getModConfig().BsrSearch.GetValue()) {
+                        BeatSaver::API::GetBeatmapByKeyAsync(value,
+                            [this, currentSearchIndex] (std::optional<BeatSaver::Beatmap> beatmap) {
+                                if(currentSearchIndex == DownloadSongsSearchViewController::searchIndex) {
+                                    QuestUI::MainThreadScheduler::Schedule(
+                                        [this, currentSearchIndex, beatmap] {
+                                            if(currentSearchIndex == DownloadSongsSearchViewController::searchIndex) {
+                                                if(beatmap.has_value()) {
+                                                    searchEntries[0].SetBeatmap(beatmap.value());
+                                                    for(int i = 1; i < ENTRIES_PER_PAGE; i++) {
+                                                        searchEntries[i].Disable();
                                                     }
-                                                    mapIndex++;
+                                                } else {
+                                                    for(int i = 0; i < ENTRIES_PER_PAGE; i++) {
+                                                        searchEntries[i].Disable();
+                                                    }
                                                 }
-                                            } else {
-                                                for(int i = 0; i < ENTRIES_PER_PAGE; i++) {
-                                                    searchEntries[i].Disable();
+                                                if(SearchEntry::spriteCount > MAX_SPRITES) {
+                                                    SearchEntry::spriteCount = 0;
+                                                    Resources::UnloadUnusedAssets();
                                                 }
-                                            }
-                                            if(SearchEntry::spriteCount > MAX_SPRITES) {
-                                                SearchEntry::spriteCount = 0;
-                                                Resources::UnloadUnusedAssets();
                                             }
                                         }
-                                    }
-                                );
+                                    );
+                                }
                             }
-                        }
-                    );
+                        );
+                    } else {
+                        BeatSaver::API::SearchPagedAsync(value, 0,
+                            [this, currentSearchIndex] (std::optional<BeatSaver::Page> page) {
+                                if(currentSearchIndex == DownloadSongsSearchViewController::searchIndex) {
+                                    QuestUI::MainThreadScheduler::Schedule(
+                                        [this, currentSearchIndex, page] {
+                                            if(currentSearchIndex == DownloadSongsSearchViewController::searchIndex) {
+                                                if(page.has_value()) {
+                                                    auto maps = page.value().GetDocs();
+                                                    auto mapsSize = maps.size();
+                                                    int mapIndex = 0;
+                                                    for(int i = 0; i < ENTRIES_PER_PAGE; i++) {
+                                                        auto& searchEntry = searchEntries[i];
+                                                        if(mapIndex < mapsSize) {
+                                                            auto& map = maps.at(mapIndex);
+                                                            if(getModConfig().AutoMapper.GetValue()) {
+                                                                searchEntry.SetBeatmap(map);
+                                                            } else {
+                                                                while(map.GetMetadata().GetAutomapper().has_value()) {
+                                                                    mapIndex++;
+                                                                    if(mapIndex >= mapsSize) {
+                                                                        break;
+                                                                    }
+                                                                    map = maps.at(mapIndex);
+                                                                }
+                                                                if(!map.GetMetadata().GetAutomapper().has_value())
+                                                                    searchEntry.SetBeatmap(map);
+                                                            }
+                                                        } else {
+                                                            searchEntry.Disable();
+                                                        }
+                                                        mapIndex++;
+                                                    }
+                                                } else {
+                                                    for(int i = 0; i < ENTRIES_PER_PAGE; i++) {
+                                                        searchEntries[i].Disable();
+                                                    }
+                                                }
+                                                if(SearchEntry::spriteCount > MAX_SPRITES) {
+                                                    SearchEntry::spriteCount = 0;
+                                                    Resources::UnloadUnusedAssets();
+                                                }
+                                            }
+                                        }
+                                    );
+                                }
+                            }
+                        );
+                    }
                 }
             }
         );

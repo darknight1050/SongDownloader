@@ -44,6 +44,6 @@ void DownloadSongsOptionsViewController::DidActivate(bool firstActivation, bool 
 		contentSizeFitter->set_verticalFit(ContentSizeFitter::FitMode::PreferredSize);
         
         AddConfigValueToggle(settingsLayoutTransform, getModConfig().AutoMapper)->get_transform()->GetParent()->GetComponent<LayoutElement*>()->set_preferredWidth(45.0f);
-
+        AddConfigValueToggle(settingsLayoutTransform, getModConfig().BsrSearch)->get_transform()->GetParent()->GetComponent<LayoutElement*>()->set_preferredWidth(45.0f);
     }
 }
