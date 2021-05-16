@@ -3,7 +3,7 @@
 
 #include "beatsaber-hook/shared/config/rapidjson-utils.hpp"
 
-namespace WebUtil {
+namespace WebUtils {
 
     std::optional<rapidjson::Document> GetJSON(std::string url);
 
