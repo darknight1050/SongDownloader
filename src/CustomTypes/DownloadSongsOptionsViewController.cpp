@@ -23,18 +23,13 @@ void DownloadSongsOptionsViewController::DidActivate(bool firstActivation, bool 
     if(firstActivation) {
         get_gameObject()->AddComponent<Touchable*>();
         
-        VerticalLayoutGroup* titleLayout = BeatSaberUI::CreateVerticalLayoutGroup(get_transform());
-        titleLayout->GetComponent<RectTransform*>()->set_anchoredPosition(UnityEngine::Vector2(0.0f, 36.0f));
-        titleLayout->GetComponent<ContentSizeFitter*>()->set_verticalFit(ContentSizeFitter::FitMode::PreferredSize);
-        titleLayout->get_gameObject()->AddComponent<Backgroundable*>()->ApplyBackground(il2cpp_utils::createcsstr("round-rect-panel"));
-        titleLayout->set_padding(UnityEngine::RectOffset::New_ctor(3, 4, 1, 0));
-        TextMeshProUGUI* titleText = BeatSaberUI::CreateText(titleLayout->get_transform(), "OPTIONS");
-        titleText->set_alignment(TextAlignmentOptions::Center);
-        titleText->set_fontSize(7.4f);
+        GameObject* mainLayout = GameObject::New_ctor();
+        RectTransform* parent = mainLayout->AddComponent<RectTransform*>();
+        parent->SetParent(get_transform(), false);
+        parent->set_localPosition(UnityEngine::Vector3(0.0f, 8.0f));
 
-        VerticalLayoutGroup* settingsLayout = QuestUI::BeatSaberUI::CreateVerticalLayoutGroup(get_rectTransform());
+        VerticalLayoutGroup* settingsLayout = QuestUI::BeatSaberUI::CreateVerticalLayoutGroup(parent);
 		RectTransform* settingsLayoutTransform = settingsLayout->GetComponent<RectTransform*>();
-        settingsLayoutTransform->set_anchoredPosition(UnityEngine::Vector2(0.0f, 18.0f));
 		settingsLayout->get_gameObject()->AddComponent<Backgroundable*>()->ApplyBackground(il2cpp_utils::createcsstr("round-rect-panel"));
 		settingsLayout->set_spacing(1.2f);
 		settingsLayout->set_padding(UnityEngine::RectOffset::New_ctor(3, 3, 2, 2));
