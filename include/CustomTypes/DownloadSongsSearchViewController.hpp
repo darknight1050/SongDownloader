@@ -61,8 +61,4 @@ DECLARE_CLASS_CODEGEN(SongDownloader, DownloadSongsSearchViewController, HMUI::V
     
     DECLARE_OVERRIDE_METHOD(void, DidDeactivate, il2cpp_utils::FindMethodUnsafe("HMUI", "ViewController", "DidDeactivate", 2), bool removedFromHierarchy, bool screenSystemDisabling);
 
-    REGISTER_FUNCTION(
-        REGISTER_METHOD(DidActivate);
-        REGISTER_METHOD(DidDeactivate);
-    )
 )

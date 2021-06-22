@@ -10,7 +10,7 @@
 using namespace QuestUI;
 using namespace SongDownloader;
 
-DEFINE_TYPE(DownloadSongsFlowCoordinator);
+DEFINE_TYPE(SongDownloader, DownloadSongsFlowCoordinator);
 
 void DownloadSongsFlowCoordinator::Awake(){
     if(!DownloadSongsOptionsViewController)

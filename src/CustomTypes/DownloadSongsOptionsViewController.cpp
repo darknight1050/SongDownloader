@@ -17,7 +17,7 @@ using namespace HMUI;
 using namespace TMPro;
 using namespace SongDownloader;
 
-DEFINE_TYPE(DownloadSongsOptionsViewController);
+DEFINE_TYPE(SongDownloader, DownloadSongsOptionsViewController);
 
 void DownloadSongsOptionsViewController::DidActivate(bool firstActivation, bool addedToHierarchy, bool screenSystemEnabling) {
     if(firstActivation) {

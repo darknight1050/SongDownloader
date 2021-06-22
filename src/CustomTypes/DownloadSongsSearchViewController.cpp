@@ -117,7 +117,7 @@ bool SearchEntry::IsEnabled() {
     return gameObject->get_activeSelf();
 }
 
-DEFINE_TYPE(DownloadSongsSearchViewController);
+DEFINE_TYPE(SongDownloader, DownloadSongsSearchViewController);
 
 int DownloadSongsSearchViewController::searchIndex = 0;
 
