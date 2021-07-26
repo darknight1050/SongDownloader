@@ -2,8 +2,8 @@
 
 #include "CustomLogger.hpp"
 
-#include "curl.h"
-#include "easy.h"
+#include "libcurl/shared/curl.h"
+#include "libcurl/shared/easy.h"
 
 #define TIMEOUT 10
 #define USER_AGENT (std::string("QuestSongDownloader/") + VERSION + " (+https://github.com/darknight1050/SongDownloader)").c_str()

@@ -20,6 +20,11 @@
       "id": "config-utils",
       "versionRange": "^0.5.0",
       "additionalData": {}
+    },
+    {
+      "id": "libcurl",
+      "versionRange": "^7.78.0",
+      "additionalData": {}
     }
   ],
   "additionalData": {}

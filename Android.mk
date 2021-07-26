@@ -24,11 +24,11 @@ LOCAL_MODULE := codegen_0_10_2
 LOCAL_EXPORT_C_INCLUDES := extern/codegen
 LOCAL_SRC_FILES := extern/libcodegen_0_10_2.so
 include $(PREBUILT_SHARED_LIBRARY)
-# Creating prebuilt for dependency: beatsaber-hook - version: 2.0.2
+# Creating prebuilt for dependency: beatsaber-hook - version: 2.0.3
 include $(CLEAR_VARS)
-LOCAL_MODULE := beatsaber-hook_2_0_2
+LOCAL_MODULE := beatsaber-hook_2_0_3
 LOCAL_EXPORT_C_INCLUDES := extern/beatsaber-hook
-LOCAL_SRC_FILES := extern/libbeatsaber-hook_2_0_2.so
+LOCAL_SRC_FILES := extern/libbeatsaber-hook_2_0_3.so
 LOCAL_CPP_FEATURES += exceptions 
 include $(PREBUILT_SHARED_LIBRARY)
 # Creating prebuilt for dependency: modloader - version: 1.1.0
@@ -55,12 +55,11 @@ LOCAL_MODULE := songloader
 LOCAL_EXPORT_C_INCLUDES := extern/songloader
 LOCAL_SRC_FILES := extern/libsongloader.so
 include $(PREBUILT_SHARED_LIBRARY)
-
-# curl
+# Creating prebuilt for dependency: libcurl - version: 7.78.0
 include $(CLEAR_VARS)
 LOCAL_MODULE := curl
-LOCAL_EXPORT_C_INCLUDES := include/curl/curl/include/curl
-LOCAL_SRC_FILES := include/curl/prebuilt/libcurl.a
+LOCAL_EXPORT_C_INCLUDES := extern/libcurl
+LOCAL_SRC_FILES := extern/libcurl.a
 include $(PREBUILT_STATIC_LIBRARY)
 
 # zip
@@ -77,15 +76,15 @@ LOCAL_SRC_FILES += $(call rwildcard,src/**,*.cpp)
 LOCAL_SRC_FILES += $(call rwildcard,extern/beatsaber-hook/src/inline-hook,*.cpp)
 LOCAL_SRC_FILES += $(call rwildcard,extern/beatsaber-hook/src/inline-hook,*.c)
 LOCAL_SHARED_LIBRARIES += modloader
-LOCAL_SHARED_LIBRARIES += beatsaber-hook_2_0_2
+LOCAL_SHARED_LIBRARIES += beatsaber-hook_2_0_3
 LOCAL_SHARED_LIBRARIES += codegen_0_10_2
 LOCAL_SHARED_LIBRARIES += custom-types
 LOCAL_SHARED_LIBRARIES += questui
 LOCAL_SHARED_LIBRARIES += songloader
+LOCAL_STATIC_LIBRARIES += curl
+LOCAL_STATIC_LIBRARIES += zip
 LOCAL_LDLIBS += -llog -lz
 LOCAL_CFLAGS += -DVERSION='"0.0.1"'
 LOCAL_C_INCLUDES += ./include ./shared ./src ./extern ./extern/libil2cpp/il2cpp/libil2cpp ./extern/codegen/include
 LOCAL_CPP_FEATURES += exceptions
-LOCAL_STATIC_LIBRARIES += curl
-LOCAL_STATIC_LIBRARIES += zip
 include $(BUILD_SHARED_LIBRARY)
