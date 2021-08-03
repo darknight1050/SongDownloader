@@ -9,10 +9,9 @@
 
 #include "songloader/shared/API.hpp"
 
-#define BASE_URL std::string("beatmaps.io")
+#define BASE_URL std::string("beatsaver.com")
 #define API_URL std::string("https://api.") + BASE_URL
 #define CDN_URL std::string("https://cdn.") + BASE_URL + "/"
-
 #define FILE_DOWNLOAD_TIMEOUT 64
 
 namespace BeatmapsIO::API {
