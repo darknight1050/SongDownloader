@@ -210,8 +210,9 @@ void DownloadSongsSearchViewController::DidActivate(bool firstActivation, bool a
                         searchEntries[i].Disable();
                     }
                 } else {
+                    // TODO: Replace 'GetBeatmapByKeyAsync' with 'GetBeatmapByIdAsync' as keys all now have an int representation for example: 0xff9 -> 4089 
                     if(getModConfig().BsrSearch.GetValue()) {
-                        BeatmapsIO::API::GetBeatmapByBeatSaverKeyAsync(value,
+                        BeatmapsIO::API::GetBeatmapByKeyAsync(value,
                             [this, currentSearchIndex] (std::optional<BeatmapsIO::Beatmap> beatmap) {
                                 if(currentSearchIndex == DownloadSongsSearchViewController::searchIndex) {
                                     QuestUI::MainThreadScheduler::Schedule(

@@ -6,9 +6,10 @@
 
 namespace BeatmapsIO::API {
 
-    std::optional<BeatmapsIO::Beatmap> GetBeatmapByKey(std::string key);
+    std::optional<BeatmapsIO::Beatmap> GetBeatmapById(int id);
 
-    std::optional<BeatmapsIO::Beatmap> GetBeatmapByBeatSaverKey(std::string key);
+    // Deprecated will not include new Beatmaps! Please use 'GetBeatmapByHash' or 'GetBeatmapById' instead
+    std::optional<BeatmapsIO::Beatmap> GetBeatmapByKey(std::string key);
 
     std::optional<BeatmapsIO::Beatmap> GetBeatmapByHash(std::string hash);
 
@@ -18,8 +19,9 @@ namespace BeatmapsIO::API {
 
     std::vector<uint8_t> GetCoverImage(const BeatmapsIO::Beatmap& beatmap);
 
-    void GetBeatmapByBeatSaverKeyAsync(std::string key, std::function<void(std::optional<BeatmapsIO::Beatmap>)> finished);
+    void GetBeatmapByIdAsync(int id, std::function<void(std::optional<BeatmapsIO::Beatmap>)> finished);
 
+    // Deprecated will not include new Beatmaps! Please use 'GetBeatmapByHashAsync' or 'GetBeatmapByIdAsync' instead
     void GetBeatmapByKeyAsync(std::string key, std::function<void(std::optional<BeatmapsIO::Beatmap>)> finished);
 
     void GetBeatmapByHashAsync(std::string hash, std::function<void(std::optional<BeatmapsIO::Beatmap>)> finished);

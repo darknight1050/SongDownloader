@@ -17,8 +17,8 @@
 
 namespace BeatmapsIO::API {
 
-    std::optional<BeatmapsIO::Beatmap> GetBeatmapByKey(std::string key) {
-        auto json = WebUtils::GetJSON(API_URL + "/maps/id/" + key);
+    std::optional<BeatmapsIO::Beatmap> GetBeatmapById(int id) {
+        auto json = WebUtils::GetJSON(API_URL + "/maps/id/" + std::to_string(id));
         if (!json.has_value())
             return std::nullopt;
         BeatmapsIO::Beatmap beatmap;
@@ -26,7 +26,7 @@ namespace BeatmapsIO::API {
         return beatmap;
     }
 
-    std::optional<BeatmapsIO::Beatmap> GetBeatmapByBeatSaverKey(std::string key) {
+    std::optional<BeatmapsIO::Beatmap> GetBeatmapByKey(std::string key) {
         auto json = WebUtils::GetJSON(API_URL + "/maps/beatsaver/" + key);
         if (!json.has_value())
             return std::nullopt;
@@ -71,7 +71,7 @@ namespace BeatmapsIO::API {
         return bytes;
     }
 
-    void GetBeatmapByBeatSaverKeyAsync(std::string key, std::function<void(std::optional<BeatmapsIO::Beatmap>)> finished) {
+    void GetBeatmapByKeyAsync(std::string key, std::function<void(std::optional<BeatmapsIO::Beatmap>)> finished) {
         WebUtils::GetJSONAsync(API_URL + "/maps/beatsaver/" + key,
             [finished](long httpCode, bool error, rapidjson::Document& document) {
                 if (error) {
@@ -86,8 +86,8 @@ namespace BeatmapsIO::API {
         );
     }
 
-    void GetBeatmapByKeyAsync(std::string key, std::function<void(std::optional<BeatmapsIO::Beatmap>)> finished) {
-        WebUtils::GetJSONAsync(API_URL + "/maps/id/" + key,
+    void GetBeatmapByIdAsync(int id, std::function<void(std::optional<BeatmapsIO::Beatmap>)> finished) {
+        WebUtils::GetJSONAsync(API_URL + "/maps/id/" + std::to_string(id),
             [finished](long httpCode, bool error, rapidjson::Document& document) {
                 if (error) {
                     finished(std::nullopt);
