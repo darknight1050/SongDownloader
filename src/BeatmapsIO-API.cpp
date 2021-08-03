@@ -15,7 +15,7 @@
 #define FILE_DOWNLOAD_TIMEOUT 64
 
 namespace BeatmapsIO::API {
-
+                   
     std::optional<BeatmapsIO::Beatmap> GetBeatmapById(int id) {
         auto json = WebUtils::GetJSON(API_URL + "/maps/id/" + std::to_string(id));
         if (!json.has_value())
