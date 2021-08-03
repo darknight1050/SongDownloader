@@ -68,21 +68,21 @@ void SearchEntry::SetBeatmap(const BeatmapsIO::Beatmap& _map) {
     int currentSearchIndex = DownloadSongsSearchViewController::searchIndex;
     
     coverImageView->set_enabled(false);
-    //BeatmapsIO::API::GetCoverImageAsync(map, [this, currentSearchIndex](std::vector<uint8_t> bytes) {
-    //    if(currentSearchIndex == DownloadSongsSearchViewController::searchIndex) {
-    //        MainThreadScheduler::Schedule([this, currentSearchIndex, bytes] {
-    //            if(currentSearchIndex == DownloadSongsSearchViewController::searchIndex) {
-    //                std::vector<uint8_t> data = bytes;
-    //                
-    //                Array<uint8_t>* spriteArray = il2cpp_utils::vectorToArray(data);
-    //                Sprite* sprite = BeatSaberUI::ArrayToSprite(spriteArray);
-    //                coverImageView->set_sprite(sprite);
-    //                coverImageView->set_enabled(true);
-    //                SearchEntry::spriteCount++;
-    //            }
-    //        });
-    //    }
-    //});
+    BeatmapsIO::API::GetCoverImageAsync(map, [this, currentSearchIndex](std::vector<uint8_t> bytes) {
+        if(currentSearchIndex == DownloadSongsSearchViewController::searchIndex) {
+            MainThreadScheduler::Schedule([this, currentSearchIndex, bytes] {
+                if(currentSearchIndex == DownloadSongsSearchViewController::searchIndex) {
+                    std::vector<uint8_t> data = bytes;
+                    
+                    Array<uint8_t>* spriteArray = il2cpp_utils::vectorToArray(data);
+                    Sprite* sprite = BeatSaberUI::ArrayToSprite(spriteArray);
+                    coverImageView->set_sprite(sprite);
+                    coverImageView->set_enabled(true);
+                    SearchEntry::spriteCount++;
+                }
+            });
+        }
+    });
     UpdateDownloadProgress(true);
 }
 
@@ -211,7 +211,7 @@ void DownloadSongsSearchViewController::DidActivate(bool firstActivation, bool a
                     }
                 } else {
                     if(getModConfig().BsrSearch.GetValue()) {
-                        BeatmapsIO::API::GetBeatmapByKeyAsync(value,
+                        BeatmapsIO::API::GetBeatmapByBeatSaverKeyAsync(value,
                             [this, currentSearchIndex] (std::optional<BeatmapsIO::Beatmap> beatmap) {
                                 if(currentSearchIndex == DownloadSongsSearchViewController::searchIndex) {
                                     QuestUI::MainThreadScheduler::Schedule(

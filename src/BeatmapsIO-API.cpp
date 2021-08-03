@@ -11,7 +11,7 @@
 
 #define BASE_URL std::string("beatmaps.io")
 #define API_URL std::string("https://api.") + BASE_URL
-#define CDN_URL std::string("https://cdn.") + BASE_URL
+#define CDN_URL std::string("https://cdn.") + BASE_URL + "/"
 
 #define FILE_DOWNLOAD_TIMEOUT 64
 
@@ -56,7 +56,7 @@ namespace BeatmapsIO::API {
 	bool DownloadBeatmap(const BeatmapsIO::Beatmap& beatmap) {
 		auto targetFolder = RuntimeSongLoader::API::GetCustomLevelsPath() + beatmap.GetVersions().front().GetKey() + " ()[]{}%&.:,;=!-_ (" + beatmap.GetMetadata().GetSongName() + " - " + beatmap.GetMetadata().GetLevelAuthorName() + ")";
 		std::string data;
-		WebUtils::Get(CDN_URL + beatmap.GetVersions().front().GetHash(), FILE_DOWNLOAD_TIMEOUT, data);
+		WebUtils::Get(CDN_URL + beatmap.GetVersions().front().GetHash() + ".zip", FILE_DOWNLOAD_TIMEOUT, data);
 		int args = 2;
 		int statusCode = zip_stream_extract(data.data(), data.length(), targetFolder.c_str(), +[](const char* name, void* arg) -> int {
 			return 0;
@@ -65,8 +65,10 @@ namespace BeatmapsIO::API {
 	}
 
 	std::vector<uint8_t> GetCoverImage(const BeatmapsIO::Beatmap& beatmap) {
+		std::string URL = CDN_URL + beatmap.GetVersions().front().GetHash() + ".jpg";
+		LOG_DEBUG("URL is: %s", URL.c_str());
 		std::string data;
-		WebUtils::Get(CDN_URL + beatmap.GetVersions().front().GetHash() + ".jpg", FILE_DOWNLOAD_TIMEOUT, data);
+		WebUtils::Get(URL, FILE_DOWNLOAD_TIMEOUT, data);
 		std::vector<uint8_t> bytes(data.begin(), data.end());
 		return bytes;
 	}
@@ -132,20 +134,24 @@ namespace BeatmapsIO::API {
 	}
 
 	void DownloadBeatmapAsync(const BeatmapsIO::Beatmap& beatmap, std::function<void(bool)> finished, std::function<void(float)> progressUpdate) {
-		WebUtils::GetAsync(CDN_URL + beatmap.GetVersions().front().GetHash(), FILE_DOWNLOAD_TIMEOUT,
+		WebUtils::GetAsync(CDN_URL + beatmap.GetVersions().front().GetHash() + ".zip", FILE_DOWNLOAD_TIMEOUT,
 			[beatmap, finished](long httpCode, std::string data) {
 				auto targetFolder = RuntimeSongLoader::API::GetCustomLevelsPath() + FileUtils::FixIlegalName(beatmap.GetVersions().front().GetKey() + " (" + beatmap.GetMetadata().GetSongName() + " - " + beatmap.GetMetadata().GetLevelAuthorName() + ")");
+				LOG_DEBUG("%s", targetFolder.c_str());
 				int args = 2;
 				int statusCode = zip_stream_extract(data.data(), data.length(), targetFolder.c_str(), +[](const char* name, void* arg) -> int {
 					return 0;
 					}, &args);
+				LOG_DEBUG("Status Code is: %d", statusCode);
 				finished(statusCode);
 			}, progressUpdate
 		);
 	}
 
 	void GetCoverImageAsync(const BeatmapsIO::Beatmap& beatmap, std::function<void(std::vector<uint8_t>)> finished, std::function<void(float)> progressUpdate) {
-		WebUtils::GetAsync(CDN_URL + beatmap.GetVersions().front().GetHash() + ".jpg", FILE_DOWNLOAD_TIMEOUT,
+		std::string URL = CDN_URL + beatmap.GetVersions().front().GetHash() + ".jpg";
+		LOG_DEBUG("URL is: %s", URL.c_str());
+		WebUtils::GetAsync(URL, FILE_DOWNLOAD_TIMEOUT,
 			[beatmap, finished](long httpCode, std::string data) {
 				std::vector<uint8_t> bytes(data.begin(), data.end());
 				finished(bytes);
