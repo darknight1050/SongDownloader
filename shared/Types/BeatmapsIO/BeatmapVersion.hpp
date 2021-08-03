@@ -12,4 +12,7 @@ DECLARE_JSON_CLASS(BeatmapsIO, BeatmapVersion,
     //GETTER_VALUE(std::string, State); // Enum with values Uploaded, Testplay, Published, Feedback
     //GETTER_VALUE(BeatmapsIO::Instant, TestplayAt);
     //GETTER_VALUE(BeatmapsIO::Testplays, Uploaded);
+	GETTER_VALUE(std::string, DownloadURL);
+	GETTER_VALUE(std::string, CoverURL);
+    GETTER_VALUE(std::string, PreviewURL);
 )

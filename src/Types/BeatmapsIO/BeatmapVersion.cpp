@@ -10,4 +10,7 @@ DESERIALIZE_METHOD(BeatmapsIO, BeatmapVersion,
     //DESERIALIZE_VALUE(State, state, String) // Contains stringified Enum I think
     //DESERIALIZE_CLASS(TestplayAt, testplayAt)
     //DESERIALIZE_CLASS(Testplays, testplays) // Not going to add that all in now
+	DESERIALIZE_VALUE(DownloadURL, downloadURL, String)
+	DESERIALIZE_VALUE(CoverURL, coverURL, String)
+	DESERIALIZE_VALUE(PreviewURL, previewURL, String)
 )
