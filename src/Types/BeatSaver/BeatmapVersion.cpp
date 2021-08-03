@@ -1,6 +1,6 @@
-#include "Types/BeatmapsIO/BeatmapVersion.hpp"
+#include "Types/BeatSaver/BeatmapVersion.hpp"
 
-DESERIALIZE_METHOD(BeatmapsIO, BeatmapVersion,
+DESERIALIZE_METHOD(BeatSaver, BeatmapVersion,
     DESERIALIZE_VALUE(CreatedAt, createdAt, String)
     DESERIALIZE_VALUE(SageScore, sageScore, Int) 
     DESERIALIZE_VECTOR(Diffs, diffs, BeatmapDifficulty)

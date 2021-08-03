@@ -1,7 +1,7 @@
 #pragma once
 #include "../TypeMacros.hpp"
 
-DECLARE_JSON_CLASS(BeatmapsIO, Stats, 
+DECLARE_JSON_CLASS(BeatSaver, Stats, 
     GETTER_VALUE(int, Plays);
     GETTER_VALUE(int, Downloads);
     GETTER_VALUE(int, UpVotes);

@@ -1,6 +1,6 @@
-#include "Types/BeatmapsIO/Stats.hpp"
+#include "Types/BeatSaver/Stats.hpp"
 
-DESERIALIZE_METHOD(BeatmapsIO, Stats, 
+DESERIALIZE_METHOD(BeatSaver, Stats, 
     DESERIALIZE_VALUE(Plays, plays, Int)
     DESERIALIZE_VALUE(Downloads, downloads, Int)
     DESERIALIZE_VALUE(UpVotes, upVotes, Int)

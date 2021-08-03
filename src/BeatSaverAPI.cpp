@@ -14,45 +14,45 @@
 #define CDN_URL std::string("https://cdn.") + BASE_URL + "/"
 #define FILE_DOWNLOAD_TIMEOUT 64
 
-namespace BeatmapsIO::API {
+namespace BeatSaver::API {
                    
-    std::optional<BeatmapsIO::Beatmap> GetBeatmapById(int id) {
+    std::optional<BeatSaver::Beatmap> GetBeatmapById(int id) {
         auto json = WebUtils::GetJSON(API_URL + "/maps/id/" + std::to_string(id));
         if (!json.has_value())
             return std::nullopt;
-        BeatmapsIO::Beatmap beatmap;
+        BeatSaver::Beatmap beatmap;
         beatmap.Deserialize(json.value().GetObject());
         return beatmap;
     }
 
-    std::optional<BeatmapsIO::Beatmap> GetBeatmapByKey(std::string key) {
+    std::optional<BeatSaver::Beatmap> GetBeatmapByKey(std::string key) {
         auto json = WebUtils::GetJSON(API_URL + "/maps/beatsaver/" + key);
         if (!json.has_value())
             return std::nullopt;
-        BeatmapsIO::Beatmap beatmap;
+        BeatSaver::Beatmap beatmap;
         beatmap.Deserialize(json.value().GetObject());
         return beatmap;
     }
 
-    std::optional<BeatmapsIO::Beatmap> GetBeatmapByHash(std::string hash) {
+    std::optional<BeatSaver::Beatmap> GetBeatmapByHash(std::string hash) {
         auto json = WebUtils::GetJSON(API_URL + "/maps/hash/" + hash);
         if (!json.has_value())
             return std::nullopt;
-        BeatmapsIO::Beatmap beatmap;
+        BeatSaver::Beatmap beatmap;
         beatmap.Deserialize(json.value().GetObject());
         return beatmap;
     }
 
-    std::optional<BeatmapsIO::Page> SearchPaged(std::string query, int pageIndex) {
+    std::optional<BeatSaver::Page> SearchPaged(std::string query, int pageIndex) {
         auto json = WebUtils::GetJSON(API_URL + "/search/text/" + std::to_string(pageIndex) + "?q=" + query);
         if (!json.has_value())
             return std::nullopt;
-        BeatmapsIO::Page page;
+        BeatSaver::Page page;
         page.Deserialize(json.value().GetObject());
         return page;
     }
 
-    bool DownloadBeatmap(const BeatmapsIO::Beatmap& beatmap) {
+    bool DownloadBeatmap(const BeatSaver::Beatmap& beatmap) {
         auto targetFolder = RuntimeSongLoader::API::GetCustomLevelsPath() + beatmap.GetVersions().front().GetKey() + " ()[]{}%&.:,;=!-_ (" + beatmap.GetMetadata().GetSongName() + " - " + beatmap.GetMetadata().GetLevelAuthorName() + ")";
         std::string data;
         WebUtils::Get(beatmap.GetVersions().front().GetDownloadURL(), FILE_DOWNLOAD_TIMEOUT, data);
@@ -63,14 +63,14 @@ namespace BeatmapsIO::API {
         return statusCode;
     }
 
-    std::vector<uint8_t> GetPreview(const BeatmapsIO::Beatmap& beatmap) {
+    std::vector<uint8_t> GetPreview(const BeatSaver::Beatmap& beatmap) {
         std::string data;
         WebUtils::Get(beatmap.GetVersions().front().GetPreviewURL(), FILE_DOWNLOAD_TIMEOUT, data);
         std::vector<uint8_t> bytes(data.begin(), data.end());
         return bytes;
     }
 
-    std::vector<uint8_t> GetCoverImage(const BeatmapsIO::Beatmap& beatmap) {
+    std::vector<uint8_t> GetCoverImage(const BeatSaver::Beatmap& beatmap) {
         std::string data;
         WebUtils::Get(beatmap.GetVersions().front().GetCoverURL(), FILE_DOWNLOAD_TIMEOUT, data);
         std::vector<uint8_t> bytes(data.begin(), data.end());
@@ -78,14 +78,14 @@ namespace BeatmapsIO::API {
     }
 
 
-    void GetBeatmapByKeyAsync(std::string key, std::function<void(std::optional<BeatmapsIO::Beatmap>)> finished) {
+    void GetBeatmapByKeyAsync(std::string key, std::function<void(std::optional<BeatSaver::Beatmap>)> finished) {
         WebUtils::GetJSONAsync(API_URL + "/maps/beatsaver/" + key,
             [finished](long httpCode, bool error, rapidjson::Document& document) {
                 if (error) {
                     finished(std::nullopt);
                 }
                 else {
-                    BeatmapsIO::Beatmap beatmap;
+                    BeatSaver::Beatmap beatmap;
                     beatmap.Deserialize(document.GetObject());
                     finished(beatmap);
                 }
@@ -93,14 +93,14 @@ namespace BeatmapsIO::API {
         );
     }
 
-    void GetBeatmapByIdAsync(int id, std::function<void(std::optional<BeatmapsIO::Beatmap>)> finished) {
+    void GetBeatmapByIdAsync(int id, std::function<void(std::optional<BeatSaver::Beatmap>)> finished) {
         WebUtils::GetJSONAsync(API_URL + "/maps/id/" + std::to_string(id),
             [finished](long httpCode, bool error, rapidjson::Document& document) {
                 if (error) {
                     finished(std::nullopt);
                 }
                 else {
-                    BeatmapsIO::Beatmap beatmap;
+                    BeatSaver::Beatmap beatmap;
                     beatmap.Deserialize(document.GetObject());
                     finished(beatmap);
                 }
@@ -108,14 +108,14 @@ namespace BeatmapsIO::API {
         );
     }
 
-    void GetBeatmapByHashAsync(std::string hash, std::function<void(std::optional<BeatmapsIO::Beatmap>)> finished) {
+    void GetBeatmapByHashAsync(std::string hash, std::function<void(std::optional<BeatSaver::Beatmap>)> finished) {
         WebUtils::GetJSONAsync(API_URL + "/maps/hash/" + hash,
             [finished](long httpCode, bool error, rapidjson::Document& document) {
                 if (error) {
                     finished(std::nullopt);
                 }
                 else {
-                    BeatmapsIO::Beatmap beatmap;
+                    BeatSaver::Beatmap beatmap;
                     beatmap.Deserialize(document.GetObject());
                     finished(beatmap);
                 }
@@ -123,14 +123,14 @@ namespace BeatmapsIO::API {
         );
     }
 
-    void SearchPagedAsync(std::string query, int pageIndex, std::function<void(std::optional<BeatmapsIO::Page>)> finished) {
+    void SearchPagedAsync(std::string query, int pageIndex, std::function<void(std::optional<BeatSaver::Page>)> finished) {
         WebUtils::GetJSONAsync(API_URL + "/search/text/" + std::to_string(pageIndex) + "?q=" + query + "&sortOrder=Relevance", // TODO: Let users probably set the sort order, I'll set it to 'Relevance' for now
             [finished](long httpCode, bool error, rapidjson::Document& document) {
                 if (error) {
                     finished(std::nullopt);
                 }
                 else {
-                    BeatmapsIO::Page page;
+                    BeatSaver::Page page;
                     page.Deserialize(document.GetObject());
                     finished(page);
                 }
@@ -138,7 +138,7 @@ namespace BeatmapsIO::API {
         );
     }
 
-    void DownloadBeatmapAsync(const BeatmapsIO::Beatmap& beatmap, std::function<void(bool)> finished, std::function<void(float)> progressUpdate) {
+    void DownloadBeatmapAsync(const BeatSaver::Beatmap& beatmap, std::function<void(bool)> finished, std::function<void(float)> progressUpdate) {
         WebUtils::GetAsync(beatmap.GetVersions().front().GetDownloadURL(), FILE_DOWNLOAD_TIMEOUT,
             [beatmap, finished](long httpCode, std::string data) {
                 auto targetFolder = RuntimeSongLoader::API::GetCustomLevelsPath() + FileUtils::FixIlegalName(beatmap.GetVersions().front().GetKey() + " (" + beatmap.GetMetadata().GetSongName() + " - " + beatmap.GetMetadata().GetLevelAuthorName() + ")");
@@ -151,7 +151,7 @@ namespace BeatmapsIO::API {
         );
     }
 
-    void GetCoverImageAsync(const BeatmapsIO::Beatmap& beatmap, std::function<void(std::vector<uint8_t>)> finished, std::function<void(float)> progressUpdate) {
+    void GetCoverImageAsync(const BeatSaver::Beatmap& beatmap, std::function<void(std::vector<uint8_t>)> finished, std::function<void(float)> progressUpdate) {
         WebUtils::GetAsync(beatmap.GetVersions().front().GetCoverURL(), FILE_DOWNLOAD_TIMEOUT,
             [beatmap, finished](long httpCode, std::string data) {
                 std::vector<uint8_t> bytes(data.begin(), data.end());
@@ -160,7 +160,7 @@ namespace BeatmapsIO::API {
         );
     }
 
-    void GetPreviewAsync(const BeatmapsIO::Beatmap& beatmap, std::function<void(std::vector<uint8_t>)> finished, std::function<void(float)> progressUpdate) {
+    void GetPreviewAsync(const BeatSaver::Beatmap& beatmap, std::function<void(std::vector<uint8_t>)> finished, std::function<void(float)> progressUpdate) {
         WebUtils::GetAsync(beatmap.GetVersions().front().GetPreviewURL(), FILE_DOWNLOAD_TIMEOUT,
             [beatmap, finished](long httpCode, std::string data) {
                 std::vector<uint8_t> bytes(data.begin(), data.end());

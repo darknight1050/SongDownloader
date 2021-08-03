@@ -1,6 +1,6 @@
-#include "Types/BeatmapsIO/Beatmap.hpp"
+#include "Types/BeatSaver/Beatmap.hpp"
 
-DESERIALIZE_METHOD(BeatmapsIO, Beatmap,
+DESERIALIZE_METHOD(BeatSaver, Beatmap,
     DESERIALIZE_VALUE(Automapper, automapper, Bool)
     DESERIALIZE_VALUE_OPTIONAL(Curator, curator, String)
     DESERIALIZE_VALUE_OPTIONAL(Description, description, String)

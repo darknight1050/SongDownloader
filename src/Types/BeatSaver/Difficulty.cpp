@@ -1,6 +1,6 @@
-#include "Types/BeatmapsIO/Difficulty.hpp"
+#include "Types/BeatSaver/Difficulty.hpp"
 
-DESERIALIZE_METHOD(BeatmapsIO, BeatmapDifficulty,
+DESERIALIZE_METHOD(BeatSaver, BeatmapDifficulty,
     DESERIALIZE_VALUE(NJS, njs, Float)
     DESERIALIZE_VALUE(Offset, offset, Float)
     DESERIALIZE_VALUE(Notes, notes, Int)

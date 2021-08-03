@@ -54,11 +54,11 @@ int SearchEntry::spriteCount = 0;
 SearchEntry::SearchEntry(GameObject* _gameObject, TextMeshProUGUI* _line1Component, TextMeshProUGUI* _line2Component, HMUI::ImageView* _coverImageView, Button* _downloadButton) : gameObject(_gameObject), line1Component(_line1Component), line2Component(_line2Component), coverImageView(_coverImageView), downloadButton(_downloadButton) {
 }
 
-const BeatmapsIO::Beatmap& SearchEntry::GetBeatmap() {
+const BeatSaver::Beatmap& SearchEntry::GetBeatmap() {
     return map;
 }
 
-void SearchEntry::SetBeatmap(const BeatmapsIO::Beatmap& _map) {
+void SearchEntry::SetBeatmap(const BeatSaver::Beatmap& _map) {
     map = _map;
     gameObject->SetActive(true);
 
@@ -68,7 +68,7 @@ void SearchEntry::SetBeatmap(const BeatmapsIO::Beatmap& _map) {
     int currentSearchIndex = DownloadSongsSearchViewController::searchIndex;
     
     coverImageView->set_enabled(false);
-    BeatmapsIO::API::GetCoverImageAsync(map, [this, currentSearchIndex](std::vector<uint8_t> bytes) {
+    BeatSaver::API::GetCoverImageAsync(map, [this, currentSearchIndex](std::vector<uint8_t> bytes) {
         if(currentSearchIndex == DownloadSongsSearchViewController::searchIndex) {
             MainThreadScheduler::Schedule([this, currentSearchIndex, bytes] {
                 if(currentSearchIndex == DownloadSongsSearchViewController::searchIndex) {
@@ -170,7 +170,7 @@ void DownloadSongsSearchViewController::CreateEntries(Transform* parent) {
         downloadButton->get_onClick()->AddListener(il2cpp_utils::MakeDelegate<UnityAction*>(classof(UnityAction*), 
             (std::function<void()>) [this, entry] {
                 auto hash = entry->GetBeatmap().GetVersions().front().GetHash();
-                BeatmapsIO::API::DownloadBeatmapAsync(entry->GetBeatmap(), 
+                BeatSaver::API::DownloadBeatmapAsync(entry->GetBeatmap(), 
                     [this] (bool error) {
                         if(!error) {
                             QuestUI::MainThreadScheduler::Schedule(
@@ -211,8 +211,8 @@ void DownloadSongsSearchViewController::DidActivate(bool firstActivation, bool a
                     }
                 } else {
                     if(getModConfig().BsrSearch.GetValue()) {
-                        BeatmapsIO::API::GetBeatmapByKeyAsync(value,
-                            [this, currentSearchIndex] (std::optional<BeatmapsIO::Beatmap> beatmap) {
+                        BeatSaver::API::GetBeatmapByKeyAsync(value,
+                            [this, currentSearchIndex] (std::optional<BeatSaver::Beatmap> beatmap) {
                                 if(currentSearchIndex == DownloadSongsSearchViewController::searchIndex) {
                                     QuestUI::MainThreadScheduler::Schedule(
                                         [this, currentSearchIndex, beatmap] {
@@ -238,8 +238,8 @@ void DownloadSongsSearchViewController::DidActivate(bool firstActivation, bool a
                             }
                         );
                     } else {
-                        BeatmapsIO::API::SearchPagedAsync(value, 0,
-                            [this, currentSearchIndex] (std::optional<BeatmapsIO::Page> page) {
+                        BeatSaver::API::SearchPagedAsync(value, 0,
+                            [this, currentSearchIndex] (std::optional<BeatSaver::Page> page) {
                                 if(currentSearchIndex == DownloadSongsSearchViewController::searchIndex) {
                                     QuestUI::MainThreadScheduler::Schedule(
                                         [this, currentSearchIndex, page] {

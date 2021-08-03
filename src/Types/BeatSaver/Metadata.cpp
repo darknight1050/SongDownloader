@@ -1,6 +1,6 @@
-#include "Types/BeatmapsIO/Metadata.hpp"
+#include "Types/BeatSaver/Metadata.hpp"
 
-DESERIALIZE_METHOD(BeatmapsIO, Metadata, 
+DESERIALIZE_METHOD(BeatSaver, Metadata, 
     //DESERIALIZE_VALUE(BPM, bpm, Float)
     DESERIALIZE_VALUE(Duration, duration, Int)
     DESERIALIZE_VALUE(LevelAuthorName, levelAuthorName, String)
