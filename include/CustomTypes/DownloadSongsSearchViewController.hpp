@@ -17,7 +17,7 @@
 
 #define MAX_SPRITES 150
 
-#define ENTRIES_PER_PAGE 25
+#define ENTRIES_PER_PAGE 20
 
 namespace SongDownloader {
     class SearchEntry {

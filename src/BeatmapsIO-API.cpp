@@ -71,12 +71,12 @@ namespace BeatmapsIO::API {
         return bytes;
     }
 
-	std::vector<uint8_t> GetCoverImage(const BeatmapsIO::Beatmap& beatmap) {
-		std::string data;
-		WebUtils::Get(beatmap.GetVersions().front().GetCoverURL(), FILE_DOWNLOAD_TIMEOUT, data);
-		std::vector<uint8_t> bytes(data.begin(), data.end());
-		return bytes;
-	}
+    std::vector<uint8_t> GetCoverImage(const BeatmapsIO::Beatmap& beatmap) {
+        std::string data;
+        WebUtils::Get(beatmap.GetVersions().front().GetCoverURL(), FILE_DOWNLOAD_TIMEOUT, data);
+        std::vector<uint8_t> bytes(data.begin(), data.end());
+        return bytes;
+    }
 
 
     void GetBeatmapByKeyAsync(std::string key, std::function<void(std::optional<BeatmapsIO::Beatmap>)> finished) {
@@ -125,7 +125,7 @@ namespace BeatmapsIO::API {
     }
 
     void SearchPagedAsync(std::string query, int pageIndex, std::function<void(std::optional<BeatmapsIO::Page>)> finished) {
-        WebUtils::GetJSONAsync(API_URL + "/search/text/" + std::to_string(pageIndex) + "?q=" + query + "&sortOrder=Latest", // TODO: Let users probably set the sort order
+        WebUtils::GetJSONAsync(API_URL + "/search/text/" + std::to_string(pageIndex) + "?q=" + query + "&sortOrder=Relevance", // TODO: Let users probably set the sort order, I'll set it to 'Relevance' for now
             [finished](long httpCode, bool error, rapidjson::Document& document) {
                 if (error) {
                     finished(std::nullopt);
@@ -161,14 +161,14 @@ namespace BeatmapsIO::API {
         );
     }
 
-	void GetPreviewAsync(const BeatmapsIO::Beatmap& beatmap, std::function<void(std::vector<uint8_t>)> finished, std::function<void(float)> progressUpdate) {
-		WebUtils::GetAsync(beatmap.GetVersions().front().GetPreviewURL(), FILE_DOWNLOAD_TIMEOUT,
-			[beatmap, finished](long httpCode, std::string data) {
-				std::vector<uint8_t> bytes(data.begin(), data.end());
-				finished(bytes);
-			}, progressUpdate
-		);
-	}
+    void GetPreviewAsync(const BeatmapsIO::Beatmap& beatmap, std::function<void(std::vector<uint8_t>)> finished, std::function<void(float)> progressUpdate) {
+        WebUtils::GetAsync(beatmap.GetVersions().front().GetPreviewURL(), FILE_DOWNLOAD_TIMEOUT,
+            [beatmap, finished](long httpCode, std::string data) {
+                std::vector<uint8_t> bytes(data.begin(), data.end());
+                finished(bytes);
+            }, progressUpdate
+        );
+    }
 
 
 }

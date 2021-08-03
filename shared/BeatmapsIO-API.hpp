@@ -19,7 +19,7 @@ namespace BeatmapsIO::API {
 
     std::vector<uint8_t> GetCoverImage(const BeatmapsIO::Beatmap& beatmap);
 
-	std::vector<uint8_t> GetPreview(const BeatmapsIO::Beatmap& beatmap);
+    std::vector<uint8_t> GetPreview(const BeatmapsIO::Beatmap& beatmap);
 
     void GetBeatmapByIdAsync(int id, std::function<void(std::optional<BeatmapsIO::Beatmap>)> finished);
 
@@ -35,6 +35,6 @@ namespace BeatmapsIO::API {
     void GetCoverImageAsync(const BeatmapsIO::Beatmap& beatmap, std::function<void(std::vector<uint8_t>)> finished, std::function<void(float)> progressUpdate = nullptr);
     
     // Returns mp3 with previewAudio
-	void GetPreviewAsync(const BeatmapsIO::Beatmap& beatmap, std::function<void(std::vector<uint8_t>)> finished, std::function<void(float)> progressUpdate = nullptr);
+    void GetPreviewAsync(const BeatmapsIO::Beatmap& beatmap, std::function<void(std::vector<uint8_t>)> finished, std::function<void(float)> progressUpdate = nullptr);
 
 }
