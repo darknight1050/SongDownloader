@@ -29,14 +29,14 @@ void DownloadSongsOptionsViewController::DidActivate(bool firstActivation, bool 
         parent->set_localPosition(UnityEngine::Vector3(0.0f, 8.0f));
 
         VerticalLayoutGroup* settingsLayout = QuestUI::BeatSaberUI::CreateVerticalLayoutGroup(parent);
-		RectTransform* settingsLayoutTransform = settingsLayout->GetComponent<RectTransform*>();
-		settingsLayout->get_gameObject()->AddComponent<Backgroundable*>()->ApplyBackground(il2cpp_utils::createcsstr("round-rect-panel"));
-		settingsLayout->set_spacing(1.2f);
-		settingsLayout->set_padding(UnityEngine::RectOffset::New_ctor(3, 3, 2, 2));
+        RectTransform* settingsLayoutTransform = settingsLayout->GetComponent<RectTransform*>();
+        settingsLayout->get_gameObject()->AddComponent<Backgroundable*>()->ApplyBackground(il2cpp_utils::createcsstr("round-rect-panel"));
+        settingsLayout->set_spacing(1.2f);
+        settingsLayout->set_padding(UnityEngine::RectOffset::New_ctor(3, 3, 2, 2));
 
-		ContentSizeFitter* contentSizeFitter = settingsLayout->get_gameObject()->AddComponent<ContentSizeFitter*>();
-		contentSizeFitter->set_horizontalFit(ContentSizeFitter::FitMode::PreferredSize);
-		contentSizeFitter->set_verticalFit(ContentSizeFitter::FitMode::PreferredSize);
+        ContentSizeFitter* contentSizeFitter = settingsLayout->get_gameObject()->AddComponent<ContentSizeFitter*>();
+        contentSizeFitter->set_horizontalFit(ContentSizeFitter::FitMode::PreferredSize);
+        contentSizeFitter->set_verticalFit(ContentSizeFitter::FitMode::PreferredSize);
         
         AddConfigValueToggle(settingsLayoutTransform, getModConfig().AutoMapper)->get_transform()->GetParent()->GetComponent<LayoutElement*>()->set_preferredWidth(45.0f);
         AddConfigValueToggle(settingsLayoutTransform, getModConfig().BsrSearch)->get_transform()->GetParent()->GetComponent<LayoutElement*>()->set_preferredWidth(45.0f);
