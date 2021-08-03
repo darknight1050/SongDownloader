@@ -10,7 +10,8 @@
 
 #include "custom-types/shared/macros.hpp"
 
-#include "Types/BeatSaver/Page.hpp"
+//#include "Types/BeatSaver/Page.hpp"
+#include "Types/BeatmapsIO/Page.hpp"
 
 #include <vector>
 
@@ -20,7 +21,7 @@
 
 namespace SongDownloader {
     class SearchEntry {
-        BeatSaver::Beatmap map;
+        BeatmapsIO::Beatmap map;
         UnityEngine::GameObject* gameObject;
         TMPro::TextMeshProUGUI* line1Component;
         TMPro::TextMeshProUGUI* line2Component;
@@ -35,9 +36,9 @@ namespace SongDownloader {
 
         SearchEntry(UnityEngine::GameObject* _gameObject, TMPro::TextMeshProUGUI* _line1Component, TMPro::TextMeshProUGUI* _line2Component, HMUI::ImageView* _coverImageView, UnityEngine::UI::Button* _downloadButton);
 
-        const BeatSaver::Beatmap& GetBeatmap();
+        const BeatmapsIO::Beatmap& GetBeatmap();
         
-        void SetBeatmap(const BeatSaver::Beatmap& _map);
+        void SetBeatmap(const BeatmapsIO::Beatmap& _map);
         
         void UpdateDownloadProgress(bool checkLoaded);
 

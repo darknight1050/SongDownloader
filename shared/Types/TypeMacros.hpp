@@ -1,5 +1,6 @@
 #pragma once
 #include "beatsaber-hook/shared/config/rapidjson-utils.hpp"
+#include "CustomLogger.hpp"
 
 #define DECLARE_JSON_CLASS(namespaze, name, impl) \
 namespace namespaze { \
@@ -25,12 +26,15 @@ public: \
 #define DESERIALIZE_METHOD(namespaze, name, impl) \
 void namespaze::name::Deserialize(const rapidjson::Value& jsonValue) { \
     impl \
+    LOG_DEBUG("Deserializing: %s", #name); \
 }
 
 #define DESERIALIZE_VALUE(name, jsonName, type) \
+LOG_DEBUG("Deserializing: %s", #jsonName); \
 name = jsonValue[#jsonName].Get##type();
 
 #define DESERIALIZE_VALUE_OPTIONAL(name, jsonName, type) \
+LOG_DEBUG("Deserializing: %s", #jsonName); \
 if(jsonValue.HasMember(#jsonName) && jsonValue[#jsonName].Is##type()) { \
     name = jsonValue[#jsonName].Get##type(); \
 } else { \
@@ -38,10 +42,12 @@ if(jsonValue.HasMember(#jsonName) && jsonValue[#jsonName].Is##type()) { \
 }
 
 #define DESERIALIZE_CLASS(name, jsonName) \
+LOG_DEBUG("Deserializing: %s", #jsonName); \
 name.Deserialize(jsonValue[#jsonName]);
 
 
 #define DESERIALIZE_VECTOR(name, jsonName, type) \
+LOG_DEBUG("Deserializing: %s", #jsonName); \
 name.clear(); \
 auto& jsonName = jsonValue[#jsonName]; \
 if(jsonName.IsArray()) { \
