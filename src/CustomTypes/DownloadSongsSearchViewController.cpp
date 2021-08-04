@@ -243,7 +243,7 @@ void DownloadSongsSearchViewController::DidActivate(bool firstActivation, bool a
                                     QuestUI::MainThreadScheduler::Schedule(
                                         [this, currentSearchIndex, page] {
                                             if(currentSearchIndex == DownloadSongsSearchViewController::searchIndex) {
-                                                if(page.has_value()) {
+                                                if(page.has_value() && !page.value().GetDocs().empty()) {
                                                     auto maps = page.value().GetDocs();
                                                     auto mapsSize = maps.size();
                                                     int mapIndex = 0;
@@ -283,8 +283,7 @@ void DownloadSongsSearchViewController::DidActivate(bool firstActivation, bool a
                                     );
                                 }
                             }, 
-                            getModConfig().SortOrder.GetValue()
-                        );
+                            getModConfig().SortOrder.GetValue());
                     }
                 }
             }

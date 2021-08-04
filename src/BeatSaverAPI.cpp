@@ -133,8 +133,15 @@ namespace BeatSaver::API {
     }
 
     void SearchPagedAsync(std::string query, int pageIndex, std::function<void(std::optional<BeatSaver::Page>)> finished, std::string sortOrder) {
-        WebUtils::GetJSONAsync(API_URL + "/search/text/" + std::to_string(pageIndex) + "?q=" + query + "&sortOrder=" + sortOrder, // TODO: Let users probably set the sort order, I'll set it to 'Relevance' for now
+        WebUtils::GetJSONAsync(API_URL + "/search/text/" + std::to_string(pageIndex) + "?q=" + query + "&sortOrder=" + sortOrder,
             [finished](long httpCode, bool error, rapidjson::Document& document) {
+                //// TODO: Warning this code causes crashes
+                //// Convert the document into a string
+                //rapidjson::StringBuffer buffer;
+                //rapidjson::Writer<rapidjson::StringBuffer> writer(buffer);
+                //document.Accept(writer);
+                //writefile("/sdcard/ModData/SearchQuery.json", buffer.GetString());
+
                 if (error) {
                     finished(std::nullopt);
                 }
