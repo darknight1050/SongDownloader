@@ -6,4 +6,5 @@ DESERIALIZE_METHOD(BeatSaver, UserDetail,
     DESERIALIZE_VALUE(AvatarURL, avatar, String)
     DESERIALIZE_VALUE_OPTIONAL(Hash, hash, String)
     DESERIALIZE_VALUE_OPTIONAL(Testplay, testplay, Bool)
+    DESERIALIZE_CLASS_OPTIONAL(Stats, stats)
 )

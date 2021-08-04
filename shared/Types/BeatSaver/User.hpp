@@ -1,6 +1,6 @@
 #pragma once
 #include "../TypeMacros.hpp"
-//#include "UserStats.hpp"
+#include "UserStats.hpp"
 
 DECLARE_JSON_CLASS(BeatSaver, UserDetail, 
     GETTER_VALUE(int, Id);
@@ -9,4 +9,5 @@ DECLARE_JSON_CLASS(BeatSaver, UserDetail,
     GETTER_VALUE_OPTIONAL(std::string, Hash);
     //GETTER_VALUE(BeatSaver::UserStats, stats); // Listed in documentation as well as testplay not seen in any recent requests though
     GETTER_VALUE_OPTIONAL(bool, Testplay);
+    GETTER_VALUE_OPTIONAL(BeatSaver::UserStats, Stats);
 )

@@ -10,6 +10,8 @@ namespace BeatSaver::API {
 
     std::optional<BeatSaver::Beatmap> GetBeatmapByHash(std::string hash);
 
+    std::optional<BeatSaver::UserDetail> GetUserById(int id);
+
     /// <summary>
     /// Search on BeatSaver
     /// </summary>
@@ -49,6 +51,8 @@ namespace BeatSaver::API {
     /// <param name="hash"> Hash of the beatmap, levelID of a custom level contains it</param>
     /// <param name="finished"> Function to run after it finishes loading</param>
     void GetBeatmapByHashAsync(std::string hash, std::function<void(std::optional<BeatSaver::Beatmap>)> finished);
+
+    void GetUserByIdAsync(int id, std::function<void(std::optional<BeatSaver::UserDetail>)> finished);
 
     /// <summary>
     /// Search on BeatSaver

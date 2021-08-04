@@ -35,6 +35,15 @@ namespace BeatSaver::API {
         return beatmap;
     }
 
+    std::optional<BeatSaver::UserDetail> GetUserById(int id) {
+        auto json = WebUtils::GetJSON(API_URL + "/users/id/" + std::to_string(id));
+        if (!json.has_value())
+            return std::nullopt;
+        BeatSaver::UserDetail user;
+        user.Deserialize(json.value().GetObject());
+        return user;
+    }
+
     std::optional<BeatSaver::Page> SearchPaged(std::string query, int pageIndex, std::string sortOrder) {
         auto json = WebUtils::GetJSON(API_URL + "/search/text/" + std::to_string(pageIndex) + "?q=" + query + "&sortOrder=" + sortOrder);
         if (!json.has_value())
@@ -127,6 +136,21 @@ namespace BeatSaver::API {
                     BeatSaver::Beatmap beatmap;
                     beatmap.Deserialize(document.GetObject());
                     finished(beatmap);
+                }
+            }
+        );
+    }
+
+    void GetUserByIdAsync(int id, std::function<void(std::optional<BeatSaver::UserDetail>)> finished) {
+        WebUtils::GetJSONAsync(API_URL + "/users/id/" + std::to_string(id),
+            [finished](long httpCode, bool error, rapidjson::Document& document) {
+                if (error) {
+                    finished(std::nullopt);
+                }
+                else {
+                    BeatSaver::UserDetail user;
+                    user.Deserialize(document.GetObject());
+                    finished(user);
                 }
             }
         );
