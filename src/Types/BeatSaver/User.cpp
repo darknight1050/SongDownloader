@@ -1,9 +1,9 @@
 #include "Types/BeatSaver/User.hpp"
 
 DESERIALIZE_METHOD(BeatSaver, UserDetail, 
-    DESERIALIZE_VALUE(AvatarURL, avatar, String)
-    DESERIALIZE_VALUE(Hash, hash, String)
     DESERIALIZE_VALUE(Id, id, Int)
     DESERIALIZE_VALUE(Username, name, String)
+    DESERIALIZE_VALUE(AvatarURL, avatar, String)
+    DESERIALIZE_VALUE_OPTIONAL(Hash, hash, String)
     DESERIALIZE_VALUE_OPTIONAL(Testplay, testplay, Bool)
 )

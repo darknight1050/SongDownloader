@@ -16,8 +16,7 @@ DESERIALIZE_METHOD(BeatSaver, BeatmapDifficulty,
     DESERIALIZE_VALUE(NE, ne, Bool)
     DESERIALIZE_VALUE(Cinema, cinema, Bool)
     DESERIALIZE_VALUE(Seconds, seconds, Int)
-    //DESERIALIZE_CLASS(ParitySummary, paritySummary)
-
+    DESERIALIZE_CLASS(ParitySummary, paritySummary)
     DESERIALIZE_VALUE_OPTIONAL(Stars, stars, Float)
 
 )

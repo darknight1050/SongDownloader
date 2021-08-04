@@ -1,5 +1,6 @@
 #pragma once
 #include "../TypeMacros.hpp"
+#include "ParitySummary.hpp"
 
 DECLARE_JSON_CLASS(BeatSaver, BeatmapDifficulty, 
     GETTER_VALUE(float, NJS);
@@ -17,6 +18,6 @@ DECLARE_JSON_CLASS(BeatSaver, BeatmapDifficulty,
     GETTER_VALUE(bool, NE);
     GETTER_VALUE(bool, Cinema);
     GETTER_VALUE(double, Seconds);
-    //GETTER_VALUE(ParitySummary, ParitySummary);
+    GETTER_VALUE(BeatSaver::BeatmapParitySummary, ParitySummary);
     GETTER_VALUE_OPTIONAL(float, Stars); // Listed in the documentation not seen on any response
 )
