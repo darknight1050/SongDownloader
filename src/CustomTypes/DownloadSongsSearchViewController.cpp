@@ -3,8 +3,7 @@
 #include "CustomLogger.hpp"
 #include "ModConfig.hpp"
 
-//#include "BeatSaverAPI.hpp"
-#include "BeatmapsIO-API.hpp"
+#include "BeatSaverAPI.hpp"
 
 #include "songloader/shared/API.hpp"
 
@@ -283,7 +282,8 @@ void DownloadSongsSearchViewController::DidActivate(bool firstActivation, bool a
                                         }
                                     );
                                 }
-                            }
+                            }, 
+                            getModConfig().SortOrder.GetValue()
                         );
                     }
                 }

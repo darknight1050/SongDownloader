@@ -3,5 +3,5 @@
 DESERIALIZE_METHOD(BeatSaver, Page,
     DESERIALIZE_VECTOR(Docs, docs, Beatmap)
     DESERIALIZE_VALUE(Redirect, redirect, Int)
-    DESERIALIZE_CLASS(User, user)
+    DESERIALIZE_CLASS_OPTIONAL(User, user)
 )

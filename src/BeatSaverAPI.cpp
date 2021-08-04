@@ -1,4 +1,4 @@
-#include "BeatmapsIO-API.hpp"
+#include "BeatSaverAPI.hpp"
 
 #include "CustomLogger.hpp"
 
@@ -10,23 +10,15 @@
 #include "songloader/shared/API.hpp"
 
 #define BASE_URL std::string("beatsaver.com")
+#define FALLBACK_URL std::string("beatmaps.io")
 #define API_URL std::string("https://api.") + BASE_URL
 #define CDN_URL std::string("https://cdn.") + BASE_URL + "/"
 #define FILE_DOWNLOAD_TIMEOUT 64
 
 namespace BeatSaver::API {
                    
-    std::optional<BeatSaver::Beatmap> GetBeatmapById(int id) {
-        auto json = WebUtils::GetJSON(API_URL + "/maps/id/" + std::to_string(id));
-        if (!json.has_value())
-            return std::nullopt;
-        BeatSaver::Beatmap beatmap;
-        beatmap.Deserialize(json.value().GetObject());
-        return beatmap;
-    }
-
     std::optional<BeatSaver::Beatmap> GetBeatmapByKey(std::string key) {
-        auto json = WebUtils::GetJSON(API_URL + "/maps/beatsaver/" + key);
+        auto json = WebUtils::GetJSON(API_URL + "/maps/id/" + key);
         if (!json.has_value())
             return std::nullopt;
         BeatSaver::Beatmap beatmap;
@@ -43,8 +35,8 @@ namespace BeatSaver::API {
         return beatmap;
     }
 
-    std::optional<BeatSaver::Page> SearchPaged(std::string query, int pageIndex) {
-        auto json = WebUtils::GetJSON(API_URL + "/search/text/" + std::to_string(pageIndex) + "?q=" + query);
+    std::optional<BeatSaver::Page> SearchPaged(std::string query, int pageIndex, std::string sortOrder) {
+        auto json = WebUtils::GetJSON(API_URL + "/search/text/" + std::to_string(pageIndex) + "?q=" + query + "&sortOrder=" + sortOrder);
         if (!json.has_value())
             return std::nullopt;
         BeatSaver::Page page;
@@ -79,22 +71,7 @@ namespace BeatSaver::API {
 
 
     void GetBeatmapByKeyAsync(std::string key, std::function<void(std::optional<BeatSaver::Beatmap>)> finished) {
-        WebUtils::GetJSONAsync(API_URL + "/maps/beatsaver/" + key,
-            [finished](long httpCode, bool error, rapidjson::Document& document) {
-                if (error) {
-                    finished(std::nullopt);
-                }
-                else {
-                    BeatSaver::Beatmap beatmap;
-                    beatmap.Deserialize(document.GetObject());
-                    finished(beatmap);
-                }
-            }
-        );
-    }
-
-    void GetBeatmapByIdAsync(int id, std::function<void(std::optional<BeatSaver::Beatmap>)> finished) {
-        WebUtils::GetJSONAsync(API_URL + "/maps/id/" + std::to_string(id),
+        WebUtils::GetJSONAsync(API_URL + "/maps/id/" + key,
             [finished](long httpCode, bool error, rapidjson::Document& document) {
                 if (error) {
                     finished(std::nullopt);
@@ -123,8 +100,8 @@ namespace BeatSaver::API {
         );
     }
 
-    void SearchPagedAsync(std::string query, int pageIndex, std::function<void(std::optional<BeatSaver::Page>)> finished) {
-        WebUtils::GetJSONAsync(API_URL + "/search/text/" + std::to_string(pageIndex) + "?q=" + query + "&sortOrder=Relevance", // TODO: Let users probably set the sort order, I'll set it to 'Relevance' for now
+    void SearchPagedAsync(std::string query, int pageIndex, std::function<void(std::optional<BeatSaver::Page>)> finished, std::string sortOrder) {
+        WebUtils::GetJSONAsync(API_URL + "/search/text/" + std::to_string(pageIndex) + "?q=" + query + "&sortOrder=" + sortOrder, // TODO: Let users probably set the sort order, I'll set it to 'Relevance' for now
             [finished](long httpCode, bool error, rapidjson::Document& document) {
                 if (error) {
                     finished(std::nullopt);

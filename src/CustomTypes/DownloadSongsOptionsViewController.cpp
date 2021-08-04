@@ -38,7 +38,16 @@ void DownloadSongsOptionsViewController::DidActivate(bool firstActivation, bool 
         contentSizeFitter->set_horizontalFit(ContentSizeFitter::FitMode::PreferredSize);
         contentSizeFitter->set_verticalFit(ContentSizeFitter::FitMode::PreferredSize);
         
-        AddConfigValueToggle(settingsLayoutTransform, getModConfig().AutoMapper)->get_transform()->GetParent()->GetComponent<LayoutElement*>()->set_preferredWidth(45.0f);
-        AddConfigValueToggle(settingsLayoutTransform, getModConfig().BsrSearch)->get_transform()->GetParent()->GetComponent<LayoutElement*>()->set_preferredWidth(45.0f);
+        AddConfigValueToggle(settingsLayoutTransform, getModConfig().AutoMapper)->get_transform()->GetParent()->GetComponent<LayoutElement*>()->set_preferredWidth(50.0f);
+        AddConfigValueToggle(settingsLayoutTransform, getModConfig().BsrSearch)->get_transform()->GetParent()->GetComponent<LayoutElement*>()->set_preferredWidth(50.0f);
+
+        std::vector<std::string> DropdownValues = { "Latest", "Relevance", "Rating" };
+
+        HMUI::SimpleTextDropdown* dropdown = QuestUI::BeatSaberUI::CreateDropdown(settingsLayoutTransform, getModConfig().SortOrder.GetName(), getModConfig().SortOrder.GetValue(), DropdownValues,
+            [] (std::string value) {
+                getModConfig().SortOrder.SetValue(value);
+            }
+        );
+        dropdown->get_transform()->GetParent()->GetComponent<LayoutElement*>()->set_preferredWidth(50.0f);
     }
 }

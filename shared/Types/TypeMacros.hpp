@@ -40,6 +40,12 @@ if(jsonValue.HasMember(#jsonName) && jsonValue[#jsonName].Is##type()) { \
 #define DESERIALIZE_CLASS(name, jsonName) \
 name.Deserialize(jsonValue[#jsonName]);
 
+#define DESERIALIZE_CLASS_OPTIONAL(name, jsonName) \
+if(jsonValue.HasMember(#jsonName)) { \
+    name->Deserialize(jsonValue[#jsonName]);\
+} else { \
+    name = std::nullopt; \
+}
 
 #define DESERIALIZE_VECTOR(name, jsonName, type) \
 name.clear(); \
