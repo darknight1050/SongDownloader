@@ -6,7 +6,7 @@ DESERIALIZE_METHOD(BeatSaver, BeatmapVersion,
     DESERIALIZE_VECTOR(Diffs, diffs, BeatmapDifficulty)
     DESERIALIZE_VALUE_OPTIONAL(Feedback, feedback, String)
     DESERIALIZE_VALUE(Hash, hash, String)
-    DESERIALIZE_VALUE(Key, key, String)
+    DESERIALIZE_VALUE_OPTIONAL(Key, key, String)
     DESERIALIZE_VALUE(State, state, String) // Contains stringified Enum I think
     //DESERIALIZE_CLASS(TestplayAt, testplayAt)
     //DESERIALIZE_CLASS(Testplays, testplays) // Not going to add that all in now

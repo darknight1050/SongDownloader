@@ -8,8 +8,8 @@
 DECLARE_JSON_CLASS(BeatSaver, Beatmap, 
     GETTER_VALUE(bool, Automapper);
     GETTER_VALUE_OPTIONAL(std::string, Curator);
-    GETTER_VALUE_OPTIONAL(std::string, Description);
-    GETTER_VALUE(int, Id);
+    GETTER_VALUE(std::string, Description);
+    GETTER_VALUE(std::string, Id);
     GETTER_VALUE(BeatSaver::Metadata, Metadata);
     GETTER_VALUE(std::string, Name);
     GETTER_VALUE(bool, Qualified);

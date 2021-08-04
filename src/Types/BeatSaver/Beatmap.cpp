@@ -3,8 +3,8 @@
 DESERIALIZE_METHOD(BeatSaver, Beatmap,
     DESERIALIZE_VALUE(Automapper, automapper, Bool)
     DESERIALIZE_VALUE_OPTIONAL(Curator, curator, String)
-    DESERIALIZE_VALUE_OPTIONAL(Description, description, String)
-    DESERIALIZE_VALUE(Id, id, Int)
+    DESERIALIZE_VALUE(Description, description, String)
+    DESERIALIZE_VALUE(Id, id, String)
     DESERIALIZE_CLASS(Metadata, metadata)
     DESERIALIZE_VALUE(Name, name, String)
     DESERIALIZE_VALUE(Qualified, qualified, Bool)
