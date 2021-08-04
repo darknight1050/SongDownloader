@@ -44,6 +44,30 @@ namespace BeatSaver::API {
         return page;
     }
 
+    std::optional<BeatSaver::Page> LatestPaged(bool automapper, std::string after) {
+        std::optional<rapidjson::Document> json;
+        if (after.empty()) {
+            json = WebUtils::GetJSON(API_URL + "/maps/latest?automapper=" + std::to_string(automapper));
+        }
+        else {
+            json = WebUtils::GetJSON(API_URL + "/maps/latest?after=" + after + "&automapper=" + std::to_string(automapper));
+        }
+        if (!json.has_value())
+            return std::nullopt;
+        BeatSaver::Page page;
+        page.Deserialize(json.value().GetObject());
+        return page;
+    }
+
+    std::optional<BeatSaver::Page> PlaysPaged(int pageIndex) {
+        auto json = WebUtils::GetJSON(API_URL + "/maps/plays/" + std::to_string(pageIndex));
+        if (!json.has_value())
+            return std::nullopt;
+        BeatSaver::Page page;
+        page.Deserialize(json.value().GetObject());
+        return page;
+    }
+
     bool DownloadBeatmap(const BeatSaver::Beatmap& beatmap) {
         auto targetFolder = RuntimeSongLoader::API::GetCustomLevelsPath() + beatmap.GetId() + " ()[]{}%&.:,;=!-_ (" + beatmap.GetMetadata().GetSongName() + " - " + beatmap.GetMetadata().GetLevelAuthorName() + ")";
         std::string data;
@@ -69,6 +93,14 @@ namespace BeatSaver::API {
         return bytes;
     }
 
+    // This isn't really ideal, but it could be kinda useful to be able to get the coverImage just by hash directly
+    std::optional<std::vector<uint8_t>> GetCoverImage(std::string hash) {
+        std::string data;
+        WebUtils::Get(CDN_URL + hash + ".jpg", FILE_DOWNLOAD_TIMEOUT, data);
+        if (data.empty()) return std::nullopt;
+        std::vector<uint8_t> bytes(data.begin(), data.end());
+        return bytes;
+    }
 
     void GetBeatmapByKeyAsync(std::string key, std::function<void(std::optional<BeatSaver::Beatmap>)> finished) {
         WebUtils::GetJSONAsync(API_URL + "/maps/id/" + key,
@@ -131,6 +163,17 @@ namespace BeatSaver::API {
     void GetCoverImageAsync(const BeatSaver::Beatmap& beatmap, std::function<void(std::vector<uint8_t>)> finished, std::function<void(float)> progressUpdate) {
         WebUtils::GetAsync(beatmap.GetVersions().front().GetCoverURL(), FILE_DOWNLOAD_TIMEOUT,
             [beatmap, finished](long httpCode, std::string data) {
+                std::vector<uint8_t> bytes(data.begin(), data.end());
+                finished(bytes);
+            }, progressUpdate
+        );
+    }
+
+    void GetCoverImageByHashAsync(std::string hash, std::function<void(std::vector<uint8_t>)> finished, std::function<void(float)> progressUpdate) {
+        WebUtils::GetAsync(CDN_URL + hash + ".jpg", FILE_DOWNLOAD_TIMEOUT,
+            [hash, finished](long httpCode, std::string data) {
+                LOG_DEBUG("HTTP Code when loading by hash: %ld", httpCode);
+                if (httpCode != 0) return;
                 std::vector<uint8_t> bytes(data.begin(), data.end());
                 finished(bytes);
             }, progressUpdate

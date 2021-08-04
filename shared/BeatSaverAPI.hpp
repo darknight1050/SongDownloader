@@ -19,9 +19,25 @@ namespace BeatSaver::API {
     /// <returns>An std::optional that either contains BeatSaver::Page or std::nullopt</returns>
     std::optional<BeatSaver::Page> SearchPaged(std::string query, int pageIndex, std::string sortOrder = "Relevance");
 
+    /// <summary>
+    /// Get maps ordered by upload date
+    /// </summary>
+    /// <param name="automapper">If automapper maps should be included, default false</param>
+    /// <param name="after">Specify to only show maps after specific data format 
+    /// "<date>T<time>" with date in "YYYY-DD-MM" and time in "hh:mm:ss.sss" plus timezone designation or "Z" for the UTC timezone 
+    /// for example "2020-03-08T01:46:20.649Z" or "2020-01-08T00:00:00.000+02:00" for UTC +02:00 read ISO 8601 UTC Date time
+    /// defaults to an empty string</param>
+    /// <returns></returns>
+    std::optional<BeatSaver::Page> LatestPaged(bool automapper = false, std::string after = "");
+
+    std::optional<BeatSaver::Page> PlaysPaged(int pageIndex);
+
     bool DownloadBeatmap(const BeatSaver::Beatmap& beatmap);
 
     std::vector<uint8_t> GetCoverImage(const BeatSaver::Beatmap& beatmap);
+
+    // You need to check yourself if the bytes would make a valid coverImage
+    std::optional<std::vector<uint8_t>> GetCoverImage(std::string hash);
 
     std::vector<uint8_t> GetPreview(const BeatSaver::Beatmap& beatmap);
 
@@ -47,6 +63,8 @@ namespace BeatSaver::API {
 
     void GetCoverImageAsync(const BeatSaver::Beatmap& beatmap, std::function<void(std::vector<uint8_t>)> finished, std::function<void(float)> progressUpdate = nullptr);
     
+    void GetCoverImageByHashAsync(std::string hash, std::function<void(std::vector<uint8_t>)> finished, std::function<void(float)> progressUpdate = nullptr);
+
     // Returns mp3 with previewAudio
     void GetPreviewAsync(const BeatSaver::Beatmap& beatmap, std::function<void(std::vector<uint8_t>)> finished, std::function<void(float)> progressUpdate = nullptr);
 

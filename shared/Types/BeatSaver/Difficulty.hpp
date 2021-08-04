@@ -10,8 +10,8 @@ DECLARE_JSON_CLASS(BeatSaver, BeatmapDifficulty,
     GETTER_VALUE(int, Obstacles);
     GETTER_VALUE(double, NPS);
     GETTER_VALUE(int, Length);
-    GETTER_VALUE(std::string, Characteristic); // Enum [ Standard, OneSaber, NoArrows, _90Degree, _360Degree, Lightshow, Lawless ] String for characteristic
-    GETTER_VALUE(std::string, Difficulty); // Enum [ Easy, Normal, Hard, Expert, ExpertPlus ] String for diffculty
+    GETTER_VALUE(std::string, Characteristic); // Enum string [ Standard, OneSaber, NoArrows, _90Degree, _360Degree, Lightshow, Lawless ] for characteristic
+    GETTER_VALUE(std::string, Difficulty); // Enum string [ Easy, Normal, Hard, Expert, ExpertPlus ] for diffculty
     GETTER_VALUE(int, Events);
     GETTER_VALUE(bool, Chroma);
     GETTER_VALUE(bool, ME);
@@ -19,5 +19,5 @@ DECLARE_JSON_CLASS(BeatSaver, BeatmapDifficulty,
     GETTER_VALUE(bool, Cinema);
     GETTER_VALUE(double, Seconds);
     GETTER_VALUE(BeatSaver::BeatmapParitySummary, ParitySummary);
-    GETTER_VALUE_OPTIONAL(float, Stars); // Listed in the documentation not seen on any response
+    GETTER_VALUE_OPTIONAL(float, Stars); // No idea what that value really is for, but it sure exists on some maps
 )
