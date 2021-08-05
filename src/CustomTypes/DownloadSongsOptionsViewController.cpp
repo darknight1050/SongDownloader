@@ -41,13 +41,53 @@ void DownloadSongsOptionsViewController::DidActivate(bool firstActivation, bool 
         AddConfigValueToggle(settingsLayoutTransform, getModConfig().AutoMapper)->get_transform()->GetParent()->GetComponent<LayoutElement*>()->set_preferredWidth(50.0f);
         AddConfigValueToggle(settingsLayoutTransform, getModConfig().BsrSearch)->get_transform()->GetParent()->GetComponent<LayoutElement*>()->set_preferredWidth(50.0f);
 
-        //std::vector<std::string> DropdownValues = { "Latest", "Relevance", "Rating" };
-
-        HMUI::SimpleTextDropdown* dropdown = QuestUI::BeatSaberUI::CreateDropdown(settingsLayoutTransform, getModConfig().SortOrder.GetName(), getModConfig().SortOrder.GetValue(), { "Latest", "Relevance", "Rating" },
+        HMUI::SimpleTextDropdown* SortOrderDropdown = QuestUI::BeatSaberUI::CreateDropdown(settingsLayoutTransform, getModConfig().SortOrder.GetName(), getModConfig().SortOrder.GetValue(), { "Latest", "Relevance", "Rating" },
             [] (std::string value) {
                 getModConfig().SortOrder.SetValue(value);
             }
         );
-        dropdown->get_transform()->GetParent()->GetComponent<LayoutElement*>()->set_preferredWidth(50.0f);
+        SortOrderDropdown->get_transform()->GetParent()->GetComponent<LayoutElement*>()->set_preferredWidth(50.0f);
+
+        std::string NEConfigSet = "Not Required";
+        if (getModConfig().NE.GetValue() == "true") NEConfigSet = "Required";
+        else if (getModConfig().NE.GetValue() == "false") NEConfigSet = "Excluded";
+
+        HMUI::SimpleTextDropdown* NEdropdown = QuestUI::BeatSaberUI::CreateDropdown(settingsLayoutTransform, getModConfig().NE.GetName(), NEConfigSet, { "Not Required", "Required", "Excluded" },
+            [](std::string value) {
+                std::string setting = "";
+                if (value == "Required") setting = "true";
+                else if (value == "Excluded") setting = "false";
+                getModConfig().NE.SetValue(setting);
+            }
+        );
+        NEdropdown->get_transform()->GetParent()->GetComponent<LayoutElement*>()->set_preferredWidth(50.0f);
+
+        std::string MEConfigSet = "Not Required";
+        if (getModConfig().ME.GetValue() == "true") MEConfigSet = "Required";
+        else if (getModConfig().ME.GetValue() == "false") MEConfigSet = "Excluded";
+
+        HMUI::SimpleTextDropdown* MEdropdown = QuestUI::BeatSaberUI::CreateDropdown(settingsLayoutTransform, getModConfig().ME.GetName(), MEConfigSet, { "Not Required", "Required", "Excluded" },
+            [](std::string value) {
+                std::string setting = "";
+                if (value == "Required") setting = "true";
+                else if (value == "Excluded") setting = "false";
+                getModConfig().ME.SetValue(setting);
+            }
+        );
+        MEdropdown->get_transform()->GetParent()->GetComponent<LayoutElement*>()->set_preferredWidth(50.0f);
+
+        std::string ChromaConfigSet = "Not Required";
+        if (getModConfig().Chroma.GetValue() == "true") ChromaConfigSet = "Required";
+        else if (getModConfig().Chroma.GetValue() == "false") ChromaConfigSet = "Excluded";
+
+        HMUI::SimpleTextDropdown* ChromaDropdown = QuestUI::BeatSaberUI::CreateDropdown(settingsLayoutTransform, getModConfig().Chroma.GetName(), ChromaConfigSet, { "Not Required", "Required", "Excluded" },
+            [](std::string value) {
+                std::string setting = "";
+                if (value == "Required") setting = "true";
+                else if (value == "Excluded") setting = "false";
+                getModConfig().Chroma.SetValue(setting);
+            }
+        );
+        ChromaDropdown->get_transform()->GetParent()->GetComponent<LayoutElement*>()->set_preferredWidth(50.0f);
     }
 }

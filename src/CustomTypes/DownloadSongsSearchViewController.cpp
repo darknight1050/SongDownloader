@@ -69,7 +69,7 @@ void SearchEntry::SetBeatmap(const BeatSaver::Beatmap& _map) {
         if (elem.GetME() && ModsUsed.find("ME") == std::string::npos) ModsUsed += "ME, ";
         if (elem.GetNE() && ModsUsed.find("NE") == std::string::npos) ModsUsed += "NE, ";
         if (elem.GetChroma() && ModsUsed.find("Chroma") == std::string::npos) ModsUsed += "Chroma, ";
-        if (elem.GetCinema() && ModsUsed.find("Cinema") == std::string::npos) ModsUsed += "Cinema, ";
+        if (elem.GetCinema() && ModsUsed.find("Cinema") == std::string::npos) ModsUsed += "<color=#ADADADFF>Cinema</color>, ";
     }
     if (ModsUsed.ends_with(", ")) ModsUsed.erase(ModsUsed.length() - 2);
     if (ModsUsed.empty()) {
@@ -297,7 +297,7 @@ void DownloadSongsSearchViewController::DidActivate(bool firstActivation, bool a
                                     );
                                 }
                             }, 
-                            getModConfig().SortOrder.GetValue());
+                            getModConfig().SortOrder.GetValue(), getModConfig().ME.GetValue(), getModConfig().NE.GetValue(), getModConfig().Chroma.GetValue());
                     }
                 }
             }

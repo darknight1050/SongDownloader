@@ -44,8 +44,12 @@ namespace BeatSaver::API {
         return user;
     }
 
-    std::optional<BeatSaver::Page> SearchPaged(std::string query, int pageIndex, std::string sortOrder) {
-        auto json = WebUtils::GetJSON(API_URL + "/search/text/" + std::to_string(pageIndex) + "?q=" + query + "&sortOrder=" + sortOrder);
+    std::optional<BeatSaver::Page> SearchPaged(std::string query, int pageIndex, std::string sortOrder, std::string ME, std::string NE, std::string Chroma) {
+        std::string searchPath = API_URL + "/search/text/" + std::to_string(pageIndex) + "?q=" + query + "&sortOrder=" + sortOrder;
+        if (!ME.empty()) searchPath += "&me=" + ME;
+        if (!NE.empty()) searchPath += "&noodle=" + NE;
+        if (!Chroma.empty()) searchPath += "&chroma=" + Chroma;
+        auto json = WebUtils::GetJSON(searchPath);
         if (!json.has_value())
             return std::nullopt;
         BeatSaver::Page page;
@@ -156,8 +160,12 @@ namespace BeatSaver::API {
         );
     }
 
-    void SearchPagedAsync(std::string query, int pageIndex, std::function<void(std::optional<BeatSaver::Page>)> finished, std::string sortOrder) {
-        WebUtils::GetJSONAsync(API_URL + "/search/text/" + std::to_string(pageIndex) + "?q=" + query + "&sortOrder=" + sortOrder,
+    void SearchPagedAsync(std::string query, int pageIndex, std::function<void(std::optional<BeatSaver::Page>)> finished, std::string sortOrder, std::string ME, std::string NE, std::string Chroma) {
+        std::string searchPath = API_URL + "/search/text/" + std::to_string(pageIndex) + "?q=" + query + "&sortOrder=" + sortOrder;
+        if (!ME.empty()) searchPath += "&me=" + ME;
+        if (!NE.empty()) searchPath += "&noodle=" + NE;
+        if (!Chroma.empty()) searchPath += "&chroma=" + Chroma;
+        WebUtils::GetJSONAsync(searchPath,
             [finished](long httpCode, bool error, rapidjson::Document& document) {
                 //// TODO: Warning this code causes crashes
                 //// Convert the document into a string

@@ -19,7 +19,10 @@ namespace BeatSaver::API {
     /// <param name="pageIndex"> Index of the pages search results</param>
     /// <param name="sortOrder"> Order in which the search results should be sorted default "Relevance"</param>
     /// <returns>An std::optional that either contains BeatSaver::Page or std::nullopt</returns>
-    std::optional<BeatSaver::Page> SearchPaged(std::string query, int pageIndex, std::string sortOrder = "Relevance");
+    /// <param name="ME"> MappingExtensions maps should be included in search default "" for unset can be "true" or "false" otherwise</param>
+    /// <param name="NE"> MappingExtensions maps should be included in search default "" for unset can be "true" or "false" otherwise</param>
+    /// <param name="Chroma"> MappingExtensions maps should be included in search default "" for unset can be "true" or "false" otherwise</param>
+    std::optional<BeatSaver::Page> SearchPaged(std::string query, int pageIndex, std::string sortOrder = "Relevance", std::string ME = "", std::string NE = "", std::string Chroma = "");
 
     /// <summary>
     /// Get maps ordered by upload date
@@ -61,7 +64,10 @@ namespace BeatSaver::API {
     /// <param name="pageIndex"> Index of the pages search results</param>
     /// <param name="finished"> Function to run after it finishes loading</param>
     /// <param name="sortOrder"> Order in which the search results should be sorted default "Relevance"</param>
-    void SearchPagedAsync(std::string query, int pageIndex, std::function<void(std::optional<BeatSaver::Page>)> finished, std::string sortOrder = "Relevance");
+    /// <param name="ME"> MappingExtensions maps should be included in search default "" for unset can be "true" or "false" otherwise</param>
+    /// <param name="NE"> MappingExtensions maps should be included in search default "" for unset can be "true" or "false" otherwise</param>
+    /// <param name="Chroma"> MappingExtensions maps should be included in search default "" for unset can be "true" or "false" otherwise</param>
+    void SearchPagedAsync(std::string query, int pageIndex, std::function<void(std::optional<BeatSaver::Page>)> finished, std::string sortOrder = "Relevance", std::string ME = "", std::string NE = "", std::string Chroma = "");
 
     void DownloadBeatmapAsync(const BeatSaver::Beatmap& beatmap, std::function<void(bool)> finished, std::function<void(float)> progressUpdate = nullptr);
 
