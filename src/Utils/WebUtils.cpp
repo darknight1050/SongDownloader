@@ -85,7 +85,7 @@ namespace WebUtils {
             s->append((char*)contents, newLength);
         } catch(std::bad_alloc &e) {
             //handle memory problem
-            getLogger().critical("Failed to allocate string of size: %u", newLength);
+            getLogger().critical("Failed to allocate string of size: %lu", newLength);
             return 0;
         }
         return newLength;

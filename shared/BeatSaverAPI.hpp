@@ -67,7 +67,7 @@ namespace BeatSaver::API {
     /// <param name="ME"> MappingExtensions maps should be included in search default "" for unset can be "true" or "false" otherwise</param>
     /// <param name="NE"> MappingExtensions maps should be included in search default "" for unset can be "true" or "false" otherwise</param>
     /// <param name="Chroma"> MappingExtensions maps should be included in search default "" for unset can be "true" or "false" otherwise</param>
-    void SearchPagedAsync(std::string query, int pageIndex, std::function<void(std::optional<BeatSaver::Page>)> finished, std::string sortOrder = "Relevance", std::string ME = "", std::string NE = "", std::string Chroma = "");
+    void SearchPagedAsync(std::string query, int pageIndex, std::function<void(std::optional<BeatSaver::Page>)> finished, std::string sortOrder = "Relevance", std::string automapper = "", std::string ranked = "", std::string ME = "", std::string NE = "", std::string Chroma = "");
 
     void DownloadBeatmapAsync(const BeatSaver::Beatmap& beatmap, std::function<void(bool)> finished, std::function<void(float)> progressUpdate = nullptr);
 

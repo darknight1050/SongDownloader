@@ -44,8 +44,10 @@ namespace BeatSaver::API {
         return user;
     }
 
-    std::optional<BeatSaver::Page> SearchPaged(std::string query, int pageIndex, std::string sortOrder, std::string ME, std::string NE, std::string Chroma) {
-        std::string searchPath = API_URL + "/search/text/" + std::to_string(pageIndex) + "?q=" + query + "&sortOrder=" + sortOrder;
+    std::optional<BeatSaver::Page> SearchPaged(std::string query, int pageIndex, std::string sortOrder, std::string automapper, std::string ME, std::string NE, std::string Chroma) {
+        std::string searchPath = API_URL + "/search/text/" + std::to_string(pageIndex) + "?sortOrder=" + sortOrder;
+        if (!automapper.empty()) searchPath += "&automapper=" + automapper;
+        if (!query.empty()) searchPath += "&q=" + query;
         if (!ME.empty()) searchPath += "&me=" + ME;
         if (!NE.empty()) searchPath += "&noodle=" + NE;
         if (!Chroma.empty()) searchPath += "&chroma=" + Chroma;
@@ -160,8 +162,11 @@ namespace BeatSaver::API {
         );
     }
 
-    void SearchPagedAsync(std::string query, int pageIndex, std::function<void(std::optional<BeatSaver::Page>)> finished, std::string sortOrder, std::string ME, std::string NE, std::string Chroma) {
-        std::string searchPath = API_URL + "/search/text/" + std::to_string(pageIndex) + "?q=" + query + "&sortOrder=" + sortOrder;
+    void SearchPagedAsync(std::string query, int pageIndex, std::function<void(std::optional<BeatSaver::Page>)> finished, std::string sortOrder, std::string automapper, std::string ranked, std::string ME, std::string NE, std::string Chroma) {
+        std::string searchPath = API_URL + "/search/text/" + std::to_string(pageIndex) + "?sortOrder=" + sortOrder;
+        if (!query.empty()) searchPath += "&q=" + query;
+        if (!automapper.empty()) searchPath += "&automapper=" + automapper;
+        if (!ranked.empty()) searchPath += "&ranked=" + ranked;
         if (!ME.empty()) searchPath += "&me=" + ME;
         if (!NE.empty()) searchPath += "&noodle=" + NE;
         if (!Chroma.empty()) searchPath += "&chroma=" + Chroma;

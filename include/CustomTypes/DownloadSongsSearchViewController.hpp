@@ -29,7 +29,6 @@ namespace SongDownloader {
         UnityEngine::UI::Button* downloadButton;
 
     public:
-
         static int spriteCount;
 
         float downloadProgress = -1.0f;
@@ -45,7 +44,6 @@ namespace SongDownloader {
         void Disable();
 
         bool IsEnabled();
-
     }; 
 
 }
@@ -54,7 +52,11 @@ DECLARE_CLASS_CODEGEN(SongDownloader, DownloadSongsSearchViewController, HMUI::V
 
     void CreateEntries(UnityEngine::Transform* parent);
 
+    static void Search();
+
     static int searchIndex;
+
+    static std::string SearchQuery;
 
     SearchEntry searchEntries[ENTRIES_PER_PAGE];
     
@@ -63,3 +65,8 @@ DECLARE_CLASS_CODEGEN(SongDownloader, DownloadSongsSearchViewController, HMUI::V
     DECLARE_OVERRIDE_METHOD(void, DidDeactivate, il2cpp_utils::FindMethodUnsafe("HMUI", "ViewController", "DidDeactivate", 2), bool removedFromHierarchy, bool screenSystemDisabling);
 
 )
+
+namespace SongDownloader {
+    extern DownloadSongsSearchViewController* searchViewController;
+    extern std::string SearchQuery;
+}
