@@ -63,7 +63,21 @@ void SearchEntry::SetBeatmap(const BeatSaver::Beatmap& _map) {
 
     line1Component->SetText(il2cpp_utils::newcsstr(map.GetMetadata().GetSongName()));
 
-    line2Component->SetText(il2cpp_utils::newcsstr(map.GetMetadata().GetSongAuthorName() + " <color=#ADADADFF>[" + map.GetMetadata().GetLevelAuthorName() + "]</color>"));
+    std::string ModsUsed;
+    std::vector<BeatSaver::BeatmapDifficulty> Difficulties = map.GetVersions().front().GetDiffs();
+    for (BeatSaver::BeatmapDifficulty& elem : Difficulties) {
+        if (elem.GetME() && ModsUsed.find("ME") == std::string::npos) ModsUsed += "ME, ";
+        if (elem.GetNE() && ModsUsed.find("NE") == std::string::npos) ModsUsed += "NE, ";
+        if (elem.GetChroma() && ModsUsed.find("Chroma") == std::string::npos) ModsUsed += "Chroma, ";
+        if (elem.GetCinema() && ModsUsed.find("Cinema") == std::string::npos) ModsUsed += "Cinema, ";
+    }
+    if (ModsUsed.ends_with(", ")) ModsUsed.erase(ModsUsed.length() - 2);
+    if (ModsUsed.empty()) {
+        line2Component->SetText(il2cpp_utils::newcsstr(map.GetMetadata().GetSongAuthorName() + " <color=#ADADADFF>[" + map.GetMetadata().GetLevelAuthorName() + "]</color>"));
+    }
+    else {
+        line2Component->SetText(il2cpp_utils::newcsstr(map.GetMetadata().GetSongAuthorName() + " <color=#ADADADFF>[" + map.GetMetadata().GetLevelAuthorName() + "]</color> [" + ModsUsed + "]"));
+    }
     int currentSearchIndex = DownloadSongsSearchViewController::searchIndex;
     
     coverImageView->set_enabled(false);
@@ -142,7 +156,7 @@ void DownloadSongsSearchViewController::CreateEntries(Transform* parent) {
 
     auto authorNameTextComponent = levelBar->authorNameText;
     authorNameTextComponent->set_richText(true);
-    authorNameTextComponent->set_fontSize(3.4f);
+    authorNameTextComponent->set_fontSize(3.2f);
     authorNameTextComponent->set_overflowMode(TextOverflowModes::Ellipsis);
     authorNameTextComponent->set_margin(Vector4(-2.0f, 0.0f, 9.0f, 0.0f));
 
