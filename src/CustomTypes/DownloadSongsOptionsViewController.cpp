@@ -39,13 +39,11 @@ void DownloadSongsOptionsViewController::DidActivate(bool firstActivation, bool 
         contentSizeFitter->set_horizontalFit(ContentSizeFitter::FitMode::PreferredSize);
         contentSizeFitter->set_verticalFit(ContentSizeFitter::FitMode::PreferredSize);
         
-        //AddConfigValueToggle(settingsLayoutTransform, getModConfig().AutoMapper)->get_transform()->GetParent()->GetComponent<LayoutElement*>()->set_preferredWidth(50.0f);
-
         std::string AutoMapperConfigSet = "Excluded";
         if (getModConfig().AutoMapper.GetValue() == "true") AutoMapperConfigSet = "Not Required";
         else if (getModConfig().AutoMapper.GetValue() == "false") AutoMapperConfigSet = "Required";
 
-        HMUI::SimpleTextDropdown* AutoMapperDropdown = QuestUI::BeatSaberUI::CreateDropdown(settingsLayoutTransform, getModConfig().AutoMapper.GetName(), AutoMapperConfigSet, { "Not Required", "Required", "Excluded" },
+        QuestUI::BeatSaberUI::CreateDropdown(settingsLayoutTransform, getModConfig().AutoMapper.GetName(), AutoMapperConfigSet, { "Not Required", "Required", "Excluded" },
             [](std::string value) {
                 std::string setting = "";
                 if (value == "Not Required") setting = "true";
@@ -53,25 +51,27 @@ void DownloadSongsOptionsViewController::DidActivate(bool firstActivation, bool 
                 getModConfig().AutoMapper.SetValue(setting);
                 DownloadSongsSearchViewController::Search();
             }
-        );
-        AutoMapperDropdown->get_transform()->GetParent()->GetComponent<LayoutElement*>()->set_preferredWidth(50.0f);
+        )->get_transform()->GetParent()->GetComponent<LayoutElement*>()->set_preferredWidth(50.0f);
 
+        QuestUI::BeatSaberUI::CreateToggle(settingsLayoutTransform, getModConfig().BsrSearch.GetName(), getModConfig().BsrSearch.GetValue(),
+            [] (bool value) {
+                getModConfig().BsrSearch.SetValue(value);
+                DownloadSongsSearchViewController::Search();
+            }
+        )->get_transform()->GetParent()->GetComponent<LayoutElement*>()->set_preferredWidth(50.0f);
 
-        AddConfigValueToggle(settingsLayoutTransform, getModConfig().BsrSearch)->get_transform()->GetParent()->GetComponent<LayoutElement*>()->set_preferredWidth(50.0f);
-
-        HMUI::SimpleTextDropdown* SortOrderDropdown = QuestUI::BeatSaberUI::CreateDropdown(settingsLayoutTransform, getModConfig().SortOrder.GetName(), getModConfig().SortOrder.GetValue(), { "Latest", "Relevance", "Rating" },
+        QuestUI::BeatSaberUI::CreateDropdown(settingsLayoutTransform, getModConfig().SortOrder.GetName(), getModConfig().SortOrder.GetValue(), { "Latest", "Relevance", "Rating" },
             [] (std::string value) {
                 getModConfig().SortOrder.SetValue(value);
                 DownloadSongsSearchViewController::Search();
             }
-        );
-        SortOrderDropdown->get_transform()->GetParent()->GetComponent<LayoutElement*>()->set_preferredWidth(50.0f);
+        )->get_transform()->GetParent()->GetComponent<LayoutElement*>()->set_preferredWidth(50.0f);
 
         std::string NEConfigSet = "Not Required";
         if (getModConfig().NE.GetValue() == "true") NEConfigSet = "Required";
         else if (getModConfig().NE.GetValue() == "false") NEConfigSet = "Excluded";
 
-        HMUI::SimpleTextDropdown* NEdropdown = QuestUI::BeatSaberUI::CreateDropdown(settingsLayoutTransform, getModConfig().NE.GetName(), NEConfigSet, { "Not Required", "Required", "Excluded" },
+        QuestUI::BeatSaberUI::CreateDropdown(settingsLayoutTransform, getModConfig().NE.GetName(), NEConfigSet, { "Not Required", "Required", "Excluded" },
             [](std::string value) {
                 std::string setting = "";
                 if (value == "Required") setting = "true";
@@ -79,14 +79,13 @@ void DownloadSongsOptionsViewController::DidActivate(bool firstActivation, bool 
                 getModConfig().NE.SetValue(setting);
                 DownloadSongsSearchViewController::Search();
             }
-        );
-        NEdropdown->get_transform()->GetParent()->GetComponent<LayoutElement*>()->set_preferredWidth(50.0f);
+        )->get_transform()->GetParent()->GetComponent<LayoutElement*>()->set_preferredWidth(50.0f);
 
         std::string MEConfigSet = "Not Required";
         if (getModConfig().ME.GetValue() == "true") MEConfigSet = "Required";
         else if (getModConfig().ME.GetValue() == "false") MEConfigSet = "Excluded";
 
-        HMUI::SimpleTextDropdown* MEdropdown = QuestUI::BeatSaberUI::CreateDropdown(settingsLayoutTransform, getModConfig().ME.GetName(), MEConfigSet, { "Not Required", "Required", "Excluded" },
+        QuestUI::BeatSaberUI::CreateDropdown(settingsLayoutTransform, getModConfig().ME.GetName(), MEConfigSet, { "Not Required", "Required", "Excluded" },
             [](std::string value) {
                 std::string setting = "";
                 if (value == "Required") setting = "true";
@@ -94,14 +93,13 @@ void DownloadSongsOptionsViewController::DidActivate(bool firstActivation, bool 
                 getModConfig().ME.SetValue(setting);
                 DownloadSongsSearchViewController::Search();
             }
-        );
-        MEdropdown->get_transform()->GetParent()->GetComponent<LayoutElement*>()->set_preferredWidth(50.0f);
+        )->get_transform()->GetParent()->GetComponent<LayoutElement*>()->set_preferredWidth(50.0f);
 
         std::string ChromaConfigSet = "Not Required";
         if (getModConfig().Chroma.GetValue() == "true") ChromaConfigSet = "Required";
         else if (getModConfig().Chroma.GetValue() == "false") ChromaConfigSet = "Excluded";
 
-        HMUI::SimpleTextDropdown* ChromaDropdown = QuestUI::BeatSaberUI::CreateDropdown(settingsLayoutTransform, getModConfig().Chroma.GetName(), ChromaConfigSet, { "Not Required", "Required", "Excluded" },
+        QuestUI::BeatSaberUI::CreateDropdown(settingsLayoutTransform, getModConfig().Chroma.GetName(), ChromaConfigSet, { "Not Required", "Required", "Excluded" },
             [](std::string value) {
                 std::string setting = "";
                 if (value == "Required") setting = "true";
@@ -109,15 +107,14 @@ void DownloadSongsOptionsViewController::DidActivate(bool firstActivation, bool 
                 getModConfig().Chroma.SetValue(setting);
                 DownloadSongsSearchViewController::Search();
             }
-        );
-        ChromaDropdown->get_transform()->GetParent()->GetComponent<LayoutElement*>()->set_preferredWidth(50.0f);
+        )->get_transform()->GetParent()->GetComponent<LayoutElement*>()->set_preferredWidth(50.0f);
 
         std::string RankedConfigSet = "Not Required";
         if (getModConfig().Ranked.GetValue() == "true") RankedConfigSet = "Required";
         else if (getModConfig().Ranked.GetValue() == "false") RankedConfigSet = "Excluded";
 
 
-        HMUI::SimpleTextDropdown* RankedDropdown = QuestUI::BeatSaberUI::CreateDropdown(settingsLayoutTransform, getModConfig().Ranked.GetName(), RankedConfigSet, { "Not Required", "Required", "Excluded" },
+        QuestUI::BeatSaberUI::CreateDropdown(settingsLayoutTransform, getModConfig().Ranked.GetName(), RankedConfigSet, { "Not Required", "Required", "Excluded" },
             [](std::string value) {
                 std::string setting = "";
                 if (value == "Required") setting = "true";
@@ -125,8 +122,6 @@ void DownloadSongsOptionsViewController::DidActivate(bool firstActivation, bool 
                 getModConfig().Ranked.SetValue(setting);
                 DownloadSongsSearchViewController::Search();
             }
-        );
-        RankedDropdown->get_transform()->GetParent()->GetComponent<LayoutElement*>()->set_preferredWidth(50.0f);
-
+        )->get_transform()->GetParent()->GetComponent<LayoutElement*>()->set_preferredWidth(50.0f);
     }
 }

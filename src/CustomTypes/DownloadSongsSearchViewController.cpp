@@ -239,9 +239,6 @@ void DownloadSongsSearchViewController::Search() {
                                 }
                                 else {
                                     searchViewController->loadingControl->ShowText(il2cpp_utils::newcsstr("No Songs Found!"), false);
-                                    for (int i = 0; i < ENTRIES_PER_PAGE; i++) {
-                                        searchViewController->searchEntries[i].Disable();
-                                    }
                                 }
                                 if (SearchEntry::spriteCount > MAX_SPRITES) {
                                     SearchEntry::spriteCount = 0;
@@ -279,10 +276,7 @@ void DownloadSongsSearchViewController::Search() {
                                     }
                                 }
                                 else {
-                                    for (int i = 0; i < ENTRIES_PER_PAGE; i++) {
-                                        searchViewController->loadingControl->ShowText(il2cpp_utils::newcsstr("No Songs Found!"), false);
-                                        searchViewController->searchEntries[i].Disable();
-                                    }
+                                    searchViewController->loadingControl->ShowText(il2cpp_utils::newcsstr("No Songs Found!"), false);
                                 }
                                 if (SearchEntry::spriteCount > MAX_SPRITES) {
                                     SearchEntry::spriteCount = 0;
