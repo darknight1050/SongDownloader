@@ -8,6 +8,8 @@
 #include "HMUI/ImageView.hpp"
 #include "TMPro/TextMeshProUGUI.hpp"
 
+#include "GlobalNamespace/LoadingControl.hpp"
+
 #include "custom-types/shared/macros.hpp"
 
 //#include "Types/BeatSaver/Page.hpp"
@@ -64,6 +66,7 @@ DECLARE_CLASS_CODEGEN(SongDownloader, DownloadSongsSearchViewController, HMUI::V
     
     DECLARE_OVERRIDE_METHOD(void, DidDeactivate, il2cpp_utils::FindMethodUnsafe("HMUI", "ViewController", "DidDeactivate", 2), bool removedFromHierarchy, bool screenSystemDisabling);
 
+    DECLARE_INSTANCE_FIELD(GlobalNamespace::LoadingControl*, loadingControl);
 )
 
 namespace SongDownloader {

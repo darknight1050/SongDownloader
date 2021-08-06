@@ -217,50 +217,89 @@ void DownloadSongsSearchViewController::CreateEntries(Transform* parent) {
 }
 
 void DownloadSongsSearchViewController::Search() {
+    for (int i = 0; i < ENTRIES_PER_PAGE; i++) {
+        searchViewController->searchEntries[i].Disable();
+    }
+    searchViewController->loadingControl->ShowLoading(il2cpp_utils::newcsstr("Loading..."));
     DownloadSongsSearchViewController::searchIndex++;
     int currentSearchIndex = DownloadSongsSearchViewController::searchIndex;
-    BeatSaver::API::SearchPagedAsync(DownloadSongsSearchViewController::SearchQuery, 0,
-        [currentSearchIndex](std::optional<BeatSaver::Page> page) {
-            if (currentSearchIndex == DownloadSongsSearchViewController::searchIndex) {
-                QuestUI::MainThreadScheduler::Schedule(
-                    [currentSearchIndex, page] {
-                        if (currentSearchIndex == DownloadSongsSearchViewController::searchIndex) {
-                            if (page.has_value() && !page.value().GetDocs().empty()) {
-                                auto maps = page.value().GetDocs();
-                                auto mapsSize = maps.size();
-                                int mapIndex = 0;
-                                for (int i = 0; i < ENTRIES_PER_PAGE; i++) {
-                                    auto& searchEntry = searchViewController->searchEntries[i];
-                                    if (mapIndex < mapsSize) {
-                                        auto& map = maps.at(mapIndex);
-                                        searchEntry.SetBeatmap(map);
+    if (getModConfig().BsrSearch.GetValue()) {
+        BeatSaver::API::GetBeatmapByKeyAsync(DownloadSongsSearchViewController::SearchQuery,
+            [currentSearchIndex](std::optional<BeatSaver::Beatmap> beatmap) {
+                if (currentSearchIndex == DownloadSongsSearchViewController::searchIndex) {
+                    QuestUI::MainThreadScheduler::Schedule(
+                        [currentSearchIndex, beatmap] {
+                            if (currentSearchIndex == DownloadSongsSearchViewController::searchIndex) {
+                                if (beatmap.has_value()) {
+                                    searchViewController->loadingControl->Hide();
+                                    searchViewController->searchEntries[0].SetBeatmap(beatmap.value());
+                                    for (int i = 1; i < ENTRIES_PER_PAGE; i++) {
+                                        searchViewController->searchEntries[i].Disable();
                                     }
-                                    else {
-                                        searchEntry.Disable();
+                                }
+                                else {
+                                    searchViewController->loadingControl->ShowText(il2cpp_utils::newcsstr("No Songs Found!"), false);
+                                    for (int i = 0; i < ENTRIES_PER_PAGE; i++) {
+                                        searchViewController->searchEntries[i].Disable();
                                     }
-                                    mapIndex++;
                                 }
-                            }
-                            else {
-                                for (int i = 0; i < ENTRIES_PER_PAGE; i++) {
-                                    searchViewController->searchEntries[i].Disable();
+                                if (SearchEntry::spriteCount > MAX_SPRITES) {
+                                    SearchEntry::spriteCount = 0;
+                                    Resources::UnloadUnusedAssets();
                                 }
-                            }
-                            if (SearchEntry::spriteCount > MAX_SPRITES) {
-                                SearchEntry::spriteCount = 0;
-                                Resources::UnloadUnusedAssets();
                             }
                         }
-                    }
-                );
+                    );
+                }
             }
-        },
-        getModConfig().SortOrder.GetValue(),
-            getModConfig().AutoMapper.GetValue(),
-            getModConfig().Ranked.GetValue(),
-            getModConfig().ME.GetValue(),
-            getModConfig().NE.GetValue(),
-            getModConfig().Chroma.GetValue());
+        );
+    }
+    else {
+        BeatSaver::API::SearchPagedAsync(DownloadSongsSearchViewController::SearchQuery, 0,
+            [currentSearchIndex](std::optional<BeatSaver::Page> page) {
+                if (currentSearchIndex == DownloadSongsSearchViewController::searchIndex) {
+                    QuestUI::MainThreadScheduler::Schedule(
+                        [currentSearchIndex, page] {
+                            if (currentSearchIndex == DownloadSongsSearchViewController::searchIndex) {
+                                if (page.has_value() && !page.value().GetDocs().empty()) {
+                                    auto maps = page.value().GetDocs();
+                                    auto mapsSize = maps.size();
+                                    int mapIndex = 0;
+                                    for (int i = 0; i < ENTRIES_PER_PAGE; i++) {
+                                        auto& searchEntry = searchViewController->searchEntries[i];
+                                        if (mapIndex < mapsSize) {
+                                            searchViewController->loadingControl->Hide();
+                                            auto& map = maps.at(mapIndex);
+                                            searchEntry.SetBeatmap(map);
+                                        }
+                                        else {
+                                            searchEntry.Disable();
+                                        }
+                                        mapIndex++;
+                                    }
+                                }
+                                else {
+                                    for (int i = 0; i < ENTRIES_PER_PAGE; i++) {
+                                        searchViewController->loadingControl->ShowText(il2cpp_utils::newcsstr("No Songs Found!"), false);
+                                        searchViewController->searchEntries[i].Disable();
+                                    }
+                                }
+                                if (SearchEntry::spriteCount > MAX_SPRITES) {
+                                    SearchEntry::spriteCount = 0;
+                                    Resources::UnloadUnusedAssets();
+                                }
+                            }
+                        }
+                    );
+                }
+            },
+            getModConfig().SortOrder.GetValue(),
+                getModConfig().AutoMapper.GetValue(),
+                getModConfig().Ranked.GetValue(),
+                getModConfig().ME.GetValue(),
+                getModConfig().NE.GetValue(),
+                getModConfig().Chroma.GetValue());
+    }
 }
 
 void DownloadSongsSearchViewController::DidActivate(bool firstActivation, bool addedToHierarchy, bool screenSystemEnabling) {
@@ -268,84 +307,17 @@ void DownloadSongsSearchViewController::DidActivate(bool firstActivation, bool a
         searchViewController = this;
         get_gameObject()->AddComponent<Touchable*>();
 
+        GameObject* existingLoadinControl = Resources::FindObjectsOfTypeAll<LoadingControl*>()->values[0]->get_gameObject();
+        GameObject* loadinControlGameObject = UnityEngine::GameObject::Instantiate(existingLoadinControl, this->get_gameObject()->get_transform());
+        auto loadingControlTransform = loadinControlGameObject->get_transform();
+        loadingControl = loadinControlGameObject->GetComponent<LoadingControl*>();
+        loadingControl->loadingText->set_text(il2cpp_utils::newcsstr("Loading..."));
+        loadingControl->set_enabled(true);
+
         auto searchSetting = BeatSaberUI::CreateStringSetting(get_transform(), "Search", "", UnityEngine::Vector2(0.0f, 0.0f), UnityEngine::Vector3(0.0f, -38.0f, 0.0f),
             [this](std::string value) {
                 DownloadSongsSearchViewController::SearchQuery = value;
-                DownloadSongsSearchViewController::searchIndex++;
-                int currentSearchIndex = DownloadSongsSearchViewController::searchIndex;
-                if (getModConfig().BsrSearch.GetValue()) {
-                    BeatSaver::API::GetBeatmapByKeyAsync(value,
-                        [this, currentSearchIndex](std::optional<BeatSaver::Beatmap> beatmap) {
-                            if (currentSearchIndex == DownloadSongsSearchViewController::searchIndex) {
-                                QuestUI::MainThreadScheduler::Schedule(
-                                    [this, currentSearchIndex, beatmap] {
-                                        if (currentSearchIndex == DownloadSongsSearchViewController::searchIndex) {
-                                            if (beatmap.has_value()) {
-                                                searchEntries[0].SetBeatmap(beatmap.value());
-                                                for (int i = 1; i < ENTRIES_PER_PAGE; i++) {
-                                                    searchEntries[i].Disable();
-                                                }
-                                            }
-                                            else {
-                                                for (int i = 0; i < ENTRIES_PER_PAGE; i++) {
-                                                    searchEntries[i].Disable();
-                                                }
-                                            }
-                                            if (SearchEntry::spriteCount > MAX_SPRITES) {
-                                                SearchEntry::spriteCount = 0;
-                                                Resources::UnloadUnusedAssets();
-                                            }
-                                        }
-                                    }
-                                );
-                            }
-                        }
-                    );
-                }
-                else {
-                    BeatSaver::API::SearchPagedAsync(value, 0,
-                        [this, currentSearchIndex](std::optional<BeatSaver::Page> page) {
-                            if (currentSearchIndex == DownloadSongsSearchViewController::searchIndex) {
-                                QuestUI::MainThreadScheduler::Schedule(
-                                    [this, currentSearchIndex, page] {
-                                        if (currentSearchIndex == DownloadSongsSearchViewController::searchIndex) {
-                                            if (page.has_value() && !page.value().GetDocs().empty()) {
-                                                auto maps = page.value().GetDocs();
-                                                auto mapsSize = maps.size();
-                                                int mapIndex = 0;
-                                                for (int i = 0; i < ENTRIES_PER_PAGE; i++) {
-                                                    auto& searchEntry = searchEntries[i];
-                                                    if (mapIndex < mapsSize) {
-                                                        auto& map = maps.at(mapIndex);
-                                                        searchEntry.SetBeatmap(map);
-                                                    }
-                                                    else {
-                                                        searchEntry.Disable();
-                                                    }
-                                                    mapIndex++;
-                                                }
-                                            }
-                                            else {
-                                                for (int i = 0; i < ENTRIES_PER_PAGE; i++) {
-                                                    searchEntries[i].Disable();
-                                                }
-                                            }
-                                            if (SearchEntry::spriteCount > MAX_SPRITES) {
-                                                SearchEntry::spriteCount = 0;
-                                                Resources::UnloadUnusedAssets();
-                                            }
-                                        }
-                                    }
-                                );
-                            }
-                        },
-                        getModConfig().SortOrder.GetValue(),
-                            getModConfig().AutoMapper.GetValue(),
-                            getModConfig().Ranked.GetValue(),
-                            getModConfig().ME.GetValue(),
-                            getModConfig().NE.GetValue(),
-                            getModConfig().Chroma.GetValue());
-                }
+                Search();
             }
         );
         auto container = BeatSaberUI::CreateScrollView(get_transform());
@@ -356,50 +328,6 @@ void DownloadSongsSearchViewController::DidActivate(bool firstActivation, bool a
         CreateEntries(container->get_transform());
 
         Search();
-
-        //DownloadSongsSearchViewController::searchIndex++;
-        //int currentSearchIndex = DownloadSongsSearchViewController::searchIndex;
-        //BeatSaver::API::SearchPagedAsync("", 0,
-        //    [this, currentSearchIndex](std::optional<BeatSaver::Page> page) {
-        //        if (currentSearchIndex == DownloadSongsSearchViewController::searchIndex) {
-        //            QuestUI::MainThreadScheduler::Schedule(
-        //                [this, currentSearchIndex, page] {
-        //                    if (currentSearchIndex == DownloadSongsSearchViewController::searchIndex) {
-        //                        if (page.has_value() && !page.value().GetDocs().empty()) {
-        //                            auto maps = page.value().GetDocs();
-        //                            auto mapsSize = maps.size();
-        //                            int mapIndex = 0;
-        //                            for (int i = 0; i < ENTRIES_PER_PAGE; i++) {
-        //                                auto& searchEntry = searchEntries[i];
-        //                                if (mapIndex < mapsSize) {
-        //                                    auto& map = maps.at(mapIndex);
-        //                                    searchEntry.SetBeatmap(map);
-        //                                }
-        //                                else {
-        //                                    searchEntry.Disable();
-        //                                }
-        //                                mapIndex++;
-        //                            }
-        //                        }
-        //                        else {
-        //                            for (int i = 0; i < ENTRIES_PER_PAGE; i++) {
-        //                                searchEntries[i].Disable();
-        //                            }
-        //                        }
-        //                        if (SearchEntry::spriteCount > MAX_SPRITES) {
-        //                            SearchEntry::spriteCount = 0;
-        //                            Resources::UnloadUnusedAssets();
-        //                        }
-        //                    }
-        //                }
-        //            );
-        //        }
-        //    },
-        //    getModConfig().AutoMapper.GetValue(),
-        //        getModConfig().SortOrder.GetValue(),
-        //        getModConfig().ME.GetValue(),
-        //        getModConfig().NE.GetValue(),
-        //        getModConfig().Chroma.GetValue());
     }
 }
 
