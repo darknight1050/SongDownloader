@@ -7,7 +7,4 @@ DESERIALIZE_METHOD(BeatSaver, Metadata,
     DESERIALIZE_VALUE(SongSubName, songSubName, String)
     DESERIALIZE_VALUE(SongAuthorName, songAuthorName, String)
     DESERIALIZE_VALUE(LevelAuthorName, levelAuthorName, String)
-    //DESERIALIZE_VALUE_OPTIONAL(Automapper, automapper, String)
-    //DESERIALIZE_CLASS(Difficulties, difficulties)
-    //DESERIALIZE_VECTOR(Characteristics, characteristics, BeatmapCharacteristic)
 )

@@ -2,7 +2,7 @@
 
 DESERIALIZE_METHOD(BeatSaver, BeatmapVersion,
     DESERIALIZE_VALUE(CreatedAt, createdAt, String)
-    DESERIALIZE_VALUE(SageScore, sageScore, Int) 
+    DESERIALIZE_VALUE_OPTIONAL(SageScore, sageScore, Int)
     DESERIALIZE_VECTOR(Diffs, diffs, BeatmapDifficulty)
     DESERIALIZE_VALUE_OPTIONAL(Feedback, feedback, String)
     DESERIALIZE_VALUE(Hash, hash, String)

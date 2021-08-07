@@ -78,4 +78,6 @@ namespace BeatSaver::API {
     // Returns mp3 with previewAudio
     void GetPreviewAsync(const BeatSaver::Beatmap& beatmap, std::function<void(std::vector<uint8_t>)> finished, std::function<void(float)> progressUpdate = nullptr);
 
+    extern std::string exception;
+
 }

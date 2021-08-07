@@ -4,7 +4,7 @@
 
 DECLARE_JSON_CLASS(BeatSaver, BeatmapVersion,
     GETTER_VALUE(std::string, CreatedAt);
-    GETTER_VALUE(int, SageScore);
+    GETTER_VALUE_OPTIONAL(int, SageScore);
     GETTER_VALUE(std::vector<BeatSaver::BeatmapDifficulty>, Diffs);
     GETTER_VALUE_OPTIONAL(std::string, Feedback);
     GETTER_VALUE(std::string, Hash);

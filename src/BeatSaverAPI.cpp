@@ -9,6 +9,8 @@
 
 #include "songloader/shared/API.hpp"
 
+#include "Exceptions.hpp"
+
 #define BASE_URL std::string("beatsaver.com")
 #define FALLBACK_URL std::string("beatmaps.io")
 #define API_URL std::string("https://api.") + BASE_URL
@@ -16,32 +18,58 @@
 #define FILE_DOWNLOAD_TIMEOUT 64
 
 namespace BeatSaver::API {
+    
+    std::string exception;
                    
     std::optional<BeatSaver::Beatmap> GetBeatmapByKey(std::string key) {
         auto json = WebUtils::GetJSON(API_URL + "/maps/id/" + key);
         if (!json.has_value())
             return std::nullopt;
-        BeatSaver::Beatmap beatmap;
-        beatmap.Deserialize(json.value().GetObject());
-        return beatmap;
+        try {
+            BeatSaver::Beatmap beatmap;
+            beatmap.Deserialize(json.value().GetObject());
+            if (!exception.empty()) exception.clear();
+            return beatmap;
+        }
+        catch (const SongDownloader::JsonException& e) {
+            LOG_ERROR("%s", e.what());
+            exception = e.what();
+            return std::nullopt;
+        }
     }
 
     std::optional<BeatSaver::Beatmap> GetBeatmapByHash(std::string hash) {
         auto json = WebUtils::GetJSON(API_URL + "/maps/hash/" + hash);
         if (!json.has_value())
             return std::nullopt;
-        BeatSaver::Beatmap beatmap;
-        beatmap.Deserialize(json.value().GetObject());
-        return beatmap;
+        try {
+            BeatSaver::Beatmap beatmap;
+            beatmap.Deserialize(json.value().GetObject());
+            if (!exception.empty()) exception.clear();
+            return beatmap;
+        }
+        catch (const SongDownloader::JsonException& e) {
+            LOG_ERROR("%s", e.what());
+            exception = e.what();
+            return std::nullopt;
+        }
     }
 
     std::optional<BeatSaver::UserDetail> GetUserById(int id) {
         auto json = WebUtils::GetJSON(API_URL + "/users/id/" + std::to_string(id));
         if (!json.has_value())
             return std::nullopt;
-        BeatSaver::UserDetail user;
-        user.Deserialize(json.value().GetObject());
-        return user;
+        try {
+            BeatSaver::UserDetail user;
+            user.Deserialize(json.value().GetObject());
+            if (!exception.empty()) exception.clear();
+            return user;
+        }
+        catch (const SongDownloader::JsonException& e) {
+            LOG_ERROR("%s", e.what());
+            exception = e.what();
+            return std::nullopt;
+        }
     }
 
     std::optional<BeatSaver::Page> SearchPaged(std::string query, int pageIndex, std::string sortOrder, std::string automapper, std::string ME, std::string NE, std::string Chroma) {
@@ -54,9 +82,17 @@ namespace BeatSaver::API {
         auto json = WebUtils::GetJSON(searchPath);
         if (!json.has_value())
             return std::nullopt;
-        BeatSaver::Page page;
-        page.Deserialize(json.value().GetObject());
-        return page;
+        try {
+            BeatSaver::Page page;
+            page.Deserialize(json.value().GetObject());
+            if (!exception.empty()) exception.clear();
+            return page;
+        }
+        catch (const SongDownloader::JsonException& e) {
+            LOG_ERROR("%s", e.what());
+            exception = e.what();
+            return std::nullopt;
+        }
     }
 
     std::optional<BeatSaver::Page> LatestPaged(bool automapper, std::string after) {
@@ -69,18 +105,34 @@ namespace BeatSaver::API {
         }
         if (!json.has_value())
             return std::nullopt;
-        BeatSaver::Page page;
-        page.Deserialize(json.value().GetObject());
-        return page;
+        try {
+            BeatSaver::Page page;
+            page.Deserialize(json.value().GetObject());
+            if (!exception.empty()) exception.clear();
+            return page;
+        }
+        catch (const SongDownloader::JsonException& e) {
+            LOG_ERROR("%s", e.what());
+            exception = e.what();
+            return std::nullopt;
+        }
     }
 
     std::optional<BeatSaver::Page> PlaysPaged(int pageIndex) {
         auto json = WebUtils::GetJSON(API_URL + "/maps/plays/" + std::to_string(pageIndex));
         if (!json.has_value())
             return std::nullopt;
-        BeatSaver::Page page;
-        page.Deserialize(json.value().GetObject());
-        return page;
+        try {
+            BeatSaver::Page page;
+            page.Deserialize(json.value().GetObject());
+            if (!exception.empty()) exception.clear();
+            return page;
+        }
+        catch (const SongDownloader::JsonException& e) {
+            LOG_ERROR("%s", e.what());
+            exception = e.what();
+            return std::nullopt;
+        }
     }
 
     bool DownloadBeatmap(const BeatSaver::Beatmap& beatmap) {
@@ -120,13 +172,26 @@ namespace BeatSaver::API {
     void GetBeatmapByKeyAsync(std::string key, std::function<void(std::optional<BeatSaver::Beatmap>)> finished) {
         WebUtils::GetJSONAsync(API_URL + "/maps/id/" + key,
             [finished](long httpCode, bool error, rapidjson::Document& document) {
-                if (error) {
+                if (error || ++document.MemberBegin() == document.MemberEnd()) {
                     finished(std::nullopt);
                 }
                 else {
-                    BeatSaver::Beatmap beatmap;
-                    beatmap.Deserialize(document.GetObject());
-                    finished(beatmap);
+                    try {
+                        BeatSaver::Beatmap beatmap;
+                        beatmap.Deserialize(document.GetObject());
+                        if (!exception.empty()) exception.clear();
+                        finished(beatmap);
+                    }
+                    catch (const SongDownloader::JsonException& e) {
+                        LOG_ERROR("%s", e.what());
+                        exception = e.what();
+                        finished(std::nullopt);
+                        //// Convert the document into a string and log/write to file for debug purposes
+                        //rapidjson::StringBuffer buffer;
+                        //rapidjson::Writer<rapidjson::StringBuffer> writer(buffer);
+                        //document.Accept(writer);
+                        //writefile("/sdcard/ModData/GetBeatmapByKeyAsync.json", buffer.GetString());
+                    }
                 }
             }
         );
@@ -135,13 +200,26 @@ namespace BeatSaver::API {
     void GetBeatmapByHashAsync(std::string hash, std::function<void(std::optional<BeatSaver::Beatmap>)> finished) {
         WebUtils::GetJSONAsync(API_URL + "/maps/hash/" + hash,
             [finished](long httpCode, bool error, rapidjson::Document& document) {
-                if (error) {
+                if (error || ++document.MemberBegin() == document.MemberEnd()) {
                     finished(std::nullopt);
                 }
                 else {
-                    BeatSaver::Beatmap beatmap;
-                    beatmap.Deserialize(document.GetObject());
-                    finished(beatmap);
+                    try {
+                        BeatSaver::Beatmap beatmap;
+                        beatmap.Deserialize(document.GetObject());
+                        if (!exception.empty()) exception.clear();
+                        finished(beatmap);
+                    }
+                    catch (const SongDownloader::JsonException& e) {
+                        LOG_ERROR("%s", e.what());
+                        exception = e.what();
+                        finished(std::nullopt);
+                        //// Convert the document into a string and log/write to file for debug purposes
+                        //rapidjson::StringBuffer buffer;
+                        //rapidjson::Writer<rapidjson::StringBuffer> writer(buffer);
+                        //document.Accept(writer);
+                        //writefile("/sdcard/ModData/GetBeatmapByHashAsync.json", buffer.GetString());
+                    }
                 }
             }
         );
@@ -154,9 +232,22 @@ namespace BeatSaver::API {
                     finished(std::nullopt);
                 }
                 else {
-                    BeatSaver::UserDetail user;
-                    user.Deserialize(document.GetObject());
-                    finished(user);
+                    try {
+                        BeatSaver::UserDetail user;
+                        user.Deserialize(document.GetObject());
+                        if (!exception.empty()) exception.clear();
+                        finished(user);
+                    }
+                    catch (const SongDownloader::JsonException& e) {
+                        LOG_ERROR("%s", e.what());
+                        exception = e.what();
+                        finished(std::nullopt);
+                        //// Convert the document into a string and log/write to file for debug purposes
+                        //rapidjson::StringBuffer buffer;
+                        //rapidjson::Writer<rapidjson::StringBuffer> writer(buffer);
+                        //document.Accept(writer);
+                        //writefile("/sdcard/ModData/GetUserByIdAsync.json", buffer.GetString());
+                    }
                 }
             }
         );
@@ -170,22 +261,29 @@ namespace BeatSaver::API {
         if (!ME.empty()) searchPath += "&me=" + ME;
         if (!NE.empty()) searchPath += "&noodle=" + NE;
         if (!Chroma.empty()) searchPath += "&chroma=" + Chroma;
+        LOG_DEBUG("%s", searchPath.c_str());
         WebUtils::GetJSONAsync(searchPath,
             [finished](long httpCode, bool error, rapidjson::Document& document) {
-                //// TODO: Warning this code causes crashes
-                //// Convert the document into a string
-                //rapidjson::StringBuffer buffer;
-                //rapidjson::Writer<rapidjson::StringBuffer> writer(buffer);
-                //document.Accept(writer);
-                //writefile("/sdcard/ModData/SearchQuery.json", buffer.GetString());
-
                 if (error) {
                     finished(std::nullopt);
                 }
                 else {
-                    BeatSaver::Page page;
-                    page.Deserialize(document.GetObject());
-                    finished(page);
+                    try {
+                        BeatSaver::Page page;
+                        page.Deserialize(document.GetObject());
+                        if (!exception.empty()) exception.clear();
+                        finished(page);
+                    }
+                    catch (const SongDownloader::JsonException& e) {
+                        LOG_ERROR("%s", e.what());
+                        exception = e.what();
+                        finished(std::nullopt);
+                        // Convert the document into a string and log/write to file for debug purposes
+                        rapidjson::StringBuffer buffer;
+                        rapidjson::Writer<rapidjson::StringBuffer> writer(buffer);
+                        document.Accept(writer);
+                        writefile("/sdcard/ModData/SearchQuery.json", buffer.GetString());
+                    }
                 }
             }
         );

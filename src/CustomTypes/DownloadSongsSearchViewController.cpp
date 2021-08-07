@@ -224,32 +224,35 @@ void DownloadSongsSearchViewController::Search() {
     DownloadSongsSearchViewController::searchIndex++;
     int currentSearchIndex = DownloadSongsSearchViewController::searchIndex;
     if (getModConfig().BsrSearch.GetValue()) {
-        BeatSaver::API::GetBeatmapByKeyAsync(DownloadSongsSearchViewController::SearchQuery,
-            [currentSearchIndex](std::optional<BeatSaver::Beatmap> beatmap) {
-                if (currentSearchIndex == DownloadSongsSearchViewController::searchIndex) {
-                    QuestUI::MainThreadScheduler::Schedule(
-                        [currentSearchIndex, beatmap] {
-                            if (currentSearchIndex == DownloadSongsSearchViewController::searchIndex) {
-                                if (beatmap.has_value()) {
-                                    searchViewController->loadingControl->Hide();
-                                    searchViewController->searchEntries[0].SetBeatmap(beatmap.value());
-                                    for (int i = 1; i < ENTRIES_PER_PAGE; i++) {
-                                        searchViewController->searchEntries[i].Disable();
+        if (!DownloadSongsSearchViewController::SearchQuery.empty()) {
+            BeatSaver::API::GetBeatmapByKeyAsync(DownloadSongsSearchViewController::SearchQuery,
+                [currentSearchIndex](std::optional<BeatSaver::Beatmap> beatmap) {
+                    if (currentSearchIndex == DownloadSongsSearchViewController::searchIndex) {
+                        QuestUI::MainThreadScheduler::Schedule(
+                            [currentSearchIndex, beatmap] {
+                                if (currentSearchIndex == DownloadSongsSearchViewController::searchIndex) {
+                                    if (beatmap.has_value()) {
+                                        searchViewController->loadingControl->Hide();
+                                        searchViewController->searchEntries[0].SetBeatmap(beatmap.value());
+                                        for (int i = 1; i < ENTRIES_PER_PAGE; i++) {
+                                            searchViewController->searchEntries[i].Disable();
+                                        }
+                                    }
+                                    else {
+                                        if (!BeatSaver::API::exception.empty()) searchViewController->loadingControl->ShowText(il2cpp_utils::newcsstr(BeatSaver::API::exception), false);
+                                        else searchViewController->loadingControl->ShowText(il2cpp_utils::newcsstr("No Songs Found!"), false);
+                                    }
+                                    if (SearchEntry::spriteCount > MAX_SPRITES) {
+                                        SearchEntry::spriteCount = 0;
+                                        Resources::UnloadUnusedAssets();
                                     }
                                 }
-                                else {
-                                    searchViewController->loadingControl->ShowText(il2cpp_utils::newcsstr("No Songs Found!"), false);
-                                }
-                                if (SearchEntry::spriteCount > MAX_SPRITES) {
-                                    SearchEntry::spriteCount = 0;
-                                    Resources::UnloadUnusedAssets();
-                                }
                             }
-                        }
-                    );
+                        );
+                    }
                 }
-            }
-        );
+            );
+        } else searchViewController->loadingControl->ShowText(il2cpp_utils::newcsstr("Please type in a key!"), false);
     }
     else {
         BeatSaver::API::SearchPagedAsync(DownloadSongsSearchViewController::SearchQuery, 0,
@@ -276,7 +279,8 @@ void DownloadSongsSearchViewController::Search() {
                                     }
                                 }
                                 else {
-                                    searchViewController->loadingControl->ShowText(il2cpp_utils::newcsstr("No Songs Found!"), false);
+                                    if (!BeatSaver::API::exception.empty()) searchViewController->loadingControl->ShowText(il2cpp_utils::newcsstr(BeatSaver::API::exception), false);
+                                    else searchViewController->loadingControl->ShowText(il2cpp_utils::newcsstr("No Songs Found!"), false);
                                 }
                                 if (SearchEntry::spriteCount > MAX_SPRITES) {
                                     SearchEntry::spriteCount = 0;

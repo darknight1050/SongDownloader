@@ -7,7 +7,7 @@ DESERIALIZE_METHOD(BeatSaver, BeatmapDifficulty,
     DESERIALIZE_VALUE(Bombs, bombs, Int)
     DESERIALIZE_VALUE(Obstacles, obstacles, Int)
     DESERIALIZE_VALUE(NPS, nps, Double)
-    DESERIALIZE_VALUE(Length, length, Int)
+    DESERIALIZE_VALUE(Length, length, Double)
     DESERIALIZE_VALUE(Characteristic, characteristic, String)
     DESERIALIZE_VALUE(Difficulty, difficulty, String)
     DESERIALIZE_VALUE(Events, events, Int)
@@ -15,8 +15,7 @@ DESERIALIZE_METHOD(BeatSaver, BeatmapDifficulty,
     DESERIALIZE_VALUE(ME, me, Bool)
     DESERIALIZE_VALUE(NE, ne, Bool)
     DESERIALIZE_VALUE(Cinema, cinema, Bool)
-    DESERIALIZE_VALUE(Seconds, seconds, Int)
+    DESERIALIZE_VALUE(Seconds, seconds, Double)
     DESERIALIZE_CLASS(ParitySummary, paritySummary)
     DESERIALIZE_VALUE_OPTIONAL(Stars, stars, Float)
-
 )

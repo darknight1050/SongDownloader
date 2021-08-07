@@ -9,7 +9,7 @@ DECLARE_JSON_CLASS(BeatSaver, BeatmapDifficulty,
     GETTER_VALUE(int, Bombs);
     GETTER_VALUE(int, Obstacles);
     GETTER_VALUE(double, NPS);
-    GETTER_VALUE(int, Length);
+    GETTER_VALUE(double, Length);
     GETTER_VALUE(std::string, Characteristic); // Enum string [ Standard, OneSaber, NoArrows, _90Degree, _360Degree, Lightshow, Lawless ] for characteristic
     GETTER_VALUE(std::string, Difficulty); // Enum string [ Easy, Normal, Hard, Expert, ExpertPlus ] for diffculty
     GETTER_VALUE(int, Events);
