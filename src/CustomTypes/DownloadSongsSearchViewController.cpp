@@ -14,11 +14,6 @@
 #include "UnityEngine/RectTransform.hpp"
 #include "UnityEngine/Vector2.hpp"
 #include "UnityEngine/Resources.hpp"
-#include "UnityEngine/Networking/UnityWebRequestAsyncOperation.hpp"
-#include "UnityEngine/Networking/UnityWebRequestTexture.hpp"
-#include "UnityEngine/Networking/UnityWebRequest_UnityWebRequestError.hpp"
-#include "UnityEngine/Networking/DownloadHandlerTexture.hpp"
-#include "UnityEngine/Networking/UnityWebRequest.hpp"
 #include "UnityEngine/Events/UnityAction.hpp"
 #include "UnityEngine/Resources.hpp"
 #include "HMUI/ScrollView.hpp"
@@ -41,7 +36,6 @@ using namespace QuestUI;
 using namespace UnityEngine;
 using namespace UnityEngine::UI;
 using namespace UnityEngine::Events;
-using namespace UnityEngine::Networking;
 using namespace HMUI;
 using namespace TMPro;
 using namespace GlobalNamespace;

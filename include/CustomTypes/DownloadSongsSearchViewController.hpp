@@ -12,7 +12,6 @@
 
 #include "custom-types/shared/macros.hpp"
 
-//#include "Types/BeatSaver/Page.hpp"
 #include "Types/BeatSaver/Page.hpp"
 
 #include <vector>
