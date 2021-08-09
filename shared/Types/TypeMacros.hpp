@@ -29,8 +29,8 @@ void namespaze::name::Deserialize(const rapidjson::Value& jsonValue) { \
 }
 
 #define DESERIALIZE_VALUE(name, jsonName, type) \
-if (!jsonValue.HasMember(#jsonName)) throw SongDownloader::JsonException("expected member in non-optional jsonValue but got false on HasMember!\n JSON Value:" #jsonName); \
-if (!jsonValue[#jsonName].Is##type()) throw SongDownloader::JsonException("expected type in non-optional jsonValue does not match!\n JSON Value:" #jsonName " ,Type expected was: " #type); \
+if (!jsonValue.HasMember(#jsonName)) throw SongDownloader::JsonException(SongDownloader::Exceptions::NoMember, #jsonName); \
+if (!jsonValue[#jsonName].Is##type()) throw SongDownloader::JsonException(SongDownloader::Exceptions::WrongType, #jsonName ", Type expected was: " #type); \
 name = jsonValue[#jsonName].Get##type();
 
 #define DESERIALIZE_VALUE_OPTIONAL(name, jsonName, type) \
@@ -41,8 +41,8 @@ if(jsonValue.HasMember(#jsonName) && jsonValue[#jsonName].Is##type()) { \
 }
 
 #define DESERIALIZE_CLASS(name, jsonName) \
-if (!jsonValue.HasMember(#jsonName)) throw SongDownloader::JsonException("expected member in non-optional jsonValue but got false on HasMember!\n JSON Value:" #jsonName); \
-if (!jsonValue[#jsonName].IsObject()) throw SongDownloader::JsonException("expected type in non-optional jsonValue does not match!\n JSON Value:" #jsonName " ,Type expected was: JsonObject"); \
+if (!jsonValue.HasMember(#jsonName)) throw SongDownloader::JsonException(SongDownloader::Exceptions::NoMember, #jsonName); \
+if (!jsonValue[#jsonName].IsObject()) throw SongDownloader::JsonException(SongDownloader::Exceptions::WrongType, #jsonName ", Type expected was: JsonObject"); \
 name.Deserialize(jsonValue[#jsonName]);
 
 #define DESERIALIZE_CLASS_OPTIONAL(name, jsonName) \
@@ -53,7 +53,7 @@ if(jsonValue.HasMember(#jsonName)) { \
 }
 
 #define DESERIALIZE_VECTOR(name, jsonName, type) \
-if (!jsonValue.HasMember(#jsonName)) throw SongDownloader::JsonException("expected member in non-optional jsonValue but got false on HasMember! " #jsonName); \
+if (!jsonValue.HasMember(#jsonName)) throw SongDownloader::JsonException(SongDownloader::Exceptions::NoMember, #jsonName); \
 name.clear(); \
 auto& jsonName = jsonValue[#jsonName]; \
 if(jsonName.IsArray()) { \
@@ -62,4 +62,4 @@ if(jsonName.IsArray()) { \
         value.Deserialize(*it); \
         name.push_back(value); \
     } \
-} else throw SongDownloader::JsonException("expected type in non-optional jsonValue does not match!\n JSON Value:" #jsonName " ,Type expected was: JsonArray");
+} else throw SongDownloader::JsonException(SongDownloader::Exceptions::WrongType, #jsonName ", Type expected was: JsonArray");
