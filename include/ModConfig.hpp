@@ -4,7 +4,7 @@
 DECLARE_CONFIG(ModConfig,
 
     CONFIG_VALUE(AutoMapper, std::string, "AutoMapper", "", "Show auto-generated Beatmaps");
-    CONFIG_VALUE(SearchType, std::string, "Search Type", "Key", "What to Display!");
+    CONFIG_VALUE(SearchType, std::string, "Search Type", "Search", "What to Display!");
     CONFIG_VALUE(SortOrder, std::string, "Sort Order", "Relevance", "How results should be sorted");
     CONFIG_VALUE(NE, std::string, "NE", "", "If NoodleExtensions maps should be included in search results");
     CONFIG_VALUE(ME, std::string, "ME", "", "If MappingExtensions maps should be included in search results");
