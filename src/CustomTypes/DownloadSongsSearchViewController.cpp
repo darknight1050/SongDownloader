@@ -18,6 +18,7 @@
 #include "UnityEngine/Resources.hpp"
 #include "HMUI/ScrollView.hpp"
 #include "HMUI/Touchable.hpp"
+#include "System/Action.hpp"
 
 #include "GlobalNamespace/LevelBar.hpp"
 
@@ -61,6 +62,13 @@ void SearchEntry::SetBeatmap(const BeatSaver::Beatmap& _map) {
 
     line1Component->SetText(il2cpp_utils::newcsstr(map.GetMetadata().GetSongName()));
 
+    if (map.GetRanked()) {
+        line1Component->set_color(UnityEngine::Color(1, 0.68f, 0, 1));
+    }
+    else {
+        line1Component->set_color(UnityEngine::Color(1, 1, 1, 1));
+    }
+
     std::string ModsUsed;
     std::vector<BeatSaver::BeatmapDifficulty> Difficulties = map.GetVersions().front().GetDiffs();
     for (BeatSaver::BeatmapDifficulty& elem : Difficulties) {
@@ -76,6 +84,7 @@ void SearchEntry::SetBeatmap(const BeatSaver::Beatmap& _map) {
     else {
         line2Component->SetText(il2cpp_utils::newcsstr(map.GetMetadata().GetSongAuthorName() + " <color=#ADADADFF>[" + map.GetMetadata().GetLevelAuthorName() + "]</color> [" + ModsUsed + "]"));
     }
+
     int currentSearchIndex = DownloadSongsSearchViewController::searchIndex;
     
     coverImageView->set_enabled(false);
@@ -210,6 +219,127 @@ void DownloadSongsSearchViewController::CreateEntries(Transform* parent) {
     Object::Destroy(prefab);
 }
 
+void DownloadSongsSearchViewController::SearchKey(int currentSearchIndex) {
+    if (!DownloadSongsSearchViewController::SearchQuery.empty()) {
+        BeatSaver::API::GetBeatmapByKeyAsync(DownloadSongsSearchViewController::SearchQuery,
+            [this, currentSearchIndex](std::optional<BeatSaver::Beatmap> beatmap) {
+                if (currentSearchIndex == DownloadSongsSearchViewController::searchIndex) {
+                    QuestUI::MainThreadScheduler::Schedule(
+                        [this, currentSearchIndex, beatmap] {
+                            if (currentSearchIndex == DownloadSongsSearchViewController::searchIndex) {
+                                if (beatmap.has_value()) {
+                                    loadingControl->Hide();
+                                    searchEntries[0].SetBeatmap(beatmap.value());
+                                    for (int i = 1; i < ENTRIES_PER_PAGE; i++) {
+                                        searchViewController->searchEntries[i].Disable();
+                                    }
+                                }
+                                else {
+                                    if (!BeatSaver::API::exception.empty()) loadingControl->ShowText(il2cpp_utils::newcsstr(BeatSaver::API::exception), true);
+                                    else loadingControl->ShowText(il2cpp_utils::newcsstr("No Song Found for Key!"), true);
+                                }
+                            }
+                        }
+                    );
+                }
+            }
+        );
+    }
+    else loadingControl->ShowText(il2cpp_utils::newcsstr("Please type in a key!"), false);
+}
+
+void DownloadSongsSearchViewController::SearchSongs(int currentSearchIndex) {
+    BeatSaver::API::SearchPagedAsync(DownloadSongsSearchViewController::SearchQuery, 0,
+        [this, currentSearchIndex](std::optional<BeatSaver::Page> page) {
+            if (currentSearchIndex == DownloadSongsSearchViewController::searchIndex) {
+                QuestUI::MainThreadScheduler::Schedule(
+                    [this, currentSearchIndex, page] {
+                        if (currentSearchIndex == DownloadSongsSearchViewController::searchIndex) {
+                            if (page.has_value() && !page.value().GetDocs().empty()) {
+                                auto maps = page.value().GetDocs();
+                                auto mapsSize = maps.size();
+                                int mapIndex = 0;
+                                for (int i = 0; i < ENTRIES_PER_PAGE; i++) {
+                                    auto& searchEntry = searchEntries[i];
+                                    if (mapIndex < mapsSize) {
+                                        loadingControl->Hide();
+                                        auto& map = maps.at(mapIndex);
+                                        searchEntry.SetBeatmap(map);
+                                    }
+                                    else {
+                                        searchEntry.Disable();
+                                    }
+                                    mapIndex++;
+                                }
+                            }
+                            else {
+                                if (!BeatSaver::API::exception.empty()) loadingControl->ShowText(il2cpp_utils::newcsstr(BeatSaver::API::exception), true);
+                                else loadingControl->ShowText(il2cpp_utils::newcsstr("No Songs Found!"), true);
+                            }
+                        }
+                    }
+                );
+            }
+        },
+        getModConfig().SortOrder.GetValue(),
+            getModConfig().AutoMapper.GetValue(),
+            getModConfig().Ranked.GetValue(),
+            getModConfig().ME.GetValue(),
+            getModConfig().NE.GetValue(),
+            getModConfig().Chroma.GetValue());
+}
+
+void DownloadSongsSearchViewController::SearchUser(int currentSearchIndex) {
+    if (!DownloadSongsSearchViewController::SearchQuery.empty()) {
+        BeatSaver::API::SearchPagedAsync(DownloadSongsSearchViewController::SearchQuery, 0,
+            [this, currentSearchIndex](std::optional<BeatSaver::Page> UserPage) {
+                QuestUI::MainThreadScheduler::Schedule(
+                    [this, currentSearchIndex, UserPage]() {
+                        if (UserPage.has_value() && UserPage.value().GetUser().has_value()) {
+                            BeatSaver::API::GetBeatmapByUserIdAsync(UserPage.value().GetUser().value().GetId(), 0,
+                                [this, currentSearchIndex](std::optional<BeatSaver::Page> page) {
+                                    QuestUI::MainThreadScheduler::Schedule(
+                                        [this, currentSearchIndex, page]() {
+                                            if (currentSearchIndex == DownloadSongsSearchViewController::searchIndex) {
+                                                if (page.has_value() && !page.value().GetDocs().empty()) {
+                                                    auto maps = page.value().GetDocs();
+                                                    auto mapsSize = maps.size();
+                                                    int mapIndex = 0;
+                                                    for (int i = 0; i < ENTRIES_PER_PAGE; i++) {
+                                                        auto& searchEntry = searchEntries[i];
+                                                        if (mapIndex < mapsSize) {
+                                                            loadingControl->Hide();
+                                                            auto& map = maps.at(mapIndex);
+                                                            searchEntry.SetBeatmap(map);
+                                                        }
+                                                        else {
+                                                            searchEntry.Disable();
+                                                        }
+                                                        mapIndex++;
+                                                    }
+                                                }
+                                                else {
+                                                    if (!BeatSaver::API::exception.empty()) loadingControl->ShowText(il2cpp_utils::newcsstr(BeatSaver::API::exception), true);
+                                                    else loadingControl->ShowText(il2cpp_utils::newcsstr("No Songs Found for given User!"), true);
+                                                }
+                                            }
+                                        }
+                                    );
+                                }
+                            );
+                        }
+                        else {
+                            if (!BeatSaver::API::exception.empty()) loadingControl->ShowText(il2cpp_utils::newcsstr(BeatSaver::API::exception), true);
+                            else loadingControl->ShowText(il2cpp_utils::newcsstr("No User Found!"), true);
+                        }
+                    }
+                );
+            }
+        );
+    }
+    else loadingControl->ShowText(il2cpp_utils::newcsstr("Please type in a Username!"), false);
+}
+
 void DownloadSongsSearchViewController::Search() {
     for (int i = 0; i < ENTRIES_PER_PAGE; i++) {
         searchViewController->searchEntries[i].Disable();
@@ -217,94 +347,26 @@ void DownloadSongsSearchViewController::Search() {
     searchViewController->loadingControl->ShowLoading(il2cpp_utils::newcsstr("Loading..."));
     DownloadSongsSearchViewController::searchIndex++;
     int currentSearchIndex = DownloadSongsSearchViewController::searchIndex;
-    if (getModConfig().BsrSearch.GetValue()) {
-        if (!DownloadSongsSearchViewController::SearchQuery.empty()) {
-            BeatSaver::API::GetBeatmapByKeyAsync(DownloadSongsSearchViewController::SearchQuery,
-                [currentSearchIndex](std::optional<BeatSaver::Beatmap> beatmap) {
-                    if (currentSearchIndex == DownloadSongsSearchViewController::searchIndex) {
-                        QuestUI::MainThreadScheduler::Schedule(
-                            [currentSearchIndex, beatmap] {
-                                if (currentSearchIndex == DownloadSongsSearchViewController::searchIndex) {
-                                    if (beatmap.has_value()) {
-                                        searchViewController->loadingControl->Hide();
-                                        searchViewController->searchEntries[0].SetBeatmap(beatmap.value());
-                                        for (int i = 1; i < ENTRIES_PER_PAGE; i++) {
-                                            searchViewController->searchEntries[i].Disable();
-                                        }
-                                    }
-                                    else {
-                                        if (!BeatSaver::API::exception.empty()) searchViewController->loadingControl->ShowText(il2cpp_utils::newcsstr(BeatSaver::API::exception), false);
-                                        else searchViewController->loadingControl->ShowText(il2cpp_utils::newcsstr("No Songs Found!"), false);
-                                    }
-                                    if (SearchEntry::spriteCount > MAX_SPRITES) {
-                                        SearchEntry::spriteCount = 0;
-                                        Resources::UnloadUnusedAssets();
-                                    }
-                                }
-                            }
-                        );
-                    }
-                }
-            );
-        } else searchViewController->loadingControl->ShowText(il2cpp_utils::newcsstr("Please type in a key!"), false);
+    if (getModConfig().SearchType.GetValue() == "Key") {
+        searchViewController->SearchKey(currentSearchIndex);
     }
-    else {
-        BeatSaver::API::SearchPagedAsync(DownloadSongsSearchViewController::SearchQuery, 0,
-            [currentSearchIndex](std::optional<BeatSaver::Page> page) {
-                if (currentSearchIndex == DownloadSongsSearchViewController::searchIndex) {
-                    QuestUI::MainThreadScheduler::Schedule(
-                        [currentSearchIndex, page] {
-                            if (currentSearchIndex == DownloadSongsSearchViewController::searchIndex) {
-                                if (page.has_value() && !page.value().GetDocs().empty()) {
-                                    auto maps = page.value().GetDocs();
-                                    auto mapsSize = maps.size();
-                                    int mapIndex = 0;
-                                    for (int i = 0; i < ENTRIES_PER_PAGE; i++) {
-                                        auto& searchEntry = searchViewController->searchEntries[i];
-                                        if (mapIndex < mapsSize) {
-                                            searchViewController->loadingControl->Hide();
-                                            auto& map = maps.at(mapIndex);
-                                            searchEntry.SetBeatmap(map);
-                                        }
-                                        else {
-                                            searchEntry.Disable();
-                                        }
-                                        mapIndex++;
-                                    }
-                                }
-                                else {
-                                    if (!BeatSaver::API::exception.empty()) searchViewController->loadingControl->ShowText(il2cpp_utils::newcsstr(BeatSaver::API::exception), false);
-                                    else searchViewController->loadingControl->ShowText(il2cpp_utils::newcsstr("No Songs Found!"), false);
-                                }
-                                if (SearchEntry::spriteCount > MAX_SPRITES) {
-                                    SearchEntry::spriteCount = 0;
-                                    Resources::UnloadUnusedAssets();
-                                }
-                            }
-                        }
-                    );
-                }
-            },
-            getModConfig().SortOrder.GetValue(),
-                getModConfig().AutoMapper.GetValue(),
-                getModConfig().Ranked.GetValue(),
-                getModConfig().ME.GetValue(),
-                getModConfig().NE.GetValue(),
-                getModConfig().Chroma.GetValue());
+    else if (getModConfig().SearchType.GetValue() == "Search") {
+        searchViewController->SearchSongs(currentSearchIndex);
     }
+    else if (getModConfig().SearchType.GetValue() == "User") {
+        searchViewController->SearchUser(currentSearchIndex);
+    }
+    if (SearchEntry::spriteCount > MAX_SPRITES) {
+        SearchEntry::spriteCount = 0;
+        Resources::UnloadUnusedAssets();
+    }
+
 }
 
 void DownloadSongsSearchViewController::DidActivate(bool firstActivation, bool addedToHierarchy, bool screenSystemEnabling) {
     if (firstActivation) {
         searchViewController = this;
         get_gameObject()->AddComponent<Touchable*>();
-
-        GameObject* existingLoadinControl = Resources::FindObjectsOfTypeAll<LoadingControl*>()->values[0]->get_gameObject();
-        GameObject* loadinControlGameObject = UnityEngine::GameObject::Instantiate(existingLoadinControl, this->get_gameObject()->get_transform());
-        auto loadingControlTransform = loadinControlGameObject->get_transform();
-        loadingControl = loadinControlGameObject->GetComponent<LoadingControl*>();
-        loadingControl->loadingText->set_text(il2cpp_utils::newcsstr("Loading..."));
-        loadingControl->set_enabled(true);
 
         auto searchSetting = BeatSaberUI::CreateStringSetting(get_transform(), "Search", "", UnityEngine::Vector2(0.0f, 0.0f), UnityEngine::Vector3(0.0f, -38.0f, 0.0f),
             [this](std::string value) {
@@ -318,6 +380,19 @@ void DownloadSongsSearchViewController::DidActivate(bool firstActivation, bool a
         scrollTransform->set_anchoredPosition(UnityEngine::Vector2(0.0f, -4.0f));
         scrollTransform->set_sizeDelta(UnityEngine::Vector2(-54.0f, -8.0f));
         CreateEntries(container->get_transform());
+
+        // LoadingControl has to be added after the ScrollView, as otherwise it will be behind it and the RefreshButton unselectable
+        GameObject* existingLoadinControl = Resources::FindObjectsOfTypeAll<LoadingControl*>()->values[0]->get_gameObject();
+        GameObject* loadinControlGameObject = UnityEngine::GameObject::Instantiate(existingLoadinControl, get_transform());
+        auto loadingControlTransform = loadinControlGameObject->get_transform();
+        loadingControl = loadinControlGameObject->GetComponent<LoadingControl*>();
+        loadingControl->add_didPressRefreshButtonEvent(il2cpp_utils::MakeDelegate<System::Action*>(classof(System::Action*),
+            (std::function<void()>) [this]() {
+                Search();
+            }
+        ));
+        loadingControl->loadingText->set_text(il2cpp_utils::newcsstr("Loading..."));
+        loadingControl->set_enabled(true);
 
         Search();
     }

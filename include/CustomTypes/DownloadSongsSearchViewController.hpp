@@ -66,6 +66,12 @@ DECLARE_CLASS_CODEGEN(SongDownloader, DownloadSongsSearchViewController, HMUI::V
     DECLARE_OVERRIDE_METHOD(void, DidDeactivate, il2cpp_utils::FindMethodUnsafe("HMUI", "ViewController", "DidDeactivate", 2), bool removedFromHierarchy, bool screenSystemDisabling);
 
     DECLARE_INSTANCE_FIELD(GlobalNamespace::LoadingControl*, loadingControl);
+
+    DECLARE_INSTANCE_METHOD(void, SearchSongs, int);
+
+    DECLARE_INSTANCE_METHOD(void, SearchUser, int);
+
+    DECLARE_INSTANCE_METHOD(void, SearchKey, int);
 )
 
 namespace SongDownloader {

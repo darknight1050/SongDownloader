@@ -45,9 +45,11 @@ if (!jsonValue.HasMember(#jsonName)) throw SongDownloader::JsonException(SongDow
 if (!jsonValue[#jsonName].IsObject()) throw SongDownloader::JsonException(SongDownloader::Exceptions::WrongType, #jsonName ", Type expected was: JsonObject"); \
 name.Deserialize(jsonValue[#jsonName]);
 
-#define DESERIALIZE_CLASS_OPTIONAL(name, jsonName) \
-if(jsonValue.HasMember(#jsonName)) { \
-    name->Deserialize(jsonValue[#jsonName]);\
+#define DESERIALIZE_CLASS_OPTIONAL(name, jsonName, type) \
+if(jsonValue.HasMember(#jsonName) && jsonValue[#jsonName].IsObject()) { \
+    type val##name; \
+    name = val##name;\
+    name.value().Deserialize(jsonValue[#jsonName]); \
 } else { \
     name = std::nullopt; \
 }

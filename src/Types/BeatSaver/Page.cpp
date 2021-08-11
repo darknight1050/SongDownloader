@@ -2,5 +2,5 @@
 
 DESERIALIZE_METHOD(BeatSaver, Page,
     DESERIALIZE_VECTOR(Docs, docs, Beatmap)
-    DESERIALIZE_CLASS_OPTIONAL(User, user)
+    DESERIALIZE_CLASS_OPTIONAL(User, user, BeatSaver::UserDetail)
 )

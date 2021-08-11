@@ -55,6 +55,8 @@ namespace BeatSaver::API {
     /// <param name="finished"> Function to run after it finishes loading</param>
     void GetBeatmapByHashAsync(std::string hash, std::function<void(std::optional<BeatSaver::Beatmap>)> finished);
 
+    void GetBeatmapByUserIdAsync(int userID, int page, std::function<void(std::optional<BeatSaver::Page>)> finished);
+
     void GetUserByIdAsync(int id, std::function<void(std::optional<BeatSaver::UserDetail>)> finished);
 
     /// <summary>
