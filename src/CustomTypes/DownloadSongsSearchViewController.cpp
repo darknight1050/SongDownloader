@@ -85,10 +85,10 @@ void SearchEntry::SetBeatmap(const BeatSaver::Beatmap& _map) {
     }
     if (ModsUsed.ends_with(", ")) ModsUsed.erase(ModsUsed.length() - 2);
     if (ModsUsed.empty()) {
-        line2Component->SetText(il2cpp_utils::newcsstr(map.GetMetadata().GetSongAuthorName() + " <color=#ADADADFF>[" + map.GetMetadata().GetLevelAuthorName() + "]</color>"));
+        line2Component->SetText(il2cpp_utils::newcsstr("<size=80%><noparse>" + map.GetMetadata().GetSongAuthorName() + "</noparse>" + " <color=#67c16f><size=90%><noparse>[" + map.GetMetadata().GetLevelAuthorName() + "]</noparse></color>"));
     }
     else {
-        line2Component->SetText(il2cpp_utils::newcsstr(map.GetMetadata().GetSongAuthorName() + " <color=#ADADADFF>[" + map.GetMetadata().GetLevelAuthorName() + "]</color> [" + ModsUsed + "]"));
+        line2Component->SetText(il2cpp_utils::newcsstr("<size=80%><noparse>" + map.GetMetadata().GetSongAuthorName() + "</noparse>" + " <color=#67c16f><size=90%><noparse>[" + map.GetMetadata().GetLevelAuthorName() + "]</noparse></color> [" + ModsUsed + "]"));
     }
 
     int currentSearchIndex = DownloadSongsSearchViewController::searchIndex;
@@ -122,10 +122,10 @@ void SearchEntry::SetBeatmap(const BeastSaber::Song& _song) {
     line1Component->set_color(UnityEngine::Color(1, 1, 1, 1));
 
     if (song.GetCurated_by().has_value()) {
-        line2Component->SetText(il2cpp_utils::newcsstr("<color=#ADADADFF>[" + song.GetLevel_author_name() + "]</color> " + "<color=#FFFFFFFF>Curated by:</color> <color=#62D752FF>" + song.GetCurated_by().value() + "</color>"));
+        line2Component->SetText(il2cpp_utils::newcsstr("<color=#67c16f><size=90%><noparse>[" + song.GetLevel_author_name() + "]</noparse></color> " + "<color=#FFFFFFFF><size=75%>Curated by:</color> <color=#ADADADFF><size=80%><noparse>" + song.GetCurated_by().value() + "</noparse></color>"));
     }
     else {
-        line2Component->SetText(il2cpp_utils::newcsstr("<color=#ADADADFF>[" + song.GetLevel_author_name() + "]</color>"));
+        line2Component->SetText(il2cpp_utils::newcsstr("<color=#67c16f><size=90%><noparse>[" + song.GetLevel_author_name() + "]</noparse></color>"));
     }
 
     int currentSearchIndex = DownloadSongsSearchViewController::searchIndex;
