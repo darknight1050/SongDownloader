@@ -182,23 +182,21 @@ void DownloadSongsOptionsViewController::DidActivate(bool firstActivation, bool 
 
         std::string checkValue = getModConfig().SearchType.GetValue();
         if (checkValue != "Search") {
+            if (checkValue != "TopRanked") {
+                RankedToggle->get_transform()->GetParent()->get_gameObject()->SetActive(false); // TODO: Actually add ScoreSaber Stuff
+                Ranked->get_transform()->GetParent()->get_gameObject()->SetActive(true);
+            }
+            else {
+                Ranked->get_transform()->GetParent()->get_gameObject()->SetActive(false);
+                RankedToggle->get_transform()->GetParent()->get_gameObject()->SetActive(true); // TODO: Actually add ScoreSaber Stuff
+            }
             Automapper->get_gameObject()->SetActive(false);
             SortOrder->get_gameObject()->SetActive(false);
             NEdropdown->get_gameObject()->SetActive(false);
             MEdropdown->get_gameObject()->SetActive(false);
             Chroma->get_gameObject()->SetActive(false);
-            //Ranked->get_gameObject()->SetActive(false);
+            Ranked->get_gameObject()->SetActive(false);
             //Ranked->get_transform()->Find(il2cpp_utils::newcsstr("Label"))->get_gameObject()->SetActive(false);
-            if (checkValue != "TopRanked") {
-                RankedToggle->get_transform()->GetParent()->get_gameObject()->SetActive(false); // TODO: Actually add ScoreSaber Stuff
-                Ranked->get_transform()->GetParent()->get_gameObject()->SetActive(true);
-                Ranked->get_gameObject()->SetActive(true);
-            }
-            else {
-                Ranked->get_gameObject()->SetActive(false);
-                Ranked->get_transform()->GetParent()->get_gameObject()->SetActive(false);
-                RankedToggle->get_transform()->GetParent()->get_gameObject()->SetActive(true); // TODO: Actually add ScoreSaber Stuff
-            }
         }
         else {
             RankedToggle->get_transform()->GetParent()->get_gameObject()->SetActive(false);
