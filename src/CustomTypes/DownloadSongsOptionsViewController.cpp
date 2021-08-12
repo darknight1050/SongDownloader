@@ -39,16 +39,15 @@ void DownloadSongsOptionsViewController::DidActivate(bool firstActivation, bool 
         contentSizeFitter->set_horizontalFit(ContentSizeFitter::FitMode::PreferredSize);
         contentSizeFitter->set_verticalFit(ContentSizeFitter::FitMode::PreferredSize);
 
-        SearchType = QuestUI::BeatSaberUI::CreateDropdown(settingsLayoutTransform, getModConfig().SearchType.GetName(), getModConfig().SearchType.GetValue(), { "Key", "Search", "User" },
+        SearchType = QuestUI::BeatSaberUI::CreateDropdown(settingsLayoutTransform, getModConfig().SearchType.GetName(), getModConfig().SearchType.GetValue(), { "Key", "Search", "User", "Curator Recommended", "Bookmarks" },
             [this](std::string value) {
-                getModConfig().SearchType.SetValue(value);
-                if (value == "Key" || value == "User") {
+                if (value != "Search") {
                     Automapper->get_gameObject()->SetActive(false);
                     SortOrder->get_gameObject()->SetActive(false);
                     NEdropdown->get_gameObject()->SetActive(false);
                     MEdropdown->get_gameObject()->SetActive(false);
                     Chroma->get_gameObject()->SetActive(false);
-                    Ranked->get_gameObject()->SetActive(false);
+                    Ranked->get_transform()->GetParent()->get_gameObject()->SetActive(false);
                 }
                 else {
                     Automapper->get_gameObject()->SetActive(true);
@@ -56,8 +55,17 @@ void DownloadSongsOptionsViewController::DidActivate(bool firstActivation, bool 
                     NEdropdown->get_gameObject()->SetActive(true);
                     MEdropdown->get_gameObject()->SetActive(true);
                     Chroma->get_gameObject()->SetActive(true);
-                    Ranked->get_gameObject()->SetActive(true);
+                    Ranked->get_transform()->GetParent()->get_gameObject()->SetActive(true);
                 }
+                if (value == "Bookmarks") {
+                    DownloadSongsSearchViewController::SearchQuery = getModConfig().BookmarkUsername.GetValue();
+                    searchViewController->SearchField->SetText(il2cpp_utils::newcsstr(getModConfig().BookmarkUsername.GetValue()));
+                }
+                else if (getModConfig().SearchType.GetValue() == "Bookmarks") {
+                    DownloadSongsSearchViewController::SearchQuery.clear();
+                    searchViewController->SearchField->SetText(il2cpp_utils::newcsstr(""));
+                }
+                getModConfig().SearchType.SetValue(value);
                 DownloadSongsSearchViewController::Search();
             }
         );
@@ -154,13 +162,29 @@ void DownloadSongsOptionsViewController::DidActivate(bool firstActivation, bool 
         QuestUI::BeatSaberUI::AddHoverHint(Ranked->get_gameObject(), getModConfig().Ranked.GetHoverHint());
         Ranked->get_transform()->GetParent()->GetComponent<LayoutElement*>()->set_preferredWidth(50.0f);
 
-        if (getModConfig().SearchType.GetValue() == "Key" || getModConfig().SearchType.GetValue() == "User") {
+        RankedToggle = QuestUI::BeatSaberUI::CreateToggle(settingsLayoutTransform, getModConfig().Ranked_Toggle.GetName(), getModConfig().Ranked_Toggle.GetValue(),
+            [](bool value) {
+                getModConfig().Ranked_Toggle.SetValue(value);
+                DownloadSongsSearchViewController::Search();
+            }
+        );
+        QuestUI::BeatSaberUI::AddHoverHint(RankedToggle->get_gameObject(), getModConfig().Ranked_Toggle.GetHoverHint());
+        RankedToggle->get_transform()->GetParent()->GetComponent<LayoutElement*>()->set_preferredWidth(50.0f);
+
+
+        std::string checkValue = getModConfig().SearchType.GetValue();
+        if (checkValue == "Key" || checkValue == "User" || checkValue == "Curator Recommended" || checkValue == "Bookmarks") {
             Automapper->get_gameObject()->SetActive(false);
             SortOrder->get_gameObject()->SetActive(false);
             NEdropdown->get_gameObject()->SetActive(false);
             MEdropdown->get_gameObject()->SetActive(false);
             Chroma->get_gameObject()->SetActive(false);
-            Ranked->get_gameObject()->SetActive(false);
+            //Ranked->get_gameObject()->SetActive(false);
+            Ranked->get_transform()->GetParent()->get_gameObject()->SetActive(false);
+            //Ranked->get_transform()->Find(il2cpp_utils::newcsstr("Label"))->get_gameObject()->SetActive(false);
+        }
+        else {
+            RankedToggle->get_transform()->GetParent()->get_gameObject()->SetActive(false);
         }
     }
 }

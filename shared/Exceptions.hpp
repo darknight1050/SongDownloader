@@ -3,7 +3,7 @@
 
 namespace SongDownloader {
     enum class Exceptions {
-        //SiteError,
+        SiteError,
         NoMember,
         WrongType
     };

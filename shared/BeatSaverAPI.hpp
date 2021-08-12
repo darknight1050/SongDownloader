@@ -1,5 +1,7 @@
 #pragma once
 
+#include "Types/BeastSaber/Song.hpp"
+
 #include "Types/BeatSaver/Page.hpp"
 
 #include <string>
@@ -73,8 +75,17 @@ namespace BeatSaver::API {
 
     void DownloadBeatmapAsync(const BeatSaver::Beatmap& beatmap, std::function<void(bool)> finished, std::function<void(float)> progressUpdate = nullptr);
 
+
+    /// <summary>
+    /// For downloading maps gotten from the BeastSaberAPI
+    /// </summary>
+    /// <param name="song">BeastSaber Song reference</param>
+    /// <param name="finished">Function to run after finishing to download</param>
+    /// <param name="progressUpdate">Function to run on updating download progress</param>
+    void DownloadBeatmapAsync(const BeastSaber::Song& song, std::function<void(bool)> finished, std::function<void(float)> progressUpdate = nullptr);
+
     void GetCoverImageAsync(const BeatSaver::Beatmap& beatmap, std::function<void(std::vector<uint8_t>)> finished, std::function<void(float)> progressUpdate = nullptr);
-    
+
     void GetCoverImageByHashAsync(std::string hash, std::function<void(std::vector<uint8_t>)> finished, std::function<void(float)> progressUpdate = nullptr);
 
     // Returns mp3 with previewAudio

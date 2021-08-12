@@ -22,13 +22,13 @@ namespace BeatSaver::API {
     std::string exception;
                    
     std::optional<BeatSaver::Beatmap> GetBeatmapByKey(std::string key) {
+        exception.clear();
         auto json = WebUtils::GetJSON(API_URL + "/maps/id/" + key);
         if (!json.has_value())
             return std::nullopt;
         try {
             BeatSaver::Beatmap beatmap;
             beatmap.Deserialize(json.value().GetObject());
-            if (!exception.empty()) exception.clear();
             return beatmap;
         }
         catch (const std::exception& e) {
@@ -334,6 +334,20 @@ namespace BeatSaver::API {
         );
     }
 
+    void DownloadBeatmapAsync(const BeastSaber::Song& song, std::function<void(bool)> finished, std::function<void(float)> progressUpdate) {
+        // Probably a deprecated method of downloading maps, but at least will work if map has isn't up to date https://api.beatsaver.com/download/key/1b236
+        WebUtils::GetAsync(API_URL + "/download/key/" + song.GetSong_key(), FILE_DOWNLOAD_TIMEOUT,
+            [song, finished](long httpCode, std::string data) {
+                auto targetFolder = RuntimeSongLoader::API::GetCustomLevelsPath() + FileUtils::FixIlegalName(song.GetSong_key() + " (" + song.GetTitle() + " - " + song.GetLevel_author_name() + ")");
+                int args = 2;
+                int statusCode = zip_stream_extract(data.data(), data.length(), targetFolder.c_str(), +[](const char* name, void* arg) -> int {
+                    return 0;
+                    }, &args);
+                finished(statusCode);
+            }, progressUpdate
+        );
+    }
+
     void GetCoverImageAsync(const BeatSaver::Beatmap& beatmap, std::function<void(std::vector<uint8_t>)> finished, std::function<void(float)> progressUpdate) {
         WebUtils::GetAsync(beatmap.GetVersions().front().GetCoverURL(), FILE_DOWNLOAD_TIMEOUT,
             [beatmap, finished](long httpCode, std::string data) {
@@ -344,10 +358,12 @@ namespace BeatSaver::API {
     }
 
     void GetCoverImageByHashAsync(std::string hash, std::function<void(std::vector<uint8_t>)> finished, std::function<void(float)> progressUpdate) {
-        WebUtils::GetAsync(CDN_URL + hash + ".jpg", FILE_DOWNLOAD_TIMEOUT,
+        std::string coverURL = CDN_URL + hash + ".jpg";
+        //LOG_DEBUG("CoverURL: %s", coverURL.c_str());
+        WebUtils::GetAsync(coverURL, FILE_DOWNLOAD_TIMEOUT,
             [hash, finished](long httpCode, std::string data) {
-                LOG_DEBUG("HTTP Code when loading by hash: %ld", httpCode);
-                if (httpCode != 0) return;
+                //LOG_DEBUG("HTTP Code when loading by hash: %ld", httpCode);
+                if (httpCode != 200) return;
                 std::vector<uint8_t> bytes(data.begin(), data.end());
                 finished(bytes);
             }, progressUpdate

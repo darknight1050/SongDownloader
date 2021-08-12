@@ -4,6 +4,7 @@
 #include "ModConfig.hpp"
 
 #include "BeatSaverAPI.hpp"
+#include "BeastSaberAPI.hpp"
 
 #include "songloader/shared/API.hpp"
 
@@ -56,9 +57,14 @@ const BeatSaver::Beatmap& SearchEntry::GetBeatmap() {
     return map;
 }
 
+const BeastSaber::Song& SearchEntry::GetSong() {
+    return song;
+}
+
 void SearchEntry::SetBeatmap(const BeatSaver::Beatmap& _map) {
     map = _map;
     gameObject->SetActive(true);
+    IsBeatSaverBeatmap = true;
 
     line1Component->SetText(il2cpp_utils::newcsstr(map.GetMetadata().GetSongName()));
 
@@ -106,10 +112,53 @@ void SearchEntry::SetBeatmap(const BeatSaver::Beatmap& _map) {
     UpdateDownloadProgress(true);
 }
 
+void SearchEntry::SetBeatmap(const BeastSaber::Song& _song) {
+    song = _song;
+    gameObject->SetActive(true);
+    IsBeatSaverBeatmap = false;
+
+    line1Component->SetText(il2cpp_utils::newcsstr(song.GetTitle()));
+
+    line1Component->set_color(UnityEngine::Color(1, 1, 1, 1));
+
+    if (song.GetCurated_by().has_value()) {
+        line2Component->SetText(il2cpp_utils::newcsstr("<color=#ADADADFF>[" + song.GetLevel_author_name() + "]</color> " + "<color=#FFFFFFFF>Curated by:</color> <color=#62D752FF>" + song.GetCurated_by().value() + "</color>"));
+    }
+    else {
+        line2Component->SetText(il2cpp_utils::newcsstr("<color=#ADADADFF>[" + song.GetLevel_author_name() + "]</color>"));
+    }
+
+    int currentSearchIndex = DownloadSongsSearchViewController::searchIndex;
+
+    coverImageView->set_enabled(false);
+    BeatSaver::API::GetCoverImageByHashAsync(song.GetHash(), [this, currentSearchIndex](std::vector<uint8_t> bytes) {
+        if (currentSearchIndex == DownloadSongsSearchViewController::searchIndex) {
+            MainThreadScheduler::Schedule([this, currentSearchIndex, bytes] {
+                if (currentSearchIndex == DownloadSongsSearchViewController::searchIndex) {
+                    std::vector<uint8_t> data = bytes;
+
+                    Array<uint8_t>* spriteArray = il2cpp_utils::vectorToArray(data);
+                    Sprite* sprite = BeatSaberUI::ArrayToSprite(spriteArray);
+                    coverImageView->set_sprite(sprite);
+                    coverImageView->set_enabled(true);
+                    SearchEntry::spriteCount++;
+                }
+                });
+        }
+        });
+    UpdateDownloadProgress(true);
+}
+
 void SearchEntry::UpdateDownloadProgress(bool checkLoaded) {
     if(checkLoaded) {
         downloadProgress = -1.0f;
-        auto hash = map.GetVersions().front().GetHash();
+        std::string hash;
+        if (IsBeatSaverBeatmap) {
+            hash = map.GetVersions().front().GetHash();
+        }
+        else {
+            hash = song.GetHash();
+        }
         std::transform(hash.begin(), hash.end(), hash.begin(), toupper);
         for(auto& song : RuntimeSongLoader::API::GetLoadedSongs()) {
             if(to_utf8(csstrtostr(song->levelID)).ends_with(hash)) {
@@ -191,28 +240,54 @@ void DownloadSongsSearchViewController::CreateEntries(Transform* parent) {
         auto entry = &searchEntries[i];
         downloadButton->get_onClick()->AddListener(il2cpp_utils::MakeDelegate<UnityAction*>(classof(UnityAction*), 
             (std::function<void()>) [this, entry] {
-                auto hash = entry->GetBeatmap().GetVersions().front().GetHash();
-                BeatSaver::API::DownloadBeatmapAsync(entry->GetBeatmap(), 
-                    [this] (bool error) {
-                        if(!error) {
-                            QuestUI::MainThreadScheduler::Schedule(
-                                [] {
-                                    RuntimeSongLoader::API::RefreshSongs(false);
-                                }
-                            );
+                if (entry->IsBeatSaverBeatmap) {
+                    auto hash = entry->GetBeatmap().GetVersions().front().GetHash();
+                    BeatSaver::API::DownloadBeatmapAsync(entry->GetBeatmap(),
+                        [this](bool error) {
+                            if (!error) {
+                                QuestUI::MainThreadScheduler::Schedule(
+                                    [] {
+                                        RuntimeSongLoader::API::RefreshSongs(false);
+                                    }
+                                );
+                            }
+                        },
+                        [entry, hash](float percentage) {
+                            if (entry->GetBeatmap().GetVersions().front().GetHash() == hash) {
+                                entry->downloadProgress = percentage;
+                                QuestUI::MainThreadScheduler::Schedule(
+                                    [entry] {
+                                        entry->UpdateDownloadProgress(false);
+                                    }
+                                );
+                            }
                         }
-                    },
-                    [entry, hash] (float percentage) {
-                        if(entry->GetBeatmap().GetVersions().front().GetHash() == hash) {
-                            entry->downloadProgress = percentage;
-                            QuestUI::MainThreadScheduler::Schedule(
-                                [entry] {
-                                    entry->UpdateDownloadProgress(false);
-                                }
-                            );
+                    );
+                }
+                else {
+                    auto hash = entry->GetSong().GetHash();
+                    BeatSaver::API::DownloadBeatmapAsync(entry->GetSong(),
+                        [this](bool error) {
+                            if (!error) {
+                                QuestUI::MainThreadScheduler::Schedule(
+                                    [] {
+                                        RuntimeSongLoader::API::RefreshSongs(false);
+                                    }
+                                );
+                            }
+                        },
+                        [entry, hash](float percentage) {
+                            if (entry->GetSong().GetHash() == hash) {
+                                entry->downloadProgress = percentage;
+                                QuestUI::MainThreadScheduler::Schedule(
+                                    [entry] {
+                                        entry->UpdateDownloadProgress(false);
+                                    }
+                                );
+                            }
                         }
-                    }
-                );
+                    );
+                }
             }
         ));
     }
@@ -340,6 +415,81 @@ void DownloadSongsSearchViewController::SearchUser(int currentSearchIndex) {
     else loadingControl->ShowText(il2cpp_utils::newcsstr("Please type in a Username!"), false);
 }
 
+void DownloadSongsSearchViewController::GetCuratorRecommended(int currentSearchIndex) {
+        BeastSaber::API::CuratorRecommendedAsync(
+            [this, currentSearchIndex](std::optional<BeastSaber::Page> page) {
+                if (currentSearchIndex == DownloadSongsSearchViewController::searchIndex) {
+                    QuestUI::MainThreadScheduler::Schedule(
+                        [this, currentSearchIndex, page] {
+                            if (currentSearchIndex == DownloadSongsSearchViewController::searchIndex) {
+                                if (page.has_value()) {
+                                    auto songs = page.value().GetSongs();
+                                    auto songsSize = songs.size();
+                                    int songIndex = 0;
+                                    for (int i = 0; i < ENTRIES_PER_PAGE; i++) {
+                                        auto& searchEntry = searchEntries[i];
+                                        if (songIndex < songsSize) {
+                                            loadingControl->Hide();
+                                            auto& song = songs.at(songIndex);
+                                            searchEntry.SetBeatmap(song);
+                                        }
+                                        else {
+                                            searchEntry.Disable();
+                                        }
+                                        songIndex++;
+                                    }
+                                }
+                                else {
+                                    if (!BeastSaber::API::exception.empty()) loadingControl->ShowText(il2cpp_utils::newcsstr(BeastSaber::API::exception), true);
+                                    else loadingControl->ShowText(il2cpp_utils::newcsstr("Damn, Curators didn't recommend anything!"), true);
+                                }
+                            }
+                        }
+                    );
+                }
+            }
+        , 0);
+}
+
+void DownloadSongsSearchViewController::GetBookmarks(int currentSearchIndex) {
+    if (!DownloadSongsSearchViewController::SearchQuery.empty()) {
+        BeastSaber::API::BookmarkedAsync(DownloadSongsSearchViewController::SearchQuery,
+            [this, currentSearchIndex](std::optional<BeastSaber::Page> page) {
+                if (currentSearchIndex == DownloadSongsSearchViewController::searchIndex) {
+                    QuestUI::MainThreadScheduler::Schedule(
+                        [this, currentSearchIndex, page] {
+                            if (currentSearchIndex == DownloadSongsSearchViewController::searchIndex) {
+                                if (page.has_value() && !page.value().GetSongs().empty()) {
+                                    auto songs = page.value().GetSongs();
+                                    auto songsSize = songs.size();
+                                    int songIndex = 0;
+                                    for (int i = 0; i < ENTRIES_PER_PAGE; i++) {
+                                        auto& searchEntry = searchEntries[i];
+                                        if (songIndex < songsSize) {
+                                            loadingControl->Hide();
+                                            auto& song = songs.at(songIndex);
+                                            searchEntry.SetBeatmap(song);
+                                        }
+                                        else {
+                                            searchEntry.Disable();
+                                        }
+                                        songIndex++;
+                                    }
+                                }
+                                else {
+                                    if (!BeastSaber::API::exception.empty()) loadingControl->ShowText(il2cpp_utils::newcsstr(BeastSaber::API::exception), true);
+                                    else loadingControl->ShowText(il2cpp_utils::newcsstr("No bookmarks found!"), true);
+                                }
+                            }
+                        }
+                    );
+                }
+            }, 
+        0);
+    }
+    else loadingControl->ShowText(il2cpp_utils::newcsstr("Please type in a Username!"), false);
+}
+
 void DownloadSongsSearchViewController::Search() {
     for (int i = 0; i < ENTRIES_PER_PAGE; i++) {
         searchViewController->searchEntries[i].Disable();
@@ -347,6 +497,7 @@ void DownloadSongsSearchViewController::Search() {
     searchViewController->loadingControl->ShowLoading(il2cpp_utils::newcsstr("Loading..."));
     DownloadSongsSearchViewController::searchIndex++;
     int currentSearchIndex = DownloadSongsSearchViewController::searchIndex;
+    searchViewController->SearchField->get_gameObject()->SetActive(true);
     if (getModConfig().SearchType.GetValue() == "Key") {
         searchViewController->SearchKey(currentSearchIndex);
     }
@@ -355,6 +506,13 @@ void DownloadSongsSearchViewController::Search() {
     }
     else if (getModConfig().SearchType.GetValue() == "User") {
         searchViewController->SearchUser(currentSearchIndex);
+    }
+    else if (getModConfig().SearchType.GetValue() == "Curator Recommended") {
+        searchViewController->SearchField->get_gameObject()->SetActive(false);
+        searchViewController->GetCuratorRecommended(currentSearchIndex);
+    }
+    else if (getModConfig().SearchType.GetValue() == "Bookmarks") {
+        searchViewController->GetBookmarks(currentSearchIndex);
     }
     if (SearchEntry::spriteCount > MAX_SPRITES) {
         SearchEntry::spriteCount = 0;
@@ -368,12 +526,18 @@ void DownloadSongsSearchViewController::DidActivate(bool firstActivation, bool a
         searchViewController = this;
         get_gameObject()->AddComponent<Touchable*>();
 
-        auto searchSetting = BeatSaberUI::CreateStringSetting(get_transform(), "Search", "", UnityEngine::Vector2(0.0f, 0.0f), UnityEngine::Vector3(0.0f, -38.0f, 0.0f),
+        SearchField = BeatSaberUI::CreateStringSetting(get_transform(), "Search", "", UnityEngine::Vector2(0.0f, 0.0f), UnityEngine::Vector3(0.0f, -38.0f, 0.0f),
             [this](std::string value) {
                 DownloadSongsSearchViewController::SearchQuery = value;
+                if (getModConfig().SearchType.GetValue() == "Bookmarks") getModConfig().BookmarkUsername.SetValue(value);
                 Search();
             }
         );
+        if (getModConfig().SearchType.GetValue() == "Bookmarks") {
+            DownloadSongsSearchViewController::SearchQuery = getModConfig().BookmarkUsername.GetValue();
+            searchViewController->SearchField->SetText(il2cpp_utils::newcsstr(getModConfig().BookmarkUsername.GetValue()));
+        }
+
         auto container = BeatSaberUI::CreateScrollView(get_transform());
         ExternalComponents* externalComponents = container->GetComponent<ExternalComponents*>();
         RectTransform* scrollTransform = externalComponents->Get<RectTransform*>();

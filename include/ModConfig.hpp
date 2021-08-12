@@ -10,6 +10,10 @@ DECLARE_CONFIG(ModConfig,
     CONFIG_VALUE(ME, std::string, "ME", "", "If MappingExtensions maps should be included in search results");
     CONFIG_VALUE(Chroma, std::string, "Chroma", "", "If Chroma maps should be included in search results");
     CONFIG_VALUE(Ranked, std::string, "Ranked", "", "If Ranked maps should be included in search results");
+    CONFIG_VALUE(Ranked_Toggle, bool, "Ranked", true, "If Only Ranked maps should be shown");
+
+    CONFIG_VALUE(BookmarkUsername, std::string, "BookmarkUsername", "");
+
 
     CONFIG_INIT_FUNCTION(
         CONFIG_INIT_VALUE(AutoMapper);
@@ -19,5 +23,8 @@ DECLARE_CONFIG(ModConfig,
         CONFIG_INIT_VALUE(ME);
         CONFIG_INIT_VALUE(Chroma);
         CONFIG_INIT_VALUE(Ranked);
+        CONFIG_INIT_VALUE(Ranked_Toggle);
+
+        CONFIG_INIT_VALUE(BookmarkUsername);
     )
 )
