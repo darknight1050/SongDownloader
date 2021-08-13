@@ -469,9 +469,11 @@ void DownloadSongsSearchViewController::Search() {
         searchViewController->GetBookmarks(currentSearchIndex);
     }
     else if (getModConfig().SearchType.GetValue() == "Top Trending") {
+        searchViewController->SearchField->get_gameObject()->SetActive(false);
         searchViewController->GetTrending(currentSearchIndex);
     }
     else if (getModConfig().SearchType.GetValue() == "Top Played") {
+        searchViewController->SearchField->get_gameObject()->SetActive(false);
         searchViewController->GetTopPlayed(currentSearchIndex);
     }
     if (SearchEntry::spriteCount > MAX_SPRITES) {
