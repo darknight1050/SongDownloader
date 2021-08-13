@@ -14,6 +14,16 @@
 
 #include "Types/BeatSaver/Page.hpp"
 #include "Types/BeastSaber/Page.hpp"
+#include "Types/ScoreSaber/Page.hpp"
+
+#include "songloader/shared/API.hpp"
+
+#include "BeatSaverAPI.hpp"
+#include "BeastSaberAPI.hpp"
+#include "ScoreSaberAPI.hpp"
+
+#include "questui/shared/BeatSaberUI.hpp"
+#include "questui/shared/CustomTypes/Components/MainThreadScheduler.hpp"
 
 #include <vector>
 
@@ -24,14 +34,21 @@
 namespace SongDownloader {
     class SearchEntry {
         BeatSaver::Beatmap map;
-        BeastSaber::Song song;
+        BeastSaber::Song BSsong;
+        ScoreSaber::Song SSsong;
         UnityEngine::GameObject* gameObject;
         TMPro::TextMeshProUGUI* line1Component;
         TMPro::TextMeshProUGUI* line2Component;
         HMUI::ImageView* coverImageView;
         UnityEngine::UI::Button* downloadButton;
 
-    public:
+    public:        
+        enum class MapType {
+            BeatSaver,
+            BeastSaber,
+            ScoreSaber
+        };
+
         static int spriteCount;
 
         float downloadProgress = -1.0f;
@@ -40,13 +57,17 @@ namespace SongDownloader {
 
         const BeatSaver::Beatmap& GetBeatmap();
 
-        const BeastSaber::Song& GetSong();
+        const BeastSaber::Song& GetSongBeastSaber();
 
-        bool IsBeatSaverBeatmap;
+        const ScoreSaber::Song& GetSongScoreSaber();
+
+        MapType MapType;
         
         void SetBeatmap(const BeatSaver::Beatmap& _map);
 
         void SetBeatmap(const BeastSaber::Song& _song);
+
+        void SetBeatmap(const ScoreSaber::Song& _song);
         
         void UpdateDownloadProgress(bool checkLoaded);
 
@@ -87,6 +108,9 @@ DECLARE_CLASS_CODEGEN(SongDownloader, DownloadSongsSearchViewController, HMUI::V
 
     DECLARE_INSTANCE_METHOD(void, GetBookmarks, int);
 
+    DECLARE_INSTANCE_METHOD(void, GetTrending, int);
+
+    DECLARE_INSTANCE_METHOD(void, GetTopPlayed, int);
 )
 
 namespace SongDownloader {

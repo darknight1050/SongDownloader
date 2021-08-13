@@ -13,6 +13,6 @@ DECLARE_JSON_CLASS(ScoreSaber, Song,
     GETTER_VALUE(std::string, Scores);
     GETTER_VALUE(int, Scores_day);
     GETTER_VALUE(int, Ranked);
-    GETTER_VALUE(int, Stars);
+    GETTER_VALUE(float, Stars);
     GETTER_VALUE(std::string, Image);
 )

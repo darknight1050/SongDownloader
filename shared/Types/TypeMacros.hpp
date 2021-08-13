@@ -33,6 +33,12 @@ if (!jsonValue.HasMember(#jsonName)) throw SongDownloader::JsonException(SongDow
 if (!jsonValue[#jsonName].Is##type()) throw SongDownloader::JsonException(SongDownloader::Exceptions::WrongType, #jsonName ", Type expected was: " #type); \
 name = jsonValue[#jsonName].Get##type();
 
+#define DESERIALIZE_VALUE_2TYPES(name, jsonName, returnType, checkType2) \
+if (!jsonValue.HasMember(#jsonName)) throw SongDownloader::JsonException(SongDownloader::Exceptions::NoMember, #jsonName); \
+if (jsonValue[#jsonName].Is##returnType() || jsonValue[#jsonName].Is##checkType2()) name = jsonValue[#jsonName].Get##returnType(); \
+else throw SongDownloader::JsonException(SongDownloader::Exceptions::WrongType, #jsonName ", Type expected was: " #returnType "or" #checkType2);
+
+
 #define DESERIALIZE_VALUE_OPTIONAL(name, jsonName, type) \
 if(jsonValue.HasMember(#jsonName) && jsonValue[#jsonName].Is##type()) { \
     name = jsonValue[#jsonName].Get##type(); \

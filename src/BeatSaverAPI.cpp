@@ -163,6 +163,7 @@ namespace BeatSaver::API {
     // This isn't really ideal, but it could be kinda useful to be able to get the coverImage just by hash directly
     std::optional<std::vector<uint8_t>> GetCoverImage(std::string hash) {
         std::string data;
+        std::transform(hash.begin(), hash.end(), hash.begin(), tolower);
         WebUtils::Get(CDN_URL + hash + ".jpg", FILE_DOWNLOAD_TIMEOUT, data);
         if (data.empty()) return std::nullopt;
         std::vector<uint8_t> bytes(data.begin(), data.end());
@@ -347,6 +348,23 @@ namespace BeatSaver::API {
             }, progressUpdate
         );
     }
+
+    void DownloadBeatmapAsync(const ScoreSaber::Song& song, std::function<void(bool)> finished, std::function<void(float)> progressUpdate) {
+        // Probably a deprecated method of downloading maps, but at least will work if map has isn't up to date https://api.beatsaver.com/download/key/1b236
+        std::string hash = song.GetId();
+        std::transform(hash.begin(), hash.end(), hash.begin(), tolower);
+        WebUtils::GetAsync(CDN_URL + hash + ".zip", FILE_DOWNLOAD_TIMEOUT,
+            [song, finished](long httpCode, std::string data) {
+                auto targetFolder = RuntimeSongLoader::API::GetCustomLevelsPath() + FileUtils::FixIlegalName(std::to_string(song.GetUid()) + " (" + song.GetName() + " - " + song.GetLevelAuthorName() + ")");
+                int args = 2;
+                int statusCode = zip_stream_extract(data.data(), data.length(), targetFolder.c_str(), +[](const char* name, void* arg) -> int {
+                    return 0;
+                    }, &args);
+                finished(statusCode);
+            }, progressUpdate
+        );
+    }
+
 
     void GetCoverImageAsync(const BeatSaver::Beatmap& beatmap, std::function<void(std::vector<uint8_t>)> finished, std::function<void(float)> progressUpdate) {
         WebUtils::GetAsync(beatmap.GetVersions().front().GetCoverURL(), FILE_DOWNLOAD_TIMEOUT,

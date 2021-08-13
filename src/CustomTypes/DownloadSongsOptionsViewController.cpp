@@ -27,7 +27,7 @@ void DownloadSongsOptionsViewController::DidActivate(bool firstActivation, bool 
         GameObject* mainLayout = GameObject::New_ctor();
         RectTransform* parent = mainLayout->AddComponent<RectTransform*>();
         parent->SetParent(get_transform(), false);
-        parent->set_localPosition(UnityEngine::Vector3(35.0f, 0.0f));
+        parent->set_localPosition(UnityEngine::Vector3(27.5f, 0.0f));
 
         VerticalLayoutGroup* settingsLayout = QuestUI::BeatSaberUI::CreateVerticalLayoutGroup(parent);
         RectTransform* settingsLayoutTransform = settingsLayout->GetComponent<RectTransform*>();
@@ -39,16 +39,16 @@ void DownloadSongsOptionsViewController::DidActivate(bool firstActivation, bool 
         contentSizeFitter->set_horizontalFit(ContentSizeFitter::FitMode::PreferredSize);
         contentSizeFitter->set_verticalFit(ContentSizeFitter::FitMode::PreferredSize);
 
-        SearchType = QuestUI::BeatSaberUI::CreateDropdown(settingsLayoutTransform, getModConfig().SearchType.GetName(), getModConfig().SearchType.GetValue(), { "Key", "Search", "User", "Curator Recommended", "Bookmarks" },
+        SearchType = QuestUI::BeatSaberUI::CreateDropdown(settingsLayoutTransform, getModConfig().SearchType.GetName(), getModConfig().SearchType.GetValue(), { "Key", "Search", "User", "Curator Recommended", "Bookmarks", "Top Trending", "Top Played"  },
             [this](std::string value) {
                 if (value != "Search") {
-                    if (value != "TopRanked") {
-                        RankedToggle->get_transform()->GetParent()->get_gameObject()->SetActive(false); // TODO: Actually add ScoreSaber Stuff
-                        Ranked->get_transform()->GetParent()->get_gameObject()->SetActive(true);
+                    if (value == "Top Ranked" || value == "Top Trending" || value == "Top Played") {
+                        Ranked->get_transform()->GetParent()->get_gameObject()->SetActive(false);
+                        RankedToggle->get_transform()->GetParent()->get_gameObject()->SetActive(true);
                     }
                     else {
-                        Ranked->get_transform()->GetParent()->get_gameObject()->SetActive(false);
-                        RankedToggle->get_transform()->GetParent()->get_gameObject()->SetActive(true); // TODO: Actually add ScoreSaber Stuff
+                        RankedToggle->get_transform()->GetParent()->get_gameObject()->SetActive(false);
+                        Ranked->get_transform()->GetParent()->get_gameObject()->SetActive(true);
                     }
                     Automapper->get_gameObject()->SetActive(false);
                     SortOrder->get_gameObject()->SetActive(false);
@@ -63,6 +63,8 @@ void DownloadSongsOptionsViewController::DidActivate(bool firstActivation, bool 
                     NEdropdown->get_gameObject()->SetActive(true);
                     MEdropdown->get_gameObject()->SetActive(true);
                     Chroma->get_gameObject()->SetActive(true);
+                    RankedToggle->get_transform()->GetParent()->get_gameObject()->SetActive(false);
+                    Ranked->get_transform()->GetParent()->get_gameObject()->SetActive(true);
                     Ranked->get_gameObject()->SetActive(true);
                 }
                 if (value == "Bookmarks") {
@@ -182,13 +184,13 @@ void DownloadSongsOptionsViewController::DidActivate(bool firstActivation, bool 
 
         std::string checkValue = getModConfig().SearchType.GetValue();
         if (checkValue != "Search") {
-            if (checkValue != "TopRanked") {
-                RankedToggle->get_transform()->GetParent()->get_gameObject()->SetActive(false); // TODO: Actually add ScoreSaber Stuff
-                Ranked->get_transform()->GetParent()->get_gameObject()->SetActive(true);
+            if (checkValue == "Top Ranked" || checkValue == "Top Trending" || checkValue == "Top Played") {
+                Ranked->get_transform()->GetParent()->get_gameObject()->SetActive(false);
+                RankedToggle->get_transform()->GetParent()->get_gameObject()->SetActive(true);
             }
             else {
-                Ranked->get_transform()->GetParent()->get_gameObject()->SetActive(false);
-                RankedToggle->get_transform()->GetParent()->get_gameObject()->SetActive(true); // TODO: Actually add ScoreSaber Stuff
+                RankedToggle->get_transform()->GetParent()->get_gameObject()->SetActive(false);
+                Ranked->get_transform()->GetParent()->get_gameObject()->SetActive(true);
             }
             Automapper->get_gameObject()->SetActive(false);
             SortOrder->get_gameObject()->SetActive(false);
@@ -196,7 +198,6 @@ void DownloadSongsOptionsViewController::DidActivate(bool firstActivation, bool 
             MEdropdown->get_gameObject()->SetActive(false);
             Chroma->get_gameObject()->SetActive(false);
             Ranked->get_gameObject()->SetActive(false);
-            //Ranked->get_transform()->Find(il2cpp_utils::newcsstr("Label"))->get_gameObject()->SetActive(false);
         }
         else {
             RankedToggle->get_transform()->GetParent()->get_gameObject()->SetActive(false);

@@ -44,6 +44,13 @@ namespace ScoreSaber::API {
     std::optional<ScoreSaber::Page> GetTopRanked(int pageIndex = 0, int amount = 20, bool ranked = false);
 
     /// <summary>
+    /// Retrieves CoverImage as uint8_t bytes
+    /// </summary>
+    /// <param name="song">Reference to a scoresaber song</param>
+    /// <returns>An optional that can contain the bytes for the coverImage or a std::nullopt if an error was encountered or coverImage found</returns>
+    std::vector<uint8_t> GetCoverImage(const ScoreSaber::Song& song);
+
+    /// <summary>
     /// Retrieves songs that are Trending as determined by ScoreSaber.
     /// </summary>
     /// <param name="finished">Function to run after getting the Response</param>
@@ -77,7 +84,14 @@ namespace ScoreSaber::API {
     /// <param name="amount">Amount of Songs to get default: 20</param>
     /// <param name="ranked">If return value should contain only ranked or be mixed default: false</param>
     void GetTopRankedAsync(std::function<void(std::optional<ScoreSaber::Page>)> finished, int pageIndex = 0, int amount = 20, bool ranked = false);
-
+    
+    /// <summary>
+    /// Gets CoverImage from ScoreSaber song
+    /// </summary>
+    /// <param name="song">Reference to a ScoreSaber Song</param>
+    /// <param name="finished"></param>
+    /// <param name="progressUpdate"></param>
+    void GetCoverImageAsync(const ScoreSaber::Song& song, std::function<void(std::vector<uint8_t>)> finished, std::function<void(float)> progressUpdate = nullptr);
 
     /// <summary>
     /// String containing any exceptions that were encountered during the request, empty otherwise

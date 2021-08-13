@@ -11,8 +11,9 @@
 
 #include "Exceptions.hpp"
 
-#define BASE_URL std::string("https://scoresaber.com/")
-#define API_URL BASE_URL + std::string("api.php?function=get-leaderboards")
+#define BASE_URL std::string("https://scoresaber.com")
+#define API_URL BASE_URL + std::string("/api.php?function=get-leaderboards")
+#define FILE_DOWNLOAD_TIMEOUT 64
 
 namespace ScoreSaber::API {
 
@@ -20,7 +21,7 @@ namespace ScoreSaber::API {
 
     std::optional<ScoreSaber::Page> GetTrending(int pageIndex, int amount, bool ranked) {
         exception.clear();
-        auto json = WebUtils::GetJSON(API_URL + "&cat=0&limit=" + std::to_string(amount) + "&page=" + std::to_string(pageIndex++) + "&ranked=" + std::to_string(int(ranked)));
+        auto json = WebUtils::GetJSON(API_URL + "&cat=0&limit=" + std::to_string(amount) + "&page=" + std::to_string(++pageIndex) + "&ranked=" + std::to_string(int(ranked)));
         if (!json.has_value())
             return std::nullopt;
         try {
@@ -37,7 +38,7 @@ namespace ScoreSaber::API {
 
     std::optional<ScoreSaber::Page> GetLatestRanked(int pageIndex, int amount, bool ranked) {
         exception.clear();
-        auto json = WebUtils::GetJSON(API_URL + "&cat=1&limit=" + std::to_string(amount) + "&page=" + std::to_string(pageIndex++) + "&ranked=" + std::to_string(int(ranked)));
+        auto json = WebUtils::GetJSON(API_URL + "&cat=1&limit=" + std::to_string(amount) + "&page=" + std::to_string(++pageIndex) + "&ranked=" + std::to_string(int(ranked)));
         if (!json.has_value())
             return std::nullopt;
         try {
@@ -54,7 +55,7 @@ namespace ScoreSaber::API {
 
     std::optional<ScoreSaber::Page> GetTopPlayed(int pageIndex, int amount, bool ranked) {
         exception.clear();
-        auto json = WebUtils::GetJSON(API_URL + "&cat=2&limit=" + std::to_string(amount) + "&page=" + std::to_string(pageIndex++) + "&ranked=" + std::to_string(int(ranked)));
+        auto json = WebUtils::GetJSON(API_URL + "&cat=2&limit=" + std::to_string(amount) + "&page=" + std::to_string(++pageIndex) + "&ranked=" + std::to_string(int(ranked)));
         if (!json.has_value())
             return std::nullopt;
         try {
@@ -71,7 +72,7 @@ namespace ScoreSaber::API {
 
     std::optional<ScoreSaber::Page> GetTopRanked(int pageIndex, int amount, bool ranked) {
         exception.clear();
-        auto json = WebUtils::GetJSON(API_URL + "&cat=3&limit=" + std::to_string(amount) + "&page=" + std::to_string(pageIndex++) + "&ranked=" + std::to_string(int(ranked)));
+        auto json = WebUtils::GetJSON(API_URL + "&cat=3&limit=" + std::to_string(amount) + "&page=" + std::to_string(++pageIndex) + "&ranked=" + std::to_string(int(ranked)));
         if (!json.has_value())
             return std::nullopt;
         try {
@@ -86,11 +87,20 @@ namespace ScoreSaber::API {
         }
     }
 
+    std::vector<uint8_t> GetCoverImage(const ScoreSaber::Song& song) {
+        std::string data;
+        std::string URL = song.GetImage();
+        URL.erase(remove(URL.begin(), URL.end(), '\\'), URL.end());
+        WebUtils::Get(BASE_URL + URL, FILE_DOWNLOAD_TIMEOUT, data);
+        std::vector<uint8_t> bytes(data.begin(), data.end());
+        return bytes;
+    }
+
     void GetTrendingAsync(std::function<void(std::optional<ScoreSaber::Page>)> finished, int pageIndex, int amount, bool ranked) {
         exception.clear();
-        WebUtils::GetJSONAsync(API_URL + "&cat=0&limit=" + std::to_string(amount) + "&page=" + std::to_string(pageIndex++) + "&ranked=" + std::to_string(int(ranked)),
+        WebUtils::GetJSONAsync(API_URL + "&cat=0&limit=" + std::to_string(amount) + "&page=" + std::to_string(++pageIndex) + "&ranked=" + std::to_string(int(ranked)),
             [finished](long httpCode, bool error, rapidjson::Document& document) {
-                if (error || ++document.MemberBegin() == document.MemberEnd()) {
+                if (error) {
                     finished(std::nullopt);
                 }
                 else {
@@ -116,9 +126,9 @@ namespace ScoreSaber::API {
 
     void GetLatestRankedAsync(std::function<void(std::optional<ScoreSaber::Page>)> finished, int pageIndex, int amount, bool ranked) {
         exception.clear();
-        WebUtils::GetJSONAsync(API_URL + "&cat=1&limit=" + std::to_string(amount) + "&page=" + std::to_string(pageIndex++) + "&ranked=" + std::to_string(int(ranked)),
+        WebUtils::GetJSONAsync(API_URL + "&cat=1&limit=" + std::to_string(amount) + "&page=" + std::to_string(++pageIndex) + "&ranked=" + std::to_string(int(ranked)),
             [finished](long httpCode, bool error, rapidjson::Document& document) {
-                if (error || ++document.MemberBegin() == document.MemberEnd()) {
+                if (error) {
                     finished(std::nullopt);
                 }
                 else {
@@ -144,9 +154,9 @@ namespace ScoreSaber::API {
 
     void GetTopPlayedAsync(std::function<void(std::optional<ScoreSaber::Page>)> finished, int pageIndex, int amount, bool ranked ) {
         exception.clear();
-        WebUtils::GetJSONAsync(API_URL + "&cat=2&limit=" + std::to_string(amount) + "&page=" + std::to_string(pageIndex++) + "&ranked=" + std::to_string(int(ranked)),
+        WebUtils::GetJSONAsync(API_URL + "&cat=2&limit=" + std::to_string(amount) + "&page=" + std::to_string(++pageIndex) + "&ranked=" + std::to_string(int(ranked)),
             [finished](long httpCode, bool error, rapidjson::Document& document) {
-                if (error || ++document.MemberBegin() == document.MemberEnd()) {
+                if (error) {
                     finished(std::nullopt);
                 }
                 else {
@@ -172,9 +182,9 @@ namespace ScoreSaber::API {
 
     void GetTopRankedAsync(std::function<void(std::optional<ScoreSaber::Page>)> finished, int pageIndex, int amount, bool ranked) {
         exception.clear();
-        WebUtils::GetJSONAsync(API_URL + "&cat=3&limit=" + std::to_string(amount) + "&page=" + std::to_string(pageIndex++) + "&ranked=" + std::to_string(int(ranked)),
+        WebUtils::GetJSONAsync(API_URL + "&cat=3&limit=" + std::to_string(amount) + "&page=" + std::to_string(++pageIndex) + "&ranked=" + std::to_string(int(ranked)),
             [finished](long httpCode, bool error, rapidjson::Document& document) {
-                if (error || ++document.MemberBegin() == document.MemberEnd()) {
+                if (error) {
                     finished(std::nullopt);
                 }
                 else {
@@ -200,9 +210,9 @@ namespace ScoreSaber::API {
 
     void SearchPagedAsync(std::string query, std::function<void(std::optional<ScoreSaber::Page>)> finished, int pageIndex, int amount, bool ranked) {
         exception.clear();
-        WebUtils::GetJSONAsync(API_URL + "&cat=3&limit=" + std::to_string(amount) + "&page=" + std::to_string(pageIndex++) + "&ranked=" + std::to_string(int(ranked)) + "&search=" + query,
+        WebUtils::GetJSONAsync(API_URL + "&cat=3&limit=" + std::to_string(amount) + "&page=" + std::to_string(++pageIndex) + "&ranked=" + std::to_string(int(ranked)) + "&search=" + query,
             [finished](long httpCode, bool error, rapidjson::Document& document) {
-                if (error || ++document.MemberBegin() == document.MemberEnd()) {
+                if (error) {
                     finished(std::nullopt);
                 }
                 else {
@@ -226,5 +236,15 @@ namespace ScoreSaber::API {
         );
     }
 
+    void GetCoverImageAsync(const ScoreSaber::Song& song, std::function<void(std::vector<uint8_t>)> finished, std::function<void(float)> progressUpdate) {
+        std::string URL = song.GetImage();
+        URL.erase(remove(URL.begin(), URL.end(), '\\'), URL.end());
+        WebUtils::GetAsync(BASE_URL + URL, FILE_DOWNLOAD_TIMEOUT,
+            [song, finished](long httpCode, std::string data) {
+                std::vector<uint8_t> bytes(data.begin(), data.end());
+                finished(bytes);
+            }, progressUpdate
+        );
+    }
 
 }
