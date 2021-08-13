@@ -39,17 +39,30 @@ void DownloadSongsOptionsViewController::DidActivate(bool firstActivation, bool 
         contentSizeFitter->set_horizontalFit(ContentSizeFitter::FitMode::PreferredSize);
         contentSizeFitter->set_verticalFit(ContentSizeFitter::FitMode::PreferredSize);
 
-        SearchType = QuestUI::BeatSaberUI::CreateDropdown(settingsLayoutTransform, getModConfig().SearchType.GetName(), getModConfig().SearchType.GetValue(), { "Key", "Search", "User", "Curator Recommended", "Bookmarks", "Top Trending", "Top Played"  },
+        // TODO: Add another DropDown for ServiceType
+
+        Service = QuestUI::BeatSaberUI::CreateDropdown(settingsLayoutTransform, getModConfig().Service.GetName(), getModConfig().Service.GetValue(), { "BeatSaver", "BeastSaber", "ScoreSaber" },
             [this](std::string value) {
-                if (value != "Search") {
-                    if (value == "Top Ranked" || value == "Top Trending" || value == "Top Played") {
-                        Ranked->get_transform()->GetParent()->get_gameObject()->SetActive(false);
+                if (value != "BeatSaver") {
+                    if (value == "ScoreSaber") {
+                        if (getModConfig().ListType_ScoreSaber.GetValue() == "Top Ranked") {
+                            RankedToggle->get_gameObject()->SetActive(false);
+                        }
+                        else {
+                            RankedToggle->get_gameObject()->SetActive(true);
+                        }
                         RankedToggle->get_transform()->GetParent()->get_gameObject()->SetActive(true);
+                        Ranked->get_transform()->GetParent()->get_gameObject()->SetActive(false);
+                        ListType_BeastSaber->get_transform()->GetParent()->get_gameObject()->SetActive(false);
+                        ListType_ScoreSaber->get_transform()->GetParent()->get_gameObject()->SetActive(true);
                     }
                     else {
                         RankedToggle->get_transform()->GetParent()->get_gameObject()->SetActive(false);
                         Ranked->get_transform()->GetParent()->get_gameObject()->SetActive(true);
+                        ListType_ScoreSaber->get_transform()->GetParent()->get_gameObject()->SetActive(false);
+                        ListType_BeastSaber->get_transform()->GetParent()->get_gameObject()->SetActive(true);
                     }
+                    ListType_BeatSaver->get_transform()->GetParent()->get_gameObject()->SetActive(false);
                     Automapper->get_gameObject()->SetActive(false);
                     SortOrder->get_gameObject()->SetActive(false);
                     NEdropdown->get_gameObject()->SetActive(false);
@@ -58,6 +71,9 @@ void DownloadSongsOptionsViewController::DidActivate(bool firstActivation, bool 
                     Ranked->get_gameObject()->SetActive(false);
                 }
                 else {
+                    ListType_BeastSaber->get_transform()->GetParent()->get_gameObject()->SetActive(false);
+                    ListType_ScoreSaber->get_transform()->GetParent()->get_gameObject()->SetActive(false);
+                    ListType_BeatSaver->get_transform()->GetParent()->get_gameObject()->SetActive(true);
                     Automapper->get_gameObject()->SetActive(true);
                     SortOrder->get_gameObject()->SetActive(true);
                     NEdropdown->get_gameObject()->SetActive(true);
@@ -67,21 +83,73 @@ void DownloadSongsOptionsViewController::DidActivate(bool firstActivation, bool 
                     Ranked->get_transform()->GetParent()->get_gameObject()->SetActive(true);
                     Ranked->get_gameObject()->SetActive(true);
                 }
+                if (value == "BeastSaber" && getModConfig().ListType_BeastSaber.GetValue() == "Bookmarks") {
+                    DownloadSongsSearchViewController::SearchQuery = getModConfig().BookmarkUsername.GetValue();
+                    searchViewController->SearchField->SetText(il2cpp_utils::newcsstr(getModConfig().BookmarkUsername.GetValue()));
+                }
+                else if (LastListType == "Bookmarks") {
+                    DownloadSongsSearchViewController::SearchQuery.clear();
+                    searchViewController->SearchField->SetText(nullptr);
+                }
+                getModConfig().Service.SetValue(value);
+                DownloadSongsSearchViewController::Search();
+            }
+        );
+        QuestUI::BeatSaberUI::AddHoverHint(Service->get_gameObject(), getModConfig().Service.GetHoverHint());
+        Service->get_transform()->GetParent()->GetComponent<LayoutElement*>()->set_preferredWidth(50.0f);
+
+        ListType_BeatSaver = QuestUI::BeatSaberUI::CreateDropdown(settingsLayoutTransform, "List", getModConfig().ListType_BeatSaver.GetValue(), { "Key", "Search", "User"  },
+            [this](std::string value) {
+                if (LastListType == "Bookmarks") {
+                    DownloadSongsSearchViewController::SearchQuery.clear();
+                    searchViewController->SearchField->SetText(nullptr);
+                }
+                LastListType = value;
+                getModConfig().ListType_BeatSaver.SetValue(value);
+                DownloadSongsSearchViewController::Search();
+            }
+        );
+        QuestUI::BeatSaberUI::AddHoverHint(ListType_BeatSaver->get_gameObject(), getModConfig().ListType_BeatSaver.GetHoverHint());
+        ListType_BeatSaver->get_transform()->GetParent()->GetComponent<LayoutElement*>()->set_preferredWidth(50.0f);
+
+        ListType_BeastSaber = QuestUI::BeatSaberUI::CreateDropdown(settingsLayoutTransform, "List", getModConfig().ListType_BeastSaber.GetValue(), { "Curator Recommended", "Bookmarks" },
+            [this](std::string value) {
                 if (value == "Bookmarks") {
                     DownloadSongsSearchViewController::SearchQuery = getModConfig().BookmarkUsername.GetValue();
                     searchViewController->SearchField->SetText(il2cpp_utils::newcsstr(getModConfig().BookmarkUsername.GetValue()));
                 }
-                else if (getModConfig().SearchType.GetValue() == "Bookmarks") {
+                else if (getModConfig().ListType_BeastSaber.GetValue() == "Bookmarks") {
                     DownloadSongsSearchViewController::SearchQuery.clear();
-                    searchViewController->SearchField->SetText(il2cpp_utils::newcsstr(""));
+                    searchViewController->SearchField->SetText(nullptr);
                 }
-                getModConfig().SearchType.SetValue(value);
+                LastListType = value;
+                getModConfig().ListType_BeastSaber.SetValue(value);
                 DownloadSongsSearchViewController::Search();
             }
         );
-        QuestUI::BeatSaberUI::AddHoverHint(SearchType->get_gameObject(), getModConfig().SearchType.GetHoverHint());
-        SearchType->get_transform()->GetParent()->GetComponent<LayoutElement*>()->set_preferredWidth(50.0f);
-        
+        QuestUI::BeatSaberUI::AddHoverHint(ListType_BeastSaber->get_gameObject(), getModConfig().ListType_BeastSaber.GetHoverHint());
+        ListType_BeastSaber->get_transform()->GetParent()->GetComponent<LayoutElement*>()->set_preferredWidth(50.0f);
+
+        ListType_ScoreSaber = QuestUI::BeatSaberUI::CreateDropdown(settingsLayoutTransform, "List", getModConfig().ListType_ScoreSaber.GetValue(), { "Top Trending", "Top Played", "Top Ranked" },
+            [this](std::string value) {
+                if (LastListType == "Bookmarks") {
+                    DownloadSongsSearchViewController::SearchQuery.clear();
+                    searchViewController->SearchField->SetText(nullptr);
+                }
+                if (value == "Top Ranked") {
+                    RankedToggle->get_gameObject()->SetActive(false);
+                }
+                else {
+                    RankedToggle->get_gameObject()->SetActive(true);
+                }
+                LastListType = value;
+                getModConfig().ListType_ScoreSaber.SetValue(value);
+                DownloadSongsSearchViewController::Search();
+            }
+        );
+        QuestUI::BeatSaberUI::AddHoverHint(ListType_ScoreSaber->get_gameObject(), getModConfig().ListType_ScoreSaber.GetHoverHint());
+        ListType_ScoreSaber->get_transform()->GetParent()->GetComponent<LayoutElement*>()->set_preferredWidth(50.0f);
+
         std::string AutoMapperConfigSet = "Excluded";
         if (getModConfig().AutoMapper.GetValue() == "true") AutoMapperConfigSet = "Not Required";
         else if (getModConfig().AutoMapper.GetValue() == "false") AutoMapperConfigSet = "Required";
@@ -160,7 +228,7 @@ void DownloadSongsOptionsViewController::DidActivate(bool firstActivation, bool 
         else if (getModConfig().Ranked.GetValue() == "false") RankedConfigSet = "Excluded";
 
 
-        Ranked = QuestUI::BeatSaberUI::CreateDropdown(settingsLayoutTransform, getModConfig().Ranked.GetName(), RankedConfigSet, { "Not Required", "Required", "Excluded" },
+        Ranked = QuestUI::BeatSaberUI::CreateDropdown(settingsLayoutTransform, "Ranked", RankedConfigSet, { "Not Required", "Required", "Excluded" },
             [](std::string value) {
                 std::string setting = "";
                 if (value == "Required") setting = "true";
@@ -172,7 +240,7 @@ void DownloadSongsOptionsViewController::DidActivate(bool firstActivation, bool 
         QuestUI::BeatSaberUI::AddHoverHint(Ranked->get_gameObject(), getModConfig().Ranked.GetHoverHint());
         Ranked->get_transform()->GetParent()->GetComponent<LayoutElement*>()->set_preferredWidth(50.0f);
 
-        RankedToggle = QuestUI::BeatSaberUI::CreateToggle(settingsLayoutTransform, getModConfig().Ranked_Toggle.GetName(), getModConfig().Ranked_Toggle.GetValue(),
+        RankedToggle = QuestUI::BeatSaberUI::CreateToggle(settingsLayoutTransform, "Ranked", getModConfig().Ranked_Toggle.GetValue(),
             [](bool value) {
                 getModConfig().Ranked_Toggle.SetValue(value);
                 DownloadSongsSearchViewController::Search();
@@ -182,16 +250,20 @@ void DownloadSongsOptionsViewController::DidActivate(bool firstActivation, bool 
         RankedToggle->get_transform()->GetParent()->GetComponent<LayoutElement*>()->set_preferredWidth(50.0f);
 
 
-        std::string checkValue = getModConfig().SearchType.GetValue();
-        if (checkValue != "Search") {
-            if (checkValue == "Top Ranked" || checkValue == "Top Trending" || checkValue == "Top Played") {
+        std::string checkValue = getModConfig().Service.GetValue();
+        if (checkValue != "BeatSaver") {
+            if (checkValue == "ScoreSaber") {
+                if (getModConfig().ListType_ScoreSaber.GetValue() == "Top Ranked") {
+                    RankedToggle->get_gameObject()->SetActive(false);
+                }
                 Ranked->get_transform()->GetParent()->get_gameObject()->SetActive(false);
-                RankedToggle->get_transform()->GetParent()->get_gameObject()->SetActive(true);
+                ListType_BeastSaber->get_transform()->GetParent()->get_gameObject()->SetActive(false);
             }
             else {
                 RankedToggle->get_transform()->GetParent()->get_gameObject()->SetActive(false);
-                Ranked->get_transform()->GetParent()->get_gameObject()->SetActive(true);
+                ListType_ScoreSaber->get_transform()->GetParent()->get_gameObject()->SetActive(false);
             }
+            ListType_BeatSaver->get_transform()->GetParent()->get_gameObject()->SetActive(false);
             Automapper->get_gameObject()->SetActive(false);
             SortOrder->get_gameObject()->SetActive(false);
             NEdropdown->get_gameObject()->SetActive(false);
@@ -200,6 +272,8 @@ void DownloadSongsOptionsViewController::DidActivate(bool firstActivation, bool 
             Ranked->get_gameObject()->SetActive(false);
         }
         else {
+            ListType_BeastSaber->get_transform()->GetParent()->get_gameObject()->SetActive(false);
+            ListType_ScoreSaber->get_transform()->GetParent()->get_gameObject()->SetActive(false);
             RankedToggle->get_transform()->GetParent()->get_gameObject()->SetActive(false);
         }
     }

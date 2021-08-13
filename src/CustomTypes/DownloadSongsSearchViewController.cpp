@@ -403,7 +403,7 @@ void DownloadSongsSearchViewController::GetTrending(int currentSearchIndex) {
                 );
             }
         },
-        0, 20, getModConfig().Ranked_Toggle.GetValue());
+        getModConfig().Ranked_Toggle.GetValue());
 }
 
 void DownloadSongsSearchViewController::GetTopPlayed(int currentSearchIndex) {
@@ -439,7 +439,43 @@ void DownloadSongsSearchViewController::GetTopPlayed(int currentSearchIndex) {
                 );
             }
         },
-        0, 20, getModConfig().Ranked_Toggle.GetValue());
+        getModConfig().Ranked_Toggle.GetValue());
+}
+
+void DownloadSongsSearchViewController::GetTopRanked(int currentSearchIndex) {
+    ScoreSaber::API::GetTopRankedAsync(
+        [this, currentSearchIndex](std::optional<ScoreSaber::Page> page) {
+            if (currentSearchIndex == DownloadSongsSearchViewController::searchIndex) {
+                QuestUI::MainThreadScheduler::Schedule(
+                    [this, currentSearchIndex, page] {
+                        if (currentSearchIndex == DownloadSongsSearchViewController::searchIndex) {
+                            if (page.has_value() && !page.value().GetSongs().empty()) {
+                                auto songs = page.value().GetSongs();
+                                auto songsSize = songs.size();
+                                int songIndex = 0;
+                                for (int i = 0; i < ENTRIES_PER_PAGE; i++) {
+                                    auto& searchEntry = searchEntries[i];
+                                    if (songIndex < songsSize) {
+                                        loadingControl->Hide();
+                                        auto& song = songs.at(songIndex);
+                                        searchEntry.SetBeatmap(song);
+                                    }
+                                    else {
+                                        searchEntry.Disable();
+                                    }
+                                    songIndex++;
+                                }
+                            }
+                            else {
+                                if (!ScoreSaber::API::exception.empty()) loadingControl->ShowText(il2cpp_utils::newcsstr(ScoreSaber::API::exception), true);
+                                else loadingControl->ShowText(il2cpp_utils::newcsstr("Dang no results,\nis your Internet working?"), true);
+                            }
+                        }
+                    }
+                );
+            }
+        },
+        getModConfig().Ranked_Toggle.GetValue());
 }
 
 #pragma endregion
@@ -452,29 +488,37 @@ void DownloadSongsSearchViewController::Search() {
     DownloadSongsSearchViewController::searchIndex++;
     int currentSearchIndex = DownloadSongsSearchViewController::searchIndex;
     searchViewController->SearchField->get_gameObject()->SetActive(true);
-    if (getModConfig().SearchType.GetValue() == "Key") {
-        searchViewController->SearchKey(currentSearchIndex);
+    if (getModConfig().Service.GetValue() == "BeatSaver") {
+        if (getModConfig().ListType_BeatSaver.GetValue() == "Key") {
+            searchViewController->SearchKey(currentSearchIndex);
+        }
+        else if (getModConfig().ListType_BeatSaver.GetValue() == "Search") {
+            searchViewController->SearchSongs(currentSearchIndex);
+        }
+        else if (getModConfig().ListType_BeatSaver.GetValue() == "User") {
+            searchViewController->SearchUser(currentSearchIndex);
+        }
     }
-    else if (getModConfig().SearchType.GetValue() == "Search") {
-        searchViewController->SearchSongs(currentSearchIndex);
+    else if (getModConfig().Service.GetValue() == "BeastSaber") {
+        if (getModConfig().ListType_BeastSaber.GetValue() == "Curator Recommended") {
+            searchViewController->SearchField->get_gameObject()->SetActive(false);
+            searchViewController->GetCuratorRecommended(currentSearchIndex);
+        }
+        else if (getModConfig().ListType_BeastSaber.GetValue() == "Bookmarks") {
+            searchViewController->GetBookmarks(currentSearchIndex);
+        }
     }
-    else if (getModConfig().SearchType.GetValue() == "User") {
-        searchViewController->SearchUser(currentSearchIndex);
-    }
-    else if (getModConfig().SearchType.GetValue() == "Curator Recommended") {
-        searchViewController->SearchField->get_gameObject()->SetActive(false);
-        searchViewController->GetCuratorRecommended(currentSearchIndex);
-    }
-    else if (getModConfig().SearchType.GetValue() == "Bookmarks") {
-        searchViewController->GetBookmarks(currentSearchIndex);
-    }
-    else if (getModConfig().SearchType.GetValue() == "Top Trending") {
-        searchViewController->SearchField->get_gameObject()->SetActive(false);
-        searchViewController->GetTrending(currentSearchIndex);
-    }
-    else if (getModConfig().SearchType.GetValue() == "Top Played") {
-        searchViewController->SearchField->get_gameObject()->SetActive(false);
-        searchViewController->GetTopPlayed(currentSearchIndex);
+    else if (getModConfig().Service.GetValue() == "ScoreSaber") {
+        searchViewController->SearchField->get_gameObject()->SetActive(false); // TODO: Add Search stuff to ScoreSaberAPI
+        if (getModConfig().ListType_ScoreSaber.GetValue() == "Top Trending") {
+            searchViewController->GetTrending(currentSearchIndex);
+        }
+        else if (getModConfig().ListType_ScoreSaber.GetValue() == "Top Played") {
+            searchViewController->GetTopPlayed(currentSearchIndex);
+        }
+        else if (getModConfig().ListType_ScoreSaber.GetValue() == "Top Ranked") {
+            searchViewController->GetTopRanked(currentSearchIndex);
+        }
     }
     if (SearchEntry::spriteCount > MAX_SPRITES) {
         SearchEntry::spriteCount = 0;
@@ -491,11 +535,11 @@ void DownloadSongsSearchViewController::DidActivate(bool firstActivation, bool a
         SearchField = BeatSaberUI::CreateStringSetting(get_transform(), "Search", "", UnityEngine::Vector2(0.0f, 0.0f), UnityEngine::Vector3(0.0f, -38.0f, 0.0f),
             [this](std::string value) {
                 DownloadSongsSearchViewController::SearchQuery = value;
-                if (getModConfig().SearchType.GetValue() == "Bookmarks") getModConfig().BookmarkUsername.SetValue(value);
+                if (getModConfig().Service.GetValue() == "BeastSaber" && getModConfig().ListType_BeastSaber.GetValue() == "Bookmarks") getModConfig().BookmarkUsername.SetValue(value);
                 Search();
             }
         );
-        if (getModConfig().SearchType.GetValue() == "Bookmarks") {
+        if (getModConfig().Service.GetValue() == "BeastSaber" && getModConfig().ListType_BeastSaber.GetValue() == "Bookmarks") {
             DownloadSongsSearchViewController::SearchQuery = getModConfig().BookmarkUsername.GetValue();
             searchViewController->SearchField->SetText(il2cpp_utils::newcsstr(getModConfig().BookmarkUsername.GetValue()));
         }

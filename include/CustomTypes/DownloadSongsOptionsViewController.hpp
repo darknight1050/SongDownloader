@@ -8,8 +8,13 @@
 
 DECLARE_CLASS_CODEGEN(SongDownloader, DownloadSongsOptionsViewController, HMUI::ViewController,
 
+    std::string LastListType;
+
     DECLARE_INSTANCE_FIELD(HMUI::SimpleTextDropdown*, Automapper);
-    DECLARE_INSTANCE_FIELD(HMUI::SimpleTextDropdown*, SearchType);
+    DECLARE_INSTANCE_FIELD(HMUI::SimpleTextDropdown*, Service);
+    DECLARE_INSTANCE_FIELD(HMUI::SimpleTextDropdown*, ListType_BeatSaver);
+    DECLARE_INSTANCE_FIELD(HMUI::SimpleTextDropdown*, ListType_BeastSaber);
+    DECLARE_INSTANCE_FIELD(HMUI::SimpleTextDropdown*, ListType_ScoreSaber);
     DECLARE_INSTANCE_FIELD(HMUI::SimpleTextDropdown*, SortOrder);
     DECLARE_INSTANCE_FIELD(HMUI::SimpleTextDropdown*, NEdropdown);
     DECLARE_INSTANCE_FIELD(HMUI::SimpleTextDropdown*, MEdropdown);
