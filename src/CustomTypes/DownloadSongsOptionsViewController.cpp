@@ -45,7 +45,7 @@ void DownloadSongsOptionsViewController::DidActivate(bool firstActivation, bool 
             [this](std::string value) {
                 if (value != "BeatSaver") {
                     if (value == "ScoreSaber") {
-                        if (getModConfig().ListType_ScoreSaber.GetValue() == "Top Ranked") {
+                        if (getModConfig().ListType_ScoreSaber.GetValue() == "Top Ranked" || getModConfig().ListType_ScoreSaber.GetValue() == "Latest Ranked") {
                             RankedToggle->get_gameObject()->SetActive(false);
                         }
                         else {
@@ -130,13 +130,13 @@ void DownloadSongsOptionsViewController::DidActivate(bool firstActivation, bool 
         QuestUI::BeatSaberUI::AddHoverHint(ListType_BeastSaber->get_gameObject(), getModConfig().ListType_BeastSaber.GetHoverHint());
         ListType_BeastSaber->get_transform()->GetParent()->GetComponent<LayoutElement*>()->set_preferredWidth(50.0f);
 
-        ListType_ScoreSaber = QuestUI::BeatSaberUI::CreateDropdown(settingsLayoutTransform, "List", getModConfig().ListType_ScoreSaber.GetValue(), { "Top Trending", "Top Played", "Top Ranked" },
+        ListType_ScoreSaber = QuestUI::BeatSaberUI::CreateDropdown(settingsLayoutTransform, "List", getModConfig().ListType_ScoreSaber.GetValue(), { "Trending", "Latest Ranked", "Top Played", "Top Ranked" },
             [this](std::string value) {
                 if (LastListType == "Bookmarks") {
                     DownloadSongsSearchViewController::SearchQuery.clear();
                     searchViewController->SearchField->SetText(nullptr);
                 }
-                if (value == "Top Ranked") {
+                if (value == "Top Ranked" || value == "Latest Ranked") {
                     RankedToggle->get_gameObject()->SetActive(false);
                 }
                 else {
@@ -253,7 +253,7 @@ void DownloadSongsOptionsViewController::DidActivate(bool firstActivation, bool 
         std::string checkValue = getModConfig().Service.GetValue();
         if (checkValue != "BeatSaver") {
             if (checkValue == "ScoreSaber") {
-                if (getModConfig().ListType_ScoreSaber.GetValue() == "Top Ranked") {
+                if (getModConfig().ListType_ScoreSaber.GetValue() == "Top Ranked" || getModConfig().ListType_ScoreSaber.GetValue() == "Latest Ranked") {
                     RankedToggle->get_gameObject()->SetActive(false);
                 }
                 Ranked->get_transform()->GetParent()->get_gameObject()->SetActive(false);

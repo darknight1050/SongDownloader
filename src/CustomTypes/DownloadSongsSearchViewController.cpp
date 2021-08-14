@@ -371,7 +371,43 @@ void DownloadSongsSearchViewController::GetBookmarks(int currentSearchIndex) {
 }
 
 void DownloadSongsSearchViewController::GetTrending(int currentSearchIndex) {
-    ScoreSaber::API::GetTrendingAsync(
+    ScoreSaber::API::SearchRankedAsync(DownloadSongsSearchViewController::SearchQuery, ScoreSaber::API::SearchType::Trending,
+        [this, currentSearchIndex](std::optional<ScoreSaber::Page> page) {
+            if (currentSearchIndex == DownloadSongsSearchViewController::searchIndex) {
+                QuestUI::MainThreadScheduler::Schedule(
+                    [this, currentSearchIndex, page] {
+                        if (currentSearchIndex == DownloadSongsSearchViewController::searchIndex) {
+                            if (page.has_value() && !page.value().GetSongs().empty()) {
+                                auto songs = page.value().GetSongs();
+                                auto songsSize = songs.size();
+                                int songIndex = 0;
+                                for (int i = 0; i < ENTRIES_PER_PAGE; i++) {
+                                    auto& searchEntry = searchEntries[i];
+                                    if (songIndex < songsSize) {
+                                        loadingControl->Hide();
+                                        auto& song = songs.at(songIndex);
+                                        searchEntry.SetBeatmap(song);
+                                    }
+                                    else {
+                                        searchEntry.Disable();
+                                    }
+                                    songIndex++;
+                                }
+                            }
+                            else {
+                                if (!ScoreSaber::API::exception.empty()) loadingControl->ShowText(il2cpp_utils::newcsstr(ScoreSaber::API::exception), true);
+                                else loadingControl->ShowText(il2cpp_utils::newcsstr("Dang no results,\nis your Internet working?"), true);
+                            }
+                        }
+                    }
+                );
+            }
+        },
+        getModConfig().Ranked_Toggle.GetValue());
+}
+
+void DownloadSongsSearchViewController::GetLatestRanked(int currentSearchIndex) {
+    ScoreSaber::API::SearchRankedAsync(DownloadSongsSearchViewController::SearchQuery, ScoreSaber::API::SearchType::LatestRanked,
         [this, currentSearchIndex](std::optional<ScoreSaber::Page> page) {
             if (currentSearchIndex == DownloadSongsSearchViewController::searchIndex) {
                 QuestUI::MainThreadScheduler::Schedule(
@@ -407,7 +443,7 @@ void DownloadSongsSearchViewController::GetTrending(int currentSearchIndex) {
 }
 
 void DownloadSongsSearchViewController::GetTopPlayed(int currentSearchIndex) {
-    ScoreSaber::API::GetTopPlayedAsync(
+    ScoreSaber::API::SearchRankedAsync(DownloadSongsSearchViewController::SearchQuery, ScoreSaber::API::SearchType::TopPlayed,
         [this, currentSearchIndex](std::optional<ScoreSaber::Page> page) {
             if (currentSearchIndex == DownloadSongsSearchViewController::searchIndex) {
                 QuestUI::MainThreadScheduler::Schedule(
@@ -443,7 +479,7 @@ void DownloadSongsSearchViewController::GetTopPlayed(int currentSearchIndex) {
 }
 
 void DownloadSongsSearchViewController::GetTopRanked(int currentSearchIndex) {
-    ScoreSaber::API::GetTopRankedAsync(
+    ScoreSaber::API::SearchRankedAsync(DownloadSongsSearchViewController::SearchQuery, ScoreSaber::API::SearchType::TopRanked,
         [this, currentSearchIndex](std::optional<ScoreSaber::Page> page) {
             if (currentSearchIndex == DownloadSongsSearchViewController::searchIndex) {
                 QuestUI::MainThreadScheduler::Schedule(
@@ -477,7 +513,6 @@ void DownloadSongsSearchViewController::GetTopRanked(int currentSearchIndex) {
         },
         getModConfig().Ranked_Toggle.GetValue());
 }
-
 #pragma endregion
 
 void DownloadSongsSearchViewController::Search() {
@@ -498,6 +533,9 @@ void DownloadSongsSearchViewController::Search() {
         else if (getModConfig().ListType_BeatSaver.GetValue() == "User") {
             searchViewController->SearchUser(currentSearchIndex);
         }
+        else {
+            searchViewController->loadingControl->ShowText(il2cpp_utils::newcsstr("Invalid Selection for\nService BeatSaver!"), false);
+        }
     }
     else if (getModConfig().Service.GetValue() == "BeastSaber") {
         if (getModConfig().ListType_BeastSaber.GetValue() == "Curator Recommended") {
@@ -507,11 +545,16 @@ void DownloadSongsSearchViewController::Search() {
         else if (getModConfig().ListType_BeastSaber.GetValue() == "Bookmarks") {
             searchViewController->GetBookmarks(currentSearchIndex);
         }
+        else {
+            searchViewController->loadingControl->ShowText(il2cpp_utils::newcsstr("Invalid Selection for\nService BeastSaber!"), false);
+        }
     }
     else if (getModConfig().Service.GetValue() == "ScoreSaber") {
-        searchViewController->SearchField->get_gameObject()->SetActive(false); // TODO: Add Search stuff to ScoreSaberAPI
-        if (getModConfig().ListType_ScoreSaber.GetValue() == "Top Trending") {
+        if (getModConfig().ListType_ScoreSaber.GetValue() == "Trending") {
             searchViewController->GetTrending(currentSearchIndex);
+        }
+        else if (getModConfig().ListType_ScoreSaber.GetValue() == "Latest Ranked") {
+            searchViewController->GetLatestRanked(currentSearchIndex);
         }
         else if (getModConfig().ListType_ScoreSaber.GetValue() == "Top Played") {
             searchViewController->GetTopPlayed(currentSearchIndex);
@@ -519,6 +562,12 @@ void DownloadSongsSearchViewController::Search() {
         else if (getModConfig().ListType_ScoreSaber.GetValue() == "Top Ranked") {
             searchViewController->GetTopRanked(currentSearchIndex);
         }
+        else {
+            searchViewController->loadingControl->ShowText(il2cpp_utils::newcsstr("Invalid Selection for\nService ScoreSaber!"), false);
+        }
+    }
+    else {
+        searchViewController->loadingControl->ShowText(il2cpp_utils::newcsstr("Invalid Selection\nselected Service Unknown!"), false);
     }
     if (SearchEntry::spriteCount > MAX_SPRITES) {
         SearchEntry::spriteCount = 0;

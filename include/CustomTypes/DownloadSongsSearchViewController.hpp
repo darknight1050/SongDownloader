@@ -110,6 +110,8 @@ DECLARE_CLASS_CODEGEN(SongDownloader, DownloadSongsSearchViewController, HMUI::V
 
     DECLARE_INSTANCE_METHOD(void, GetTrending, int);
 
+    DECLARE_INSTANCE_METHOD(void, GetLatestRanked, int);
+
     DECLARE_INSTANCE_METHOD(void, GetTopPlayed, int);
 
     DECLARE_INSTANCE_METHOD(void, GetTopRanked, int);
