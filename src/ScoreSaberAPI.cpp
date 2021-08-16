@@ -210,7 +210,7 @@ namespace ScoreSaber::API {
         );
     }
 
-    void SearchRankedAsync(std::string query, SearchType list, std::function<void(std::optional<ScoreSaber::Page>)> finished, bool ranked, int pageIndex, int amount) {
+    void SearchSSAsync(std::string query, SearchType list, std::function<void(std::optional<ScoreSaber::Page>)> finished, bool ranked, int pageIndex, int amount) {
         exception.clear();
         WebUtils::GetJSONAsync(API_URL + "&cat=" + std::to_string((int)list) + "&limit=" + std::to_string(amount) + "&page=" + std::to_string(++pageIndex) + "&ranked=" + std::to_string(int(ranked)) + "&search=" + query,
             [finished](long httpCode, bool error, rapidjson::Document& document) {

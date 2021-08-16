@@ -49,7 +49,7 @@ namespace SongDownloader {
             ScoreSaber
         };
 
-        static int spriteCount;
+        //static int spriteCount;
 
         float downloadProgress = -1.0f;
 
@@ -119,5 +119,4 @@ DECLARE_CLASS_CODEGEN(SongDownloader, DownloadSongsSearchViewController, HMUI::V
 
 namespace SongDownloader {
     extern DownloadSongsSearchViewController* searchViewController;
-    extern std::string SearchQuery;
 }

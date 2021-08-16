@@ -229,6 +229,7 @@ void DownloadSongsSearchViewController::SearchSongs(int currentSearchIndex) {
                             }
                             else {
                                 if (!BeatSaver::API::exception.empty()) loadingControl->ShowText(il2cpp_utils::newcsstr(BeatSaver::API::exception), true);
+                                else if (DownloadSongsSearchViewController::SearchQuery.empty()) loadingControl->ShowText(il2cpp_utils::newcsstr("No Results,\nis your Internet working?"), true);
                                 else loadingControl->ShowText(il2cpp_utils::newcsstr("No Songs Found!"), true);
                             }
                         }
@@ -358,7 +359,7 @@ void DownloadSongsSearchViewController::GetBookmarks(int currentSearchIndex) {
                                 }
                                 else {
                                     if (!BeastSaber::API::exception.empty()) loadingControl->ShowText(il2cpp_utils::newcsstr(BeastSaber::API::exception), true);
-                                    else loadingControl->ShowText(il2cpp_utils::newcsstr("No bookmarks found!"), true);
+                                    else loadingControl->ShowText(il2cpp_utils::newcsstr("No bookmarks found\nfor given User!"), true);
                                 }
                             }
                         }
@@ -371,7 +372,7 @@ void DownloadSongsSearchViewController::GetBookmarks(int currentSearchIndex) {
 }
 
 void DownloadSongsSearchViewController::GetTrending(int currentSearchIndex) {
-    ScoreSaber::API::SearchRankedAsync(DownloadSongsSearchViewController::SearchQuery, ScoreSaber::API::SearchType::Trending,
+    ScoreSaber::API::GetTrendingAsync(
         [this, currentSearchIndex](std::optional<ScoreSaber::Page> page) {
             if (currentSearchIndex == DownloadSongsSearchViewController::searchIndex) {
                 QuestUI::MainThreadScheduler::Schedule(
@@ -396,7 +397,7 @@ void DownloadSongsSearchViewController::GetTrending(int currentSearchIndex) {
                             }
                             else {
                                 if (!ScoreSaber::API::exception.empty()) loadingControl->ShowText(il2cpp_utils::newcsstr(ScoreSaber::API::exception), true);
-                                else loadingControl->ShowText(il2cpp_utils::newcsstr("Dang no results,\nis your Internet working?"), true);
+                                else loadingControl->ShowText(il2cpp_utils::newcsstr("No Songs Found!"), true);
                             }
                         }
                     }
@@ -407,7 +408,7 @@ void DownloadSongsSearchViewController::GetTrending(int currentSearchIndex) {
 }
 
 void DownloadSongsSearchViewController::GetLatestRanked(int currentSearchIndex) {
-    ScoreSaber::API::SearchRankedAsync(DownloadSongsSearchViewController::SearchQuery, ScoreSaber::API::SearchType::LatestRanked,
+    ScoreSaber::API::SearchSSAsync(DownloadSongsSearchViewController::SearchQuery, ScoreSaber::API::SearchType::LatestRanked,
         [this, currentSearchIndex](std::optional<ScoreSaber::Page> page) {
             if (currentSearchIndex == DownloadSongsSearchViewController::searchIndex) {
                 QuestUI::MainThreadScheduler::Schedule(
@@ -432,7 +433,8 @@ void DownloadSongsSearchViewController::GetLatestRanked(int currentSearchIndex) 
                             }
                             else {
                                 if (!ScoreSaber::API::exception.empty()) loadingControl->ShowText(il2cpp_utils::newcsstr(ScoreSaber::API::exception), true);
-                                else loadingControl->ShowText(il2cpp_utils::newcsstr("Dang no results,\nis your Internet working?"), true);
+                                else if (DownloadSongsSearchViewController::SearchQuery.empty()) loadingControl->ShowText(il2cpp_utils::newcsstr("No Results,\nis your Internet working?"), true);
+                                else loadingControl->ShowText(il2cpp_utils::newcsstr("No Songs Found!"), true);
                             }
                         }
                     }
@@ -443,7 +445,7 @@ void DownloadSongsSearchViewController::GetLatestRanked(int currentSearchIndex) 
 }
 
 void DownloadSongsSearchViewController::GetTopPlayed(int currentSearchIndex) {
-    ScoreSaber::API::SearchRankedAsync(DownloadSongsSearchViewController::SearchQuery, ScoreSaber::API::SearchType::TopPlayed,
+    ScoreSaber::API::SearchSSAsync(DownloadSongsSearchViewController::SearchQuery, ScoreSaber::API::SearchType::TopPlayed,
         [this, currentSearchIndex](std::optional<ScoreSaber::Page> page) {
             if (currentSearchIndex == DownloadSongsSearchViewController::searchIndex) {
                 QuestUI::MainThreadScheduler::Schedule(
@@ -468,7 +470,8 @@ void DownloadSongsSearchViewController::GetTopPlayed(int currentSearchIndex) {
                             }
                             else {
                                 if (!ScoreSaber::API::exception.empty()) loadingControl->ShowText(il2cpp_utils::newcsstr(ScoreSaber::API::exception), true);
-                                else loadingControl->ShowText(il2cpp_utils::newcsstr("Dang no results,\nis your Internet working?"), true);
+                                else if (DownloadSongsSearchViewController::SearchQuery.empty()) loadingControl->ShowText(il2cpp_utils::newcsstr("No Results,\nis your Internet working?"), true);
+                                else loadingControl->ShowText(il2cpp_utils::newcsstr("No Songs Found!"), true);
                             }
                         }
                     }
@@ -479,7 +482,7 @@ void DownloadSongsSearchViewController::GetTopPlayed(int currentSearchIndex) {
 }
 
 void DownloadSongsSearchViewController::GetTopRanked(int currentSearchIndex) {
-    ScoreSaber::API::SearchRankedAsync(DownloadSongsSearchViewController::SearchQuery, ScoreSaber::API::SearchType::TopRanked,
+    ScoreSaber::API::SearchSSAsync(DownloadSongsSearchViewController::SearchQuery, ScoreSaber::API::SearchType::TopRanked,
         [this, currentSearchIndex](std::optional<ScoreSaber::Page> page) {
             if (currentSearchIndex == DownloadSongsSearchViewController::searchIndex) {
                 QuestUI::MainThreadScheduler::Schedule(
@@ -504,7 +507,8 @@ void DownloadSongsSearchViewController::GetTopRanked(int currentSearchIndex) {
                             }
                             else {
                                 if (!ScoreSaber::API::exception.empty()) loadingControl->ShowText(il2cpp_utils::newcsstr(ScoreSaber::API::exception), true);
-                                else loadingControl->ShowText(il2cpp_utils::newcsstr("Dang no results,\nis your Internet working?"), true);
+                                else if (DownloadSongsSearchViewController::SearchQuery.empty()) loadingControl->ShowText(il2cpp_utils::newcsstr("No Results,\nis your Internet working?"), true);
+                                else loadingControl->ShowText(il2cpp_utils::newcsstr("No Songs Found!"), true);
                             }
                         }
                     }
@@ -551,6 +555,7 @@ void DownloadSongsSearchViewController::Search() {
     }
     else if (getModConfig().Service.GetValue() == "ScoreSaber") {
         if (getModConfig().ListType_ScoreSaber.GetValue() == "Trending") {
+            searchViewController->SearchField->get_gameObject()->SetActive(false);
             searchViewController->GetTrending(currentSearchIndex);
         }
         else if (getModConfig().ListType_ScoreSaber.GetValue() == "Latest Ranked") {
@@ -569,10 +574,10 @@ void DownloadSongsSearchViewController::Search() {
     else {
         searchViewController->loadingControl->ShowText(il2cpp_utils::newcsstr("Invalid Selection\nselected Service Unknown!"), false);
     }
-    if (SearchEntry::spriteCount > MAX_SPRITES) {
-        SearchEntry::spriteCount = 0;
-        Resources::UnloadUnusedAssets();
-    }
+    //if (SearchEntry::spriteCount > MAX_SPRITES) {
+    //    SearchEntry::spriteCount = 0;
+    //    Resources::UnloadUnusedAssets();
+    //}
 
 }
 
@@ -618,8 +623,8 @@ void DownloadSongsSearchViewController::DidActivate(bool firstActivation, bool a
 }
 
 void DownloadSongsSearchViewController::DidDeactivate(bool removedFromHierarchy, bool screenSystemDisabling) {
-    if(SearchEntry::spriteCount > 0) {
-        SearchEntry::spriteCount = 0;
-        Resources::UnloadUnusedAssets();
-    }
+    //if(SearchEntry::spriteCount > 0) {
+    //    SearchEntry::spriteCount = 0;
+    //    Resources::UnloadUnusedAssets();
+    //}
 }
