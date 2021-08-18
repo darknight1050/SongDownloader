@@ -23,7 +23,7 @@ LOCAL_MODULE := zip
 LOCAL_EXPORT_C_INCLUDES := include/zip/src
 LOCAL_SRC_FILES := $(call rwildcard,include/zip/src/,*.c)
 include $(BUILD_STATIC_LIBRARY)
-# Creating prebuilt for dependency: songloader - version: 0.6.2
+# Creating prebuilt for dependency: songloader - version: 0.6.3
 include $(CLEAR_VARS)
 LOCAL_MODULE := songloader
 LOCAL_EXPORT_C_INCLUDES := extern/songloader
@@ -84,11 +84,11 @@ LOCAL_SHARED_LIBRARIES += beatsaber-hook_2_2_5
 LOCAL_SHARED_LIBRARIES += modloader
 LOCAL_SHARED_LIBRARIES += codegen_0_12_5
 LOCAL_SHARED_LIBRARIES += custom-types
+LOCAL_STATIC_LIBRARIES += zip
+LOCAL_STATIC_LIBRARIES += curl
+LOCAL_STATIC_LIBRARIES += cryptopp
 LOCAL_LDLIBS += -llog -lz
 LOCAL_CFLAGS += -DVERSION='"0.0.1"'
 LOCAL_C_INCLUDES += ./include ./shared ./src ./extern ./extern/libil2cpp/il2cpp/libil2cpp ./extern/codegen/include
 LOCAL_CPP_FEATURES += exceptions
-LOCAL_STATIC_LIBRARIES += zip
-LOCAL_STATIC_LIBRARIES += curl
-LOCAL_STATIC_LIBRARIES += cryptopp
 include $(BUILD_SHARED_LIBRARY)
