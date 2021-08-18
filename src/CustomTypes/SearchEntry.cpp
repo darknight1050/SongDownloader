@@ -6,8 +6,6 @@ using namespace UnityEngine::UI;
 using namespace TMPro;
 using namespace SongDownloader;
 
-// int SearchEntry::spriteCount = 0;
-
 SearchEntry::SearchEntry(GameObject* _gameObject, TextMeshProUGUI* _line1Component, TextMeshProUGUI* _line2Component, HMUI::ImageView* _coverImageView, Button* _downloadButton) : gameObject(_gameObject), line1Component(_line1Component), line2Component(_line2Component), coverImageView(_coverImageView), downloadButton(_downloadButton) {
 }
 
@@ -72,7 +70,6 @@ void SearchEntry::SetBeatmap(const BeatSaver::Beatmap& _map) {
                     Sprite* sprite = BeatSaberUI::ArrayToSprite(spriteArray);
                     coverImageView->set_sprite(sprite);
                     coverImageView->set_enabled(true);
-                    // SearchEntry::spriteCount++;
                 }
                 });
         }
@@ -109,7 +106,6 @@ void SearchEntry::SetBeatmap(const BeastSaber::Song& _song) {
                     Sprite* sprite = BeatSaberUI::ArrayToSprite(spriteArray);
                     coverImageView->set_sprite(sprite);
                     coverImageView->set_enabled(true);
-                    // SearchEntry::spriteCount++;
                 }
                 });
         }
@@ -146,7 +142,6 @@ void SearchEntry::SetBeatmap(const ScoreSaber::Song& _song) {
                     Sprite* sprite = BeatSaberUI::ArrayToSprite(spriteArray);
                     coverImageView->set_sprite(sprite);
                     coverImageView->set_enabled(true);
-                    // SearchEntry::spriteCount++;
                 }
                 });
         }

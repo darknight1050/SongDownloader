@@ -49,8 +49,6 @@ namespace SongDownloader {
             ScoreSaber
         };
 
-        //static int spriteCount;
-
         float downloadProgress = -1.0f;
 
         SearchEntry(UnityEngine::GameObject* _gameObject, TMPro::TextMeshProUGUI* _line1Component, TMPro::TextMeshProUGUI* _line2Component, HMUI::ImageView* _coverImageView, UnityEngine::UI::Button* _downloadButton);
@@ -92,8 +90,6 @@ DECLARE_CLASS_CODEGEN(SongDownloader, DownloadSongsSearchViewController, HMUI::V
     
     DECLARE_OVERRIDE_METHOD(void, DidActivate, il2cpp_utils::FindMethodUnsafe("HMUI", "ViewController", "DidActivate", 3), bool firstActivation, bool addedToHierarchy, bool screenSystemEnabling);
     
-    DECLARE_OVERRIDE_METHOD(void, DidDeactivate, il2cpp_utils::FindMethodUnsafe("HMUI", "ViewController", "DidDeactivate", 2), bool removedFromHierarchy, bool screenSystemDisabling);
-
     DECLARE_INSTANCE_FIELD(GlobalNamespace::LoadingControl*, loadingControl);
 
     DECLARE_INSTANCE_FIELD(HMUI::InputFieldView*, SearchField);

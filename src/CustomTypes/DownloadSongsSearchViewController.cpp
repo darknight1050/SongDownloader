@@ -574,11 +574,6 @@ void DownloadSongsSearchViewController::Search() {
     else {
         searchViewController->loadingControl->ShowText(il2cpp_utils::newcsstr("Invalid Selection\nselected Service Unknown!"), false);
     }
-    //if (SearchEntry::spriteCount > MAX_SPRITES) {
-    //    SearchEntry::spriteCount = 0;
-    //    Resources::UnloadUnusedAssets();
-    //}
-
 }
 
 void DownloadSongsSearchViewController::DidActivate(bool firstActivation, bool addedToHierarchy, bool screenSystemEnabling) {
@@ -620,11 +615,4 @@ void DownloadSongsSearchViewController::DidActivate(bool firstActivation, bool a
 
         Search();
     }
-}
-
-void DownloadSongsSearchViewController::DidDeactivate(bool removedFromHierarchy, bool screenSystemDisabling) {
-    //if(SearchEntry::spriteCount > 0) {
-    //    SearchEntry::spriteCount = 0;
-    //    Resources::UnloadUnusedAssets();
-    //}
 }
