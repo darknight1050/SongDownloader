@@ -49,3 +49,11 @@ extern
 qpm.shared.json
 
 Android.mk.backup
+/.vs/SongDownloader/v16
+*.sqlite
+/.vs
+/log_timestamp
+*.log
+/advanced-logging.ps1
+/BuildTools
+*.qmod

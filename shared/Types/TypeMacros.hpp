@@ -1,5 +1,6 @@
 #pragma once
 #include "beatsaber-hook/shared/config/rapidjson-utils.hpp"
+#include "Exceptions.hpp"
 
 #define DECLARE_JSON_CLASS(namespaze, name, impl) \
 namespace namespaze { \
@@ -28,7 +29,15 @@ void namespaze::name::Deserialize(const rapidjson::Value& jsonValue) { \
 }
 
 #define DESERIALIZE_VALUE(name, jsonName, type) \
+if (!jsonValue.HasMember(#jsonName)) throw SongDownloader::JsonException(SongDownloader::Exceptions::NoMember, #jsonName); \
+if (!jsonValue[#jsonName].Is##type()) throw SongDownloader::JsonException(SongDownloader::Exceptions::WrongType, #jsonName ", Type expected was: " #type); \
 name = jsonValue[#jsonName].Get##type();
+
+#define DESERIALIZE_VALUE_2TYPES(name, jsonName, returnType, checkType2) \
+if (!jsonValue.HasMember(#jsonName)) throw SongDownloader::JsonException(SongDownloader::Exceptions::NoMember, #jsonName); \
+if (jsonValue[#jsonName].Is##returnType() || jsonValue[#jsonName].Is##checkType2()) name = jsonValue[#jsonName].Get##returnType(); \
+else throw SongDownloader::JsonException(SongDownloader::Exceptions::WrongType, #jsonName ", Type expected was: " #returnType "or" #checkType2);
+
 
 #define DESERIALIZE_VALUE_OPTIONAL(name, jsonName, type) \
 if(jsonValue.HasMember(#jsonName) && jsonValue[#jsonName].Is##type()) { \
@@ -38,10 +47,21 @@ if(jsonValue.HasMember(#jsonName) && jsonValue[#jsonName].Is##type()) { \
 }
 
 #define DESERIALIZE_CLASS(name, jsonName) \
+if (!jsonValue.HasMember(#jsonName)) throw SongDownloader::JsonException(SongDownloader::Exceptions::NoMember, #jsonName); \
+if (!jsonValue[#jsonName].IsObject()) throw SongDownloader::JsonException(SongDownloader::Exceptions::WrongType, #jsonName ", Type expected was: JsonObject"); \
 name.Deserialize(jsonValue[#jsonName]);
 
+#define DESERIALIZE_CLASS_OPTIONAL(name, jsonName, type) \
+if(jsonValue.HasMember(#jsonName) && jsonValue[#jsonName].IsObject()) { \
+    type val##name; \
+    name = val##name;\
+    name.value().Deserialize(jsonValue[#jsonName]); \
+} else { \
+    name = std::nullopt; \
+}
 
 #define DESERIALIZE_VECTOR(name, jsonName, type) \
+if (!jsonValue.HasMember(#jsonName)) throw SongDownloader::JsonException(SongDownloader::Exceptions::NoMember, #jsonName); \
 name.clear(); \
 auto& jsonName = jsonValue[#jsonName]; \
 if(jsonName.IsArray()) { \
@@ -50,4 +70,4 @@ if(jsonName.IsArray()) { \
         value.Deserialize(*it); \
         name.push_back(value); \
     } \
-}
+} else throw SongDownloader::JsonException(SongDownloader::Exceptions::WrongType, #jsonName ", Type expected was: JsonArray");
