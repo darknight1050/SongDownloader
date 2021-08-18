@@ -88,7 +88,7 @@ LOCAL_STATIC_LIBRARIES += zip
 LOCAL_STATIC_LIBRARIES += curl
 LOCAL_STATIC_LIBRARIES += cryptopp
 LOCAL_LDLIBS += -llog -lz
-LOCAL_CFLAGS += -DVERSION='"0.0.1"'
+LOCAL_CFLAGS += -DVERSION='"0.2.0"'
 LOCAL_C_INCLUDES += ./include ./shared ./src ./extern ./extern/libil2cpp/il2cpp/libil2cpp ./extern/codegen/include
 LOCAL_CPP_FEATURES += exceptions
 include $(BUILD_SHARED_LIBRARY)
