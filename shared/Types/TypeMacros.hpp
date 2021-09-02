@@ -1,6 +1,6 @@
 #pragma once
 #include "beatsaber-hook/shared/config/rapidjson-utils.hpp"
-#include "Exceptions.hpp"
+#include "../Exceptions.hpp"
 
 #define DECLARE_JSON_CLASS(namespaze, name, impl) \
 namespace namespaze { \
