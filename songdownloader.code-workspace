@@ -111,7 +111,23 @@
 			"shared_mutex": "cpp",
 			"__memory": "cpp",
 			"hash_map": "cpp",
-			"hash_set": "cpp"
+			"hash_set": "cpp",
+			"xstring": "cpp",
+			"xfacet": "cpp",
+			"xhash": "cpp",
+			"xiosbase": "cpp",
+			"xlocale": "cpp",
+			"xlocbuf": "cpp",
+			"xlocinfo": "cpp",
+			"xlocmes": "cpp",
+			"xlocmon": "cpp",
+			"xlocnum": "cpp",
+			"xloctime": "cpp",
+			"xmemory": "cpp",
+			"xstddef": "cpp",
+			"xtr1common": "cpp",
+			"xtree": "cpp",
+			"xutility": "cpp"
 		}
 	}
 }
