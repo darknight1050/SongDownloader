@@ -60,6 +60,10 @@ void DownloadSongsSearchViewController::CreateEntries(Transform* parent) {
     GameObject* existingLevelBar = Resources::FindObjectsOfTypeAll<LevelBar*>()->values[0]->get_gameObject();
     GameObject* levelBarGameObject = UnityEngine::GameObject::Instantiate(existingLevelBar, levelBarLayout->get_transform());
     auto levelBarTransform = levelBarGameObject->get_transform();
+
+    static auto multipleLineTextContainerName = il2cpp_utils::newcsstr<il2cpp_utils::CreationType::Manual>("MultipleLineTextContainer");
+    Object::Destroy(levelBarTransform->FindChild(multipleLineTextContainerName)->get_gameObject());
+
     LevelBar* levelBar = levelBarGameObject->GetComponent<LevelBar*>();
     auto songNameTextComponent = levelBar->songNameText;
     songNameTextComponent->set_fontSize(4.2f);
