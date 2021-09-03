@@ -65,14 +65,7 @@ LOCAL_MODULE := curl
 LOCAL_EXPORT_C_INCLUDES := extern/libcurl
 LOCAL_SRC_FILES := extern/libcurl.a
 include $(PREBUILT_STATIC_LIBRARY)
-# Creating prebuilt for dependency: libcryptopp - version: 8.5.0
-include $(CLEAR_VARS)
-LOCAL_MODULE := cryptopp
-LOCAL_EXPORT_C_INCLUDES := extern/libcryptopp
-LOCAL_SRC_FILES := extern/libcryptopp.a
-include $(PREBUILT_STATIC_LIBRARY)
 
-# If you would like to use more shared libraries (such as custom UI, utils, or more) add them here, following the format above. # In addition, ensure that you add them to the shared library build below. 
 include $(CLEAR_VARS) 
 LOCAL_MODULE := songdownloader
 LOCAL_SRC_FILES += $(call rwildcard,src/**,*.cpp)
@@ -86,7 +79,6 @@ LOCAL_SHARED_LIBRARIES += codegen_0_13_0
 LOCAL_SHARED_LIBRARIES += custom-types
 LOCAL_STATIC_LIBRARIES += zip
 LOCAL_STATIC_LIBRARIES += curl
-LOCAL_STATIC_LIBRARIES += cryptopp
 LOCAL_LDLIBS += -llog -lz
 LOCAL_CFLAGS += -DVERSION='"0.0.1"'
 LOCAL_C_INCLUDES += ./include ./shared ./src ./extern ./extern/libil2cpp/il2cpp/libil2cpp ./extern/codegen/include
