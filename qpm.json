@@ -7,7 +7,10 @@
     "version": "0.3.2",
     "url": "https://github.com/darknight1050/songdownloader",
     "additionalData": {
-      "overrideSoName": "libsongdownloader.so"
+      "overrideSoName": "libsongdownloader.so",
+      "branchName": "version-v0.3.2",
+      "soLink": "https://github.com/darknight1050/SongDownloader/releases/download/v0.3.2/libsongdownloader.so",
+      "debugSoLink": "https://github.com/darknight1050/SongDownloader/releases/download/v0.3.2/debug_libsongdownloader.so"
     }
   },
   "dependencies": [
