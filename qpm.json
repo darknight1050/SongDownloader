@@ -25,6 +25,11 @@
       "id": "libcurl",
       "versionRange": "^7.78.0",
       "additionalData": {}
+    },
+    {
+      "id": "libil2cpp",
+      "versionRange": "=0.2.3",
+      "additionalData": {}
     }
   ],
   "additionalData": {}
