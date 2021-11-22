@@ -24,7 +24,7 @@ namespace ScoreSaber::API {
     /// NOTE: Trending doesn't support searchQueries
     /// and will return no results if one is entered
     /// </summary>
-    typedef ListCategory SearchType;
+    [[deprecated]] typedef ListCategory SearchType;
 
     /// <summary>
     /// Retrieves songs that are Trending as determined by ScoreSaber.

@@ -316,7 +316,7 @@ namespace ScoreSaber::API {
         if (ranked.has_value()) request += "&ranked=" + std::string(ranked.value() ? "true" : "false");
         if (qualified.has_value()) request += "&qualified=" + std::string(qualified.value() ? "true" : "false");
         if (unique.has_value()) request += "&unique=" + std::string(unique.value() ? "true" : "false");
-        getLogger().debug("URL is: %s", (API_LEADERBOARD + request).c_str());
+        LOG_DEBUG("URL is: %s", (API_LEADERBOARD + request).c_str());
         WebUtils::GetJSONAsync(API_LEADERBOARD + request,
             [finished](long httpCode, bool error, rapidjson::Document& document) {
                 if (error) {
