@@ -2,6 +2,7 @@
 
 #include "HMUI/ViewController.hpp"
 #include "HMUI/SimpleTextDropdown.hpp"
+#include "UnityEngine/UI/Toggle.hpp"
 
 #include "custom-types/shared/macros.hpp"
 
@@ -19,6 +20,7 @@ DECLARE_CLASS_CODEGEN(SongDownloader, DownloadSongsOptionsViewController, HMUI::
     DECLARE_INSTANCE_FIELD(HMUI::SimpleTextDropdown*, MEdropdown);
     DECLARE_INSTANCE_FIELD(HMUI::SimpleTextDropdown*, Chroma);
     DECLARE_INSTANCE_FIELD(HMUI::SimpleTextDropdown*, Ranked);
+    DECLARE_INSTANCE_FIELD(UnityEngine::UI::Toggle*, RankedToggle);
 
     DECLARE_OVERRIDE_METHOD(void, DidActivate, il2cpp_utils::FindMethodUnsafe("HMUI", "ViewController", "DidActivate", 3), bool firstActivation, bool addedToHierarchy, bool screenSystemEnabling);
 )

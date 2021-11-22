@@ -179,12 +179,6 @@ void DownloadSongsSearchViewController::CreateEntries(Transform* parent) {
     Object::Destroy(prefab);
 }
 
-std::optional<bool> StringToBool(std::string value) {
-    if (value == "true") return true;
-    else if (value == "false") return false;
-    else return std::nullopt;
-}
-
 #pragma region SearchType Functions
 
 void DownloadSongsSearchViewController::SearchKey(int currentSearchIndex) {
@@ -385,15 +379,14 @@ void DownloadSongsSearchViewController::GetBookmarks(int currentSearchIndex) {
 }
 
 void DownloadSongsSearchViewController::GetTrending(int currentSearchIndex) {
-    ScoreSaber::API::SearchAsync(DownloadSongsSearchViewController::SearchQuery, ScoreSaber::API::ListCategory::TopRanked,
-    //ScoreSaber::API::GetTrendingAsync(
-        [this, currentSearchIndex](std::optional<ScoreSaber::Leaderboards> page) {
+    ScoreSaber::API::GetTrendingAsync(
+        [this, currentSearchIndex](std::optional<ScoreSaber::Page> page) {
             if (currentSearchIndex == DownloadSongsSearchViewController::searchIndex) {
                 QuestUI::MainThreadScheduler::Schedule(
                     [this, currentSearchIndex, page] {
                         if (currentSearchIndex == DownloadSongsSearchViewController::searchIndex) {
-                            if (page.has_value() && !page.value().GetLeaderboards().empty()) {
-                                auto songs = page.value().GetLeaderboards();
+                            if (page.has_value() && !page.value().GetSongs().empty()) {
+                                auto songs = page.value().GetSongs();
                                 auto songsSize = songs.size();
                                 int songIndex = 0;
                                 for (int i = 0; i < ENTRIES_PER_PAGE; i++) {
@@ -411,7 +404,6 @@ void DownloadSongsSearchViewController::GetTrending(int currentSearchIndex) {
                             }
                             else {
                                 if (!ScoreSaber::API::exception.empty()) loadingControl->ShowText(il2cpp_utils::newcsstr(ScoreSaber::API::exception), true);
-                                else if (DownloadSongsSearchViewController::SearchQuery.empty()) loadingControl->ShowText(il2cpp_utils::newcsstr("No Results,\nis your Internet working?"), true);
                                 else loadingControl->ShowText(il2cpp_utils::newcsstr("No Songs Found!"), true);
                             }
                         }
@@ -419,19 +411,18 @@ void DownloadSongsSearchViewController::GetTrending(int currentSearchIndex) {
                 );
             }
         },
-        StringToBool(getModConfig().Ranked.GetValue()), std::nullopt, true); // TODO: Possibly add option to search by qualified, for now just nullopt on that parameter
+        getModConfig().Ranked_Toggle.GetValue());
 }
 
 void DownloadSongsSearchViewController::GetLatestRanked(int currentSearchIndex) {
-    ScoreSaber::API::SearchAsync(DownloadSongsSearchViewController::SearchQuery, ScoreSaber::API::ListCategory::LatestRanked,
-    //ScoreSaber::API::SearchSSAsync(DownloadSongsSearchViewController::SearchQuery, ScoreSaber::API::SearchType::LatestRanked,
-        [this, currentSearchIndex](std::optional<ScoreSaber::Leaderboards> page) {
+    ScoreSaber::API::SearchSSAsync(DownloadSongsSearchViewController::SearchQuery, ScoreSaber::API::SearchType::LatestRanked,
+        [this, currentSearchIndex](std::optional<ScoreSaber::Page> page) {
             if (currentSearchIndex == DownloadSongsSearchViewController::searchIndex) {
                 QuestUI::MainThreadScheduler::Schedule(
                     [this, currentSearchIndex, page] {
                         if (currentSearchIndex == DownloadSongsSearchViewController::searchIndex) {
-                            if (page.has_value() && !page.value().GetLeaderboards().empty()) {
-                                auto songs = page.value().GetLeaderboards();
+                            if (page.has_value() && !page.value().GetSongs().empty()) {
+                                auto songs = page.value().GetSongs();
                                 auto songsSize = songs.size();
                                 int songIndex = 0;
                                 for (int i = 0; i < ENTRIES_PER_PAGE; i++) {
@@ -457,19 +448,18 @@ void DownloadSongsSearchViewController::GetLatestRanked(int currentSearchIndex) 
                 );
             }
         },
-        std::nullopt, std::nullopt, true); // TODO: Possibly add option to search by qualified, for now just nullopt on that parameter
+        getModConfig().Ranked_Toggle.GetValue());
 }
 
 void DownloadSongsSearchViewController::GetTopPlayed(int currentSearchIndex) {
-    ScoreSaber::API::GetListAsync(ScoreSaber::API::ListCategory::TopPlayed, /*)
-    ScoreSaber::API::SearchSSAsync(DownloadSongsSearchViewController::SearchQuery, ScoreSaber::API::SearchType::TopPlayed,*/
-        [this, currentSearchIndex](std::optional<ScoreSaber::Leaderboards> page) {
+    ScoreSaber::API::SearchSSAsync(DownloadSongsSearchViewController::SearchQuery, ScoreSaber::API::SearchType::TopPlayed,
+        [this, currentSearchIndex](std::optional<ScoreSaber::Page> page) {
             if (currentSearchIndex == DownloadSongsSearchViewController::searchIndex) {
                 QuestUI::MainThreadScheduler::Schedule(
                     [this, currentSearchIndex, page] {
                         if (currentSearchIndex == DownloadSongsSearchViewController::searchIndex) {
-                            if (page.has_value() && !page.value().GetLeaderboards().empty()) {
-                                auto songs = page.value().GetLeaderboards();
+                            if (page.has_value() && !page.value().GetSongs().empty()) {
+                                auto songs = page.value().GetSongs();
                                 auto songsSize = songs.size();
                                 int songIndex = 0;
                                 for (int i = 0; i < ENTRIES_PER_PAGE; i++) {
@@ -495,19 +485,18 @@ void DownloadSongsSearchViewController::GetTopPlayed(int currentSearchIndex) {
                 );
             }
         },
-        StringToBool(getModConfig().Ranked.GetValue()), std::nullopt, true); // TODO: Possibly add option to search by qualified, for now just nullopt on that parameter
+        getModConfig().Ranked_Toggle.GetValue());
 }
 
 void DownloadSongsSearchViewController::GetTopRanked(int currentSearchIndex) {
-    ScoreSaber::API::SearchAsync(DownloadSongsSearchViewController::SearchQuery, ScoreSaber::API::ListCategory::TopRanked,
-    //ScoreSaber::API::SearchSSAsync(DownloadSongsSearchViewController::SearchQuery, ScoreSaber::API::SearchType::TopRanked,
-        [this, currentSearchIndex](std::optional<ScoreSaber::Leaderboards> page) {
+    ScoreSaber::API::SearchSSAsync(DownloadSongsSearchViewController::SearchQuery, ScoreSaber::API::SearchType::TopRanked,
+        [this, currentSearchIndex](std::optional<ScoreSaber::Page> page) {
             if (currentSearchIndex == DownloadSongsSearchViewController::searchIndex) {
                 QuestUI::MainThreadScheduler::Schedule(
                     [this, currentSearchIndex, page] {
                         if (currentSearchIndex == DownloadSongsSearchViewController::searchIndex) {
-                            if (page.has_value() && !page.value().GetLeaderboards().empty()) {
-                                auto songs = page.value().GetLeaderboards();
+                            if (page.has_value() && !page.value().GetSongs().empty()) {
+                                auto songs = page.value().GetSongs();
                                 auto songsSize = songs.size();
                                 int songIndex = 0;
                                 for (int i = 0; i < ENTRIES_PER_PAGE; i++) {
@@ -533,7 +522,7 @@ void DownloadSongsSearchViewController::GetTopRanked(int currentSearchIndex) {
                 );
             }
         },
-        std::nullopt, std::nullopt, true); // TODO: Possibly add option to search by qualified, for now just nullopt on that parameter
+        getModConfig().Ranked_Toggle.GetValue());
 }
 #pragma endregion
 
@@ -573,13 +562,13 @@ void DownloadSongsSearchViewController::Search() {
     }
     else if (getModConfig().Service.GetValue() == "ScoreSaber") {
         if (getModConfig().ListType_ScoreSaber.GetValue() == "Trending") {
+            searchViewController->SearchField->get_gameObject()->SetActive(false);
             searchViewController->GetTrending(currentSearchIndex);
         }
         else if (getModConfig().ListType_ScoreSaber.GetValue() == "Latest Ranked") {
             searchViewController->GetLatestRanked(currentSearchIndex);
         }
         else if (getModConfig().ListType_ScoreSaber.GetValue() == "Top Played") {
-            searchViewController->SearchField->get_gameObject()->SetActive(false);
             searchViewController->GetTopPlayed(currentSearchIndex);
         }
         else if (getModConfig().ListType_ScoreSaber.GetValue() == "Top Ranked") {
