@@ -13,7 +13,6 @@ DECLARE_CONFIG(ModConfig,
     CONFIG_VALUE(ME, std::string, "ME", "", "If MappingExtensions maps should be included in search results");
     CONFIG_VALUE(Chroma, std::string, "Chroma", "", "If Chroma maps should be included in search results");
     CONFIG_VALUE(Ranked, std::string, "Ranked_BeatSaver", "", "If Ranked maps should be included in search results");
-    CONFIG_VALUE(Ranked_Toggle, bool, "Ranked_ScoreSaber", true, "If Only Ranked maps should be shown");
 
     CONFIG_VALUE(BookmarkUsername, std::string, "BookmarkUsername", "");
 
@@ -28,7 +27,6 @@ DECLARE_CONFIG(ModConfig,
         CONFIG_INIT_VALUE(ME);
         CONFIG_INIT_VALUE(Chroma);
         CONFIG_INIT_VALUE(Ranked);
-        CONFIG_INIT_VALUE(Ranked_Toggle);
 
         CONFIG_INIT_VALUE(BookmarkUsername);
     )
