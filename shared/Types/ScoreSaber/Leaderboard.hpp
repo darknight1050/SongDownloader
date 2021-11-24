@@ -1,6 +1,7 @@
 #pragma once
 #include "../TypeMacros.hpp"
 
+// Forward declaration of Leaderbaord and the GetCoverImageAsync function.
 namespace ScoreSaber {
     class Leaderboard;
     namespace API {

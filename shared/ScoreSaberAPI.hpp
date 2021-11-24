@@ -10,6 +10,7 @@ namespace ScoreSaber::API {
 
     /// <summary>
     /// Enum of categories supported by ScoreSaber
+    /// Search is not supported on TopPlayed and TopRanked
     /// </summary>
     enum class ListCategory {
         Trending,
@@ -90,7 +91,7 @@ namespace ScoreSaber::API {
     /// <summary>
     /// Retrieves CoverImage as uint8_t bytes
     /// </summary>
-    /// <param name="song">Reference to a scoresaber leaderboard</param>
+    /// <param name="ldb">Reference to a scoresaber leaderboard</param>
     /// <returns>The bytes for the coverImage, check if valid</returns>
     std::vector<uint8_t> GetCoverImage(const ScoreSaber::Leaderboard& ldb);
 
@@ -167,7 +168,9 @@ namespace ScoreSaber::API {
     /// <param name="query">Searh Query</param>
     /// <param name="list">Category to seach in</param>
     /// <param name="finished"></param>
-    /// <param name="ranked">If return value should contain only ranked or be mixed default: false</param>
+    /// <param name="ranked">If return value should contain only ranked, be mixed or exclude ranked default: std::nullopt</param>
+    /// <param name="qualified">If return value should contain only qualified, be mixed or exclude qualified default: std::nullopt</param>
+    /// <param name="unique">If return value should contain each leaderboard only once or not default: std::nullopt</param>
     /// <param name="pageIndex">Index of the pages search results default: 0</param>
     /// <param name="amount">Amount of Songs to get default: 20</param>
     void SearchAsync(std::string query, ListCategory list, std::function<void(std::optional<ScoreSaber::Leaderboards>)> finished, std::optional<bool> ranked =  std::nullopt, std::optional<bool> qualified = std::nullopt, std::optional<bool> unique = std::nullopt, int pageIndex = 1);
