@@ -21,7 +21,7 @@ void DownloadSongsFlowCoordinator::Awake(){
 
 void DownloadSongsFlowCoordinator::DidActivate(bool firstActivation, bool addedToHierarchy, bool screenSystemEnabling){
     if(firstActivation){
-        SetTitle(il2cpp_utils::createcsstr("Download Songs"), HMUI::ViewController::AnimationType::In);
+        SetTitle(il2cpp_utils::newcsstr("Download Songs"), HMUI::ViewController::AnimationType::In);
         showBackButton = true;
         ProvideInitialViewControllers(DownloadSongsSearchViewController, DownloadSongsOptionsViewController, nullptr, nullptr, nullptr);
     }

@@ -13,7 +13,7 @@
   "dependencies": [
     {
       "id": "songloader",
-      "versionRange": "^0.7.1",
+      "versionRange": "^0.8.0",
       "additionalData": {}
     },
     {

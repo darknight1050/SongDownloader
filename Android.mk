@@ -35,11 +35,11 @@ LOCAL_MODULE := questui
 LOCAL_EXPORT_C_INCLUDES := extern/questui
 LOCAL_SRC_FILES := extern/libquestui.so
 include $(PREBUILT_SHARED_LIBRARY)
-# Creating prebuilt for dependency: beatsaber-hook - version: 2.3.0
+# Creating prebuilt for dependency: beatsaber-hook - version: 3.4.4
 include $(CLEAR_VARS)
-LOCAL_MODULE := beatsaber-hook_2_3_0
+LOCAL_MODULE := beatsaber-hook_3_4_4
 LOCAL_EXPORT_C_INCLUDES := extern/beatsaber-hook
-LOCAL_SRC_FILES := extern/libbeatsaber-hook_2_3_0.so
+LOCAL_SRC_FILES := extern/libbeatsaber-hook_3_4_4.so
 include $(PREBUILT_SHARED_LIBRARY)
 # Creating prebuilt for dependency: modloader - version: 1.2.3
 include $(CLEAR_VARS)
@@ -73,7 +73,7 @@ LOCAL_SRC_FILES += $(call rwildcard,extern/beatsaber-hook/src/inline-hook,*.cpp)
 LOCAL_SRC_FILES += $(call rwildcard,extern/beatsaber-hook/src/inline-hook,*.c)
 LOCAL_SHARED_LIBRARIES += songloader
 LOCAL_SHARED_LIBRARIES += questui
-LOCAL_SHARED_LIBRARIES += beatsaber-hook_2_3_0
+LOCAL_SHARED_LIBRARIES += beatsaber-hook_3_4_4
 LOCAL_SHARED_LIBRARIES += modloader
 LOCAL_SHARED_LIBRARIES += custom-types
 LOCAL_SHARED_LIBRARIES += codegen
