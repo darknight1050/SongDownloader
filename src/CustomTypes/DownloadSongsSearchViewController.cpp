@@ -260,12 +260,12 @@ void DownloadSongsSearchViewController::SearchSongs(int currentSearchIndex) {
 
 void DownloadSongsSearchViewController::SearchUser(int currentSearchIndex) {
     if (!DownloadSongsSearchViewController::SearchQuery.empty()) {
-        BeatSaver::API::SearchPagedAsync(DownloadSongsSearchViewController::SearchQuery, 0,
-            [this, currentSearchIndex](std::optional<BeatSaver::Page> UserPage) {
+        BeatSaver::API::GetUserByNameAsync(DownloadSongsSearchViewController::SearchQuery,
+            [this, currentSearchIndex](std::optional<BeatSaver::UserDetail> User) {
                 QuestUI::MainThreadScheduler::Schedule(
-                    [this, currentSearchIndex, UserPage]() {
-                        if (UserPage.has_value() && UserPage.value().GetUser().has_value()) {
-                            BeatSaver::API::GetBeatmapByUserIdAsync(UserPage.value().GetUser().value().GetId(), 0,
+                    [this, currentSearchIndex, User]() {
+                        if (User.has_value()) {
+                            BeatSaver::API::GetBeatmapByUserIdAsync(User.value().GetId(), 0,
                                 [this, currentSearchIndex](std::optional<BeatSaver::Page> page) {
                                     QuestUI::MainThreadScheduler::Schedule(
                                         [this, currentSearchIndex, page]() {
@@ -288,7 +288,7 @@ void DownloadSongsSearchViewController::SearchUser(int currentSearchIndex) {
                                                     }
                                                 }
                                                 else {
-                                                    if (!BeatSaver::API::exception.empty()) loadingControl->ShowText(il2cpp_utils::newcsstr(BeatSaver::API::exception), true);
+                                                    if (BeatSaver::API::exception != "Not Found") loadingControl->ShowText(il2cpp_utils::newcsstr(BeatSaver::API::exception), true);
                                                     else loadingControl->ShowText(il2cpp_utils::newcsstr("No Songs Found for given User!"), true);
                                                 }
                                             }
@@ -298,7 +298,7 @@ void DownloadSongsSearchViewController::SearchUser(int currentSearchIndex) {
                             );
                         }
                         else {
-                            if (!BeatSaver::API::exception.empty()) loadingControl->ShowText(il2cpp_utils::newcsstr(BeatSaver::API::exception), true);
+                            if (BeatSaver::API::exception != "Not Found") loadingControl->ShowText(il2cpp_utils::newcsstr(BeatSaver::API::exception), true);
                             else loadingControl->ShowText(il2cpp_utils::newcsstr("No User Found!"), true);
                         }
                     }

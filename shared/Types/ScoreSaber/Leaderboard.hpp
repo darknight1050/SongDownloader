@@ -1,5 +1,6 @@
 #pragma once
 #include "../TypeMacros.hpp"
+#include "Difficulty.hpp"
 
 // Forward declaration of Leaderbaord and the GetCoverImageAsync function.
 namespace ScoreSaber {
@@ -16,16 +17,15 @@ DECLARE_JSON_CLASS(ScoreSaber, Leaderboard,
     GETTER_VALUE(std::string, SongSubName);
     GETTER_VALUE(std::string, SongAuthorName);
     GETTER_VALUE(std::string, LevelAuthorName);
-    GETTER_VALUE(int, Difficulty);
-    GETTER_VALUE(std::string, DifficultyRaw);
+    GETTER_VALUE(Difficulty_t, Difficulty);
     GETTER_VALUE(int, MaxScore);
     GETTER_VALUE(std::string, CreatedDate);
-    GETTER_VALUE(int, RankedDate);
-    GETTER_VALUE(int, QualifiedDate);
-    GETTER_VALUE(int, LovedDate);
-    GETTER_VALUE(int, Ranked);
-    GETTER_VALUE(int, Qualified);
-    GETTER_VALUE(int, Loved);
+    GETTER_VALUE_OPTIONAL(int, RankedDate);
+    GETTER_VALUE_OPTIONAL(int, QualifiedDate);
+    GETTER_VALUE_OPTIONAL(int, LovedDate);
+    GETTER_VALUE(bool, Ranked);
+    GETTER_VALUE(bool, Qualified);
+    GETTER_VALUE(bool, Loved);
     GETTER_VALUE(int, MaxPP);
     GETTER_VALUE(float, Stars);
     GETTER_VALUE(int, Plays);

@@ -17,6 +17,8 @@ namespace BeatSaver::API {
 
     std::optional<BeatSaver::UserDetail> GetUserById(int id);
 
+    std::optional<BeatSaver::UserDetail> GetUserByName(std::string username);
+
     /// <summary>
     /// Search on BeatSaver
     /// </summary>
@@ -63,6 +65,8 @@ namespace BeatSaver::API {
     void GetBeatmapByUserIdAsync(int userID, int page, std::function<void(std::optional<BeatSaver::Page>)> finished);
 
     void GetUserByIdAsync(int id, std::function<void(std::optional<BeatSaver::UserDetail>)> finished);
+
+    void GetUserByNameAsync(std::string username, std::function<void(std::optional<BeatSaver::UserDetail>)> finished);
 
     /// <summary>
     /// Search on BeatSaver

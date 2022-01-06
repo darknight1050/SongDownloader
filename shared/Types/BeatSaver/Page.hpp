@@ -10,5 +10,5 @@ DECLARE_JSON_CLASS(BeatSaver, Page,
     // Returns beatmap results for searchQuery term, can be empty
     GETTER_VALUE(std::vector<BeatSaver::Beatmap>, Docs);
     // Returns UserDetail for a Username with the searchQuery term, or std::nullopt if none is found.
-    GETTER_VALUE_OPTIONAL(BeatSaver::UserDetail, User)
+    GETTER_CLASS_OPTIONAL(BeatSaver::UserDetail, User)
 )

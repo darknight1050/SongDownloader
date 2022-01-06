@@ -97,6 +97,7 @@ namespace ScoreSaber::API {
         if (ranked.has_value()) request += "&ranked=" + std::string(ranked.value() ? "true" : "false");
         if (qualified.has_value()) request += "&qualified=" + std::string(qualified.value() ? "true" : "false");
         if (unique.has_value()) request += "&unique=" + std::string(unique.value() ? "true" : "false");
+        LOG_DEBUG("Request: %s", (API_LEADERBOARD + request).c_str());
         auto json = WebUtils::GetJSON(API_LEADERBOARD + request);
         if (!json.has_value())
             return std::nullopt;
@@ -336,11 +337,11 @@ namespace ScoreSaber::API {
                         LOG_ERROR("%s", e.what());
                         exception = e.what();
                         finished(std::nullopt);
-                        //// Convert the document into a string and log/write to file for debug purposes
-                        //rapidjson::StringBuffer buffer;
-                        //rapidjson::Writer<rapidjson::StringBuffer> writer(buffer);
-                        //document.Accept(writer);
-                        //writefile("/sdcard/ModData/SearchSSAsync.json", buffer.GetString());
+                        // Convert the document into a string and log/write to file for debug purposes
+                        rapidjson::StringBuffer buffer;
+                        rapidjson::Writer<rapidjson::StringBuffer> writer(buffer);
+                        document.Accept(writer);
+                        writefile("/sdcard/ModData/SearchSSAsync.json", buffer.GetString());
                     }
                 }
             }
