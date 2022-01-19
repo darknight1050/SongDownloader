@@ -5,6 +5,7 @@
 #include "Types/BeatSaver/Page.hpp"
 
 #include "Types/ScoreSaber/Page.hpp"
+#include "Types/ScoreSaber/Leaderboards.hpp"
 
 #include <string>
 
@@ -15,6 +16,8 @@ namespace BeatSaver::API {
     std::optional<BeatSaver::Beatmap> GetBeatmapByHash(std::string hash);
 
     std::optional<BeatSaver::UserDetail> GetUserById(int id);
+
+    std::optional<BeatSaver::UserDetail> GetUserByName(std::string username);
 
     /// <summary>
     /// Search on BeatSaver
@@ -63,6 +66,8 @@ namespace BeatSaver::API {
 
     void GetUserByIdAsync(int id, std::function<void(std::optional<BeatSaver::UserDetail>)> finished);
 
+    void GetUserByNameAsync(std::string username, std::function<void(std::optional<BeatSaver::UserDetail>)> finished);
+
     /// <summary>
     /// Search on BeatSaver
     /// </summary>
@@ -76,6 +81,8 @@ namespace BeatSaver::API {
     void SearchPagedAsync(std::string query, int pageIndex, std::function<void(std::optional<BeatSaver::Page>)> finished, std::string sortOrder = "Relevance", std::string automapper = "", std::string ranked = "", std::string ME = "", std::string NE = "", std::string Chroma = "");
 
     void DownloadBeatmapAsync(const BeatSaver::Beatmap& beatmap, std::function<void(bool)> finished, std::function<void(float)> progressUpdate = nullptr);
+
+    void DownloadBeatmapAsync(const BeatSaver::Beatmap& beatmap, const BeatSaver::BeatmapVersion& beatmapVer, std::function<void(bool)> finished, std::function<void(float)> progressUpdate = nullptr);
 
     /// <summary>
     /// For downloading maps gotten from the BeastSaberAPI
@@ -91,9 +98,20 @@ namespace BeatSaver::API {
     /// <param name="song">ScoreSaber Song reference</param>
     /// <param name="finished">Function to run after finishing to download</param>
     /// <param name="progressUpdate">Function to run on updating download progress</param>
+    [[deprecated("Downloading with ScoreSaber::Song will not be supported in the future use ScoreSaber::Leaderboard!")]]
     void DownloadBeatmapAsync(const ScoreSaber::Song& song, std::function<void(bool)> finished, std::function<void(float)> progressUpdate = nullptr);
 
+    /// <summary>
+    /// For downloading maps gotten from the ScoreSaberAPI
+    /// </summary>
+    /// <param name="ldb">ScoreSaber Leaderboard reference</param>
+    /// <param name="finished">Function to run after finishing to download</param>
+    /// <param name="progressUpdate">Function to run on updating download progress</param>
+    void DownloadBeatmapAsync(const ScoreSaber::Leaderboard& ldb, std::function<void(bool)> finished, std::function<void(float)> progressUpdate = nullptr);
+
     void GetCoverImageAsync(const BeatSaver::Beatmap& beatmap, std::function<void(std::vector<uint8_t>)> finished, std::function<void(float)> progressUpdate = nullptr);
+
+    void GetCoverImageAsync(const BeatSaver::BeatmapVersion& beatmap, std::function<void(std::vector<uint8_t>)> finished, std::function<void(float)> progressUpdate = nullptr);
 
     void GetCoverImageByHashAsync(std::string hash, std::function<void(std::vector<uint8_t>)> finished, std::function<void(float)> progressUpdate = nullptr);
 

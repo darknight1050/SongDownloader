@@ -23,12 +23,20 @@ private: \
 public: \
     std::optional<type> Get##name() const { return name; }
 
+#define GETTER_CLASS_OPTIONAL(type, name) \
+private: \
+    std::optional<type> name = type(); \
+public: \
+    std::optional<type> Get##name() const { return name; }
+
+
 #define DESERIALIZE_METHOD(namespaze, name, impl) \
 void namespaze::name::Deserialize(const rapidjson::Value& jsonValue) { \
     impl \
 }
 
 #define DESERIALIZE_VALUE(name, jsonName, type) \
+if (jsonValue.HasMember("error") && jsonValue["error"].IsString()) throw SongDownloader::JsonException(SongDownloader::Exceptions::SiteError, jsonValue["error"].GetString()); \
 if (!jsonValue.HasMember(#jsonName)) throw SongDownloader::JsonException(SongDownloader::Exceptions::NoMember, #jsonName); \
 if (!jsonValue[#jsonName].Is##type()) throw SongDownloader::JsonException(SongDownloader::Exceptions::WrongType, #jsonName ", Type expected was: " #type); \
 name = jsonValue[#jsonName].Get##type();
@@ -40,6 +48,7 @@ else throw SongDownloader::JsonException(SongDownloader::Exceptions::WrongType, 
 
 
 #define DESERIALIZE_VALUE_OPTIONAL(name, jsonName, type) \
+if (jsonValue.HasMember("error") && jsonValue["error"].IsString()) throw SongDownloader::JsonException(SongDownloader::Exceptions::SiteError, jsonValue["error"].GetString()); \
 if(jsonValue.HasMember(#jsonName) && jsonValue[#jsonName].Is##type()) { \
     name = jsonValue[#jsonName].Get##type(); \
 } else { \
@@ -47,20 +56,21 @@ if(jsonValue.HasMember(#jsonName) && jsonValue[#jsonName].Is##type()) { \
 }
 
 #define DESERIALIZE_CLASS(name, jsonName) \
+if (jsonValue.HasMember("error") && jsonValue["error"].IsString()) throw SongDownloader::JsonException(SongDownloader::Exceptions::SiteError, jsonValue["error"].GetString()); \
 if (!jsonValue.HasMember(#jsonName)) throw SongDownloader::JsonException(SongDownloader::Exceptions::NoMember, #jsonName); \
 if (!jsonValue[#jsonName].IsObject()) throw SongDownloader::JsonException(SongDownloader::Exceptions::WrongType, #jsonName ", Type expected was: JsonObject"); \
 name.Deserialize(jsonValue[#jsonName]);
 
-#define DESERIALIZE_CLASS_OPTIONAL(name, jsonName, type) \
+#define DESERIALIZE_CLASS_OPTIONAL(name, jsonName) \
+if (jsonValue.HasMember("error") && jsonValue["error"].IsString()) throw SongDownloader::JsonException(SongDownloader::Exceptions::SiteError, jsonValue["error"].GetString()); \
 if(jsonValue.HasMember(#jsonName) && jsonValue[#jsonName].IsObject()) { \
-    type val##name; \
-    name = val##name;\
-    name.value().Deserialize(jsonValue[#jsonName]); \
+    name->Deserialize(jsonValue[#jsonName]); \
 } else { \
     name = std::nullopt; \
 }
 
 #define DESERIALIZE_VECTOR(name, jsonName, type) \
+if (jsonValue.HasMember("error") && jsonValue["error"].IsString()) throw SongDownloader::JsonException(SongDownloader::Exceptions::SiteError, jsonValue["error"].GetString()); \
 if (!jsonValue.HasMember(#jsonName)) throw SongDownloader::JsonException(SongDownloader::Exceptions::NoMember, #jsonName); \
 name.clear(); \
 auto& jsonName = jsonValue[#jsonName]; \

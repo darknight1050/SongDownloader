@@ -19,7 +19,7 @@ const BeastSaber::Song& SearchEntry::GetSongBeastSaber() {
     return BSsong;
 }
 
-const ScoreSaber::Song& SearchEntry::GetSongScoreSaber() {
+const ScoreSaber::Leaderboard& SearchEntry::GetSongScoreSaber() {
     return SSsong;
 }
 
@@ -113,12 +113,48 @@ void SearchEntry::SetBeatmap(const BeastSaber::Song& _song) {
     UpdateDownloadProgress(true);
 }
 
-void SearchEntry::SetBeatmap(const ScoreSaber::Song& _song) {
+//void SearchEntry::SetBeatmap(const ScoreSaber::Song& _song) {
+//    SSsong = _song;
+//    gameObject->SetActive(true);
+//    MapType = SearchEntry::MapType::ScoreSaber;
+//
+//    line1Component->SetText(il2cpp_utils::newcsstr(SSsong.GetName()));
+//
+//    if (SSsong.GetRanked() > 0) {
+//        line1Component->set_color(UnityEngine::Color(1, 0.68f, 0, 1));
+//    }
+//    else {
+//        line1Component->set_color(UnityEngine::Color(1, 1, 1, 1));
+//    }
+//
+//    line2Component->SetText(il2cpp_utils::newcsstr("<size=80%><noparse>" + SSsong.GetSongAuthorName() + "</noparse>" + " <size=90%>[<color=#67c16f><noparse>" + SSsong.GetLevelAuthorName() + "</noparse></color>]"));
+//
+//    int currentSearchIndex = DownloadSongsSearchViewController::searchIndex;
+//
+//    coverImageView->set_enabled(false);
+//    ScoreSaber::API::GetCoverImageAsync(SSsong, [this, currentSearchIndex](std::vector<uint8_t> bytes) {
+//        if (currentSearchIndex == DownloadSongsSearchViewController::searchIndex) {
+//            MainThreadScheduler::Schedule([this, currentSearchIndex, bytes] {
+//                if (currentSearchIndex == DownloadSongsSearchViewController::searchIndex) {
+//                    std::vector<uint8_t> data = bytes;
+//
+//                    Array<uint8_t>* spriteArray = il2cpp_utils::vectorToArray(data);
+//                    Sprite* sprite = BeatSaberUI::ArrayToSprite(spriteArray);
+//                    coverImageView->set_sprite(sprite);
+//                    coverImageView->set_enabled(true);
+//                }
+//                });
+//        }
+//        });
+//    UpdateDownloadProgress(true);
+//}
+
+void SearchEntry::SetBeatmap(const ScoreSaber::Leaderboard& _song) {
     SSsong = _song;
     gameObject->SetActive(true);
     MapType = SearchEntry::MapType::ScoreSaber;
 
-    line1Component->SetText(il2cpp_utils::newcsstr(SSsong.GetName()));
+    line1Component->SetText(il2cpp_utils::newcsstr(SSsong.GetSongName()));
 
     if (SSsong.GetRanked() > 0) {
         line1Component->set_color(UnityEngine::Color(1, 0.68f, 0, 1));
@@ -166,7 +202,7 @@ void SearchEntry::UpdateDownloadProgress(bool checkLoaded) {
         }
         std::transform(hash.begin(), hash.end(), hash.begin(), toupper);
         for (auto& song : RuntimeSongLoader::API::GetLoadedSongs()) {
-            if (to_utf8(csstrtostr(song->levelID)).ends_with(hash)) {
+            if (to_utf8(csstrtostr(song->get_levelID())).ends_with(hash)) {
                 downloadProgress = 100.0f;
                 break;
             }
