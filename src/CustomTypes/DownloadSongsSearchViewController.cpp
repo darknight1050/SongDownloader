@@ -57,7 +57,7 @@ void DownloadSongsSearchViewController::CreateEntries(Transform* parent) {
     levelBarLayoutElement->set_minHeight(15.0f);
     levelBarLayoutElement->set_minWidth(90.0f);
 
-    GameObject* existingLevelBar = Resources::FindObjectsOfTypeAll<LevelBar*>()->values[0]->get_gameObject();
+    GameObject* existingLevelBar = Resources::FindObjectsOfTypeAll<LevelBar*>()[0]->get_gameObject();
     GameObject* levelBarGameObject = UnityEngine::GameObject::Instantiate(existingLevelBar, levelBarLayout->get_transform());
     auto levelBarTransform = levelBarGameObject->get_transform();
 
@@ -608,7 +608,7 @@ void DownloadSongsSearchViewController::DidActivate(bool firstActivation, bool a
         CreateEntries(container->get_transform());
 
         // LoadingControl has to be added after the ScrollView, as otherwise it will be behind it and the RefreshButton unselectable
-        GameObject* existingLoadinControl = Resources::FindObjectsOfTypeAll<LoadingControl*>()->values[0]->get_gameObject();
+        GameObject* existingLoadinControl = Resources::FindObjectsOfTypeAll<LoadingControl*>()[0]->get_gameObject();
         GameObject* loadinControlGameObject = UnityEngine::GameObject::Instantiate(existingLoadinControl, get_transform());
         auto loadingControlTransform = loadinControlGameObject->get_transform();
         loadingControl = loadinControlGameObject->GetComponent<LoadingControl*>();
