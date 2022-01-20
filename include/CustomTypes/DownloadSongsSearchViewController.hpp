@@ -83,7 +83,11 @@ DECLARE_CLASS_CODEGEN(SongDownloader, DownloadSongsSearchViewController, HMUI::V
 
     static void Search();
 
+    static void SetPage(int page);
+
     static int searchIndex;
+
+    static int searchPage;
 
     static std::string SearchQuery;
 
@@ -94,6 +98,8 @@ DECLARE_CLASS_CODEGEN(SongDownloader, DownloadSongsSearchViewController, HMUI::V
     DECLARE_INSTANCE_FIELD(GlobalNamespace::LoadingControl*, loadingControl);
 
     DECLARE_INSTANCE_FIELD(HMUI::InputFieldView*, SearchField);
+
+    DECLARE_INSTANCE_FIELD(QuestUI::IncrementSetting*, pageIncrement);
 
     DECLARE_INSTANCE_METHOD(void, SearchSongs, int);
 

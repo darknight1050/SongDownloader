@@ -92,6 +92,7 @@ void DownloadSongsOptionsViewController::DidActivate(bool firstActivation, bool 
                     searchViewController->SearchField->SetText(il2cpp_utils::newcsstr(""));
                 }
                 getModConfig().Service.SetValue(std::string(value));
+                DownloadSongsSearchViewController::SetPage(0);
                 DownloadSongsSearchViewController::Search();
             }
         );
@@ -106,6 +107,7 @@ void DownloadSongsOptionsViewController::DidActivate(bool firstActivation, bool 
                 }
                 LastListType = value;
                 getModConfig().ListType_BeatSaver.SetValue(std::string(value));
+                DownloadSongsSearchViewController::SetPage(0);
                 DownloadSongsSearchViewController::Search();
             }
         );
@@ -124,6 +126,7 @@ void DownloadSongsOptionsViewController::DidActivate(bool firstActivation, bool 
                 }
                 LastListType = value;
                 getModConfig().ListType_BeastSaber.SetValue(std::string(value));
+                DownloadSongsSearchViewController::SetPage(0);
                 DownloadSongsSearchViewController::Search();
             }
         );
@@ -144,6 +147,7 @@ void DownloadSongsOptionsViewController::DidActivate(bool firstActivation, bool 
                 }
                 LastListType = value;
                 getModConfig().ListType_ScoreSaber.SetValue(std::string(value));
+                DownloadSongsSearchViewController::SetPage(0);
                 DownloadSongsSearchViewController::Search();
             }
         );
@@ -160,6 +164,7 @@ void DownloadSongsOptionsViewController::DidActivate(bool firstActivation, bool 
                 if (value == "Not Required") setting = "true";
                 else if (value == "Required") setting = "false";
                 getModConfig().AutoMapper.SetValue(setting);
+                DownloadSongsSearchViewController::SetPage(0);
                 DownloadSongsSearchViewController::Search();
             }
         );
@@ -169,6 +174,7 @@ void DownloadSongsOptionsViewController::DidActivate(bool firstActivation, bool 
         SortOrder = QuestUI::BeatSaberUI::CreateDropdown(settingsLayoutTransform, getModConfig().SortOrder.GetName(), getModConfig().SortOrder.GetValue(), { "Latest", "Relevance", "Rating" },
             [](std::string_view value) {
                 getModConfig().SortOrder.SetValue(std::string(value));
+                DownloadSongsSearchViewController::SetPage(0);
                 DownloadSongsSearchViewController::Search();
             }
         );
@@ -185,6 +191,7 @@ void DownloadSongsOptionsViewController::DidActivate(bool firstActivation, bool 
                 if (value == "Required") setting = "true";
                 else if (value == "Excluded") setting = "false";
                 getModConfig().NE.SetValue(setting);
+                DownloadSongsSearchViewController::SetPage(0);
                 DownloadSongsSearchViewController::Search();
             }
         );
@@ -201,6 +208,7 @@ void DownloadSongsOptionsViewController::DidActivate(bool firstActivation, bool 
                 if (value == "Required") setting = "true";
                 else if (value == "Excluded") setting = "false";
                 getModConfig().ME.SetValue(setting);
+                DownloadSongsSearchViewController::SetPage(0);
                 DownloadSongsSearchViewController::Search();
             }
         ); 
@@ -217,6 +225,7 @@ void DownloadSongsOptionsViewController::DidActivate(bool firstActivation, bool 
                 if (value == "Required") setting = "true";
                 else if (value == "Excluded") setting = "false";
                 getModConfig().Chroma.SetValue(setting);
+                DownloadSongsSearchViewController::SetPage(0);
                 DownloadSongsSearchViewController::Search();
             }
         ); 
@@ -234,6 +243,7 @@ void DownloadSongsOptionsViewController::DidActivate(bool firstActivation, bool 
                 if (value == "Required") setting = "true";
                 else if (value == "Excluded") setting = "false";
                 getModConfig().Ranked.SetValue(setting);
+                DownloadSongsSearchViewController::SetPage(0);
                 DownloadSongsSearchViewController::Search();
             }
         );

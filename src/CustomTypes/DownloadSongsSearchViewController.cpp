@@ -45,6 +45,8 @@ DEFINE_TYPE(SongDownloader, DownloadSongsSearchViewController);
 
 int DownloadSongsSearchViewController::searchIndex = 0;
 
+int DownloadSongsSearchViewController::searchPage = 0;
+
 std::string DownloadSongsSearchViewController::SearchQuery = "";
 
 void DownloadSongsSearchViewController::CreateEntries(Transform* parent) {
@@ -217,7 +219,7 @@ void DownloadSongsSearchViewController::SearchKey(int currentSearchIndex) {
 }
 
 void DownloadSongsSearchViewController::SearchSongs(int currentSearchIndex) {
-    BeatSaver::API::SearchPagedAsync(DownloadSongsSearchViewController::SearchQuery, 0,
+    BeatSaver::API::SearchPagedAsync(DownloadSongsSearchViewController::SearchQuery, DownloadSongsSearchViewController::searchPage,
         [this, currentSearchIndex](std::optional<BeatSaver::Page> page) {
             if (currentSearchIndex == DownloadSongsSearchViewController::searchIndex) {
                 QuestUI::MainThreadScheduler::Schedule(
@@ -265,7 +267,7 @@ void DownloadSongsSearchViewController::SearchUser(int currentSearchIndex) {
                 QuestUI::MainThreadScheduler::Schedule(
                     [this, currentSearchIndex, User]() {
                         if (User.has_value()) {
-                            BeatSaver::API::GetBeatmapByUserIdAsync(User.value().GetId(), 0,
+                            BeatSaver::API::GetBeatmapByUserIdAsync(User.value().GetId(), DownloadSongsSearchViewController::searchPage,
                                 [this, currentSearchIndex](std::optional<BeatSaver::Page> page) {
                                     QuestUI::MainThreadScheduler::Schedule(
                                         [this, currentSearchIndex, page]() {
@@ -342,7 +344,7 @@ void DownloadSongsSearchViewController::GetCuratorRecommended(int currentSearchI
                     );
                 }
             }
-        , 0);
+        , DownloadSongsSearchViewController::searchPage);
 }
 
 void DownloadSongsSearchViewController::GetBookmarks(int currentSearchIndex) {
@@ -379,7 +381,7 @@ void DownloadSongsSearchViewController::GetBookmarks(int currentSearchIndex) {
                     );
                 }
             }, 
-        0);
+        DownloadSongsSearchViewController::searchPage);
     }
     else loadingControl->ShowText(il2cpp_utils::newcsstr("Please type in a Username!"), false);
 }
@@ -419,7 +421,7 @@ void DownloadSongsSearchViewController::GetTrending(int currentSearchIndex) {
                 );
             }
         },
-        StringToBool(getModConfig().Ranked.GetValue()), std::nullopt, true); // TODO: Possibly add option to search by qualified, for now just nullopt on that parameter
+        StringToBool(getModConfig().Ranked.GetValue()), std::nullopt, true, DownloadSongsSearchViewController::searchPage); // TODO: Possibly add option to search by qualified, for now just nullopt on that parameter
 }
 
 void DownloadSongsSearchViewController::GetLatestRanked(int currentSearchIndex) {
@@ -457,7 +459,7 @@ void DownloadSongsSearchViewController::GetLatestRanked(int currentSearchIndex) 
                 );
             }
         },
-        std::nullopt, std::nullopt, true); // TODO: Possibly add option to search by qualified, for now just nullopt on that parameter
+        std::nullopt, std::nullopt, true, DownloadSongsSearchViewController::searchPage); // TODO: Possibly add option to search by qualified, for now just nullopt on that parameter
 }
 
 void DownloadSongsSearchViewController::GetTopPlayed(int currentSearchIndex) {
@@ -495,7 +497,7 @@ void DownloadSongsSearchViewController::GetTopPlayed(int currentSearchIndex) {
                 );
             }
         },
-        StringToBool(getModConfig().Ranked.GetValue()), std::nullopt, true); // TODO: Possibly add option to search by qualified, for now just nullopt on that parameter
+        StringToBool(getModConfig().Ranked.GetValue()), std::nullopt, true, DownloadSongsSearchViewController::searchPage); // TODO: Possibly add option to search by qualified, for now just nullopt on that parameter
 }
 
 void DownloadSongsSearchViewController::GetTopRanked(int currentSearchIndex) {
@@ -533,7 +535,7 @@ void DownloadSongsSearchViewController::GetTopRanked(int currentSearchIndex) {
                 );
             }
         },
-        std::nullopt, std::nullopt, true); // TODO: Possibly add option to search by qualified, for now just nullopt on that parameter
+        std::nullopt, std::nullopt, true, DownloadSongsSearchViewController::searchPage); // TODO: Possibly add option to search by qualified, for now just nullopt on that parameter
 }
 #pragma endregion
 
@@ -594,6 +596,13 @@ void DownloadSongsSearchViewController::Search() {
     }
 }
 
+void DownloadSongsSearchViewController::SetPage(int page) {
+    DownloadSongsSearchViewController::searchPage = page;
+
+    searchViewController->pageIncrement->CurrentValue = page + 1;
+    searchViewController->pageIncrement->UpdateValue();
+}
+
 void DownloadSongsSearchViewController::DidActivate(bool firstActivation, bool addedToHierarchy, bool screenSystemEnabling) {
     if (firstActivation) {
         searchViewController = this;
@@ -614,9 +623,20 @@ void DownloadSongsSearchViewController::DidActivate(bool firstActivation, bool a
         auto container = BeatSaberUI::CreateScrollView(get_transform());
         ExternalComponents* externalComponents = container->GetComponent<ExternalComponents*>();
         RectTransform* scrollTransform = externalComponents->Get<RectTransform*>();
-        scrollTransform->set_anchoredPosition(UnityEngine::Vector2(0.0f, -4.0f));
-        scrollTransform->set_sizeDelta(UnityEngine::Vector2(-54.0f, -8.0f));
+        scrollTransform->set_anchoredPosition(UnityEngine::Vector2(0.0f, -1.0f));
+        scrollTransform->set_sizeDelta(UnityEngine::Vector2(-54.0f, -12.0f));
         CreateEntries(container->get_transform());
+
+        pageIncrement = BeatSaberUI::CreateIncrementSetting(get_transform(), "", 0, 1, DownloadSongsSearchViewController::searchPage + 1, true, false, 1, 0, UnityEngine::Vector2(-60.0f, -72.0f),
+            [this](float newValue){
+                if(newValue - 1 != DownloadSongsSearchViewController::searchPage) {
+                    DownloadSongsSearchViewController::searchPage = newValue - 1;
+                    Search();
+                }
+            }
+        );
+        Object::Destroy(pageIncrement->GetComponentInChildren<TextMeshProUGUI*>());
+        Object::Destroy(pageIncrement->GetComponentInChildren<LayoutElement*>());
 
         // LoadingControl has to be added after the ScrollView, as otherwise it will be behind it and the RefreshButton unselectable
         GameObject* existingLoadinControl = Resources::FindObjectsOfTypeAll<LoadingControl*>()[0]->get_gameObject();

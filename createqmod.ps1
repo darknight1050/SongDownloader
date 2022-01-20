@@ -1,5 +1,5 @@
 Param(
-    [String]$qmodname="PlaylistManager",
+    [String]$qmodname="SongDownloader",
     [Parameter(Mandatory=$false)]
     [Switch]$clean
 )
