@@ -284,10 +284,10 @@ namespace BeatSaver::API {
                 }
                 else {
                     // Convert the document into a string and log/write to file for debug purposes
-                    rapidjson::StringBuffer buffer;
-                    rapidjson::Writer<rapidjson::StringBuffer> writer(buffer);
-                    document.Accept(writer);
-                    writefile("/sdcard/ModData/GetUserByNameAsync.json", buffer.GetString());
+                    //rapidjson::StringBuffer buffer;
+                    //rapidjson::Writer<rapidjson::StringBuffer> writer(buffer);
+                    //document.Accept(writer);
+                    //writefile("/sdcard/ModData/GetUserByNameAsync.json", buffer.GetString());
                     try {
                         BeatSaver::UserDetail user;
                         user.Deserialize(document.GetObject());
