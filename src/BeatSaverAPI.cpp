@@ -39,13 +39,13 @@ namespace BeatSaver::API {
     }
 
     std::optional<BeatSaver::Beatmap> GetBeatmapByHash(std::string hash) {
+        exception.clear();
         auto json = WebUtils::GetJSON(API_URL + "/maps/hash/" + hash);
         if (!json.has_value())
             return std::nullopt;
         try {
             BeatSaver::Beatmap beatmap;
             beatmap.Deserialize(json.value().GetObject());
-            if (!exception.empty()) exception.clear();
             return beatmap;
         }
         catch (const std::exception& e) {
@@ -56,13 +56,30 @@ namespace BeatSaver::API {
     }
 
     std::optional<BeatSaver::UserDetail> GetUserById(int id) {
+        exception.clear();
         auto json = WebUtils::GetJSON(API_URL + "/users/id/" + std::to_string(id));
         if (!json.has_value())
             return std::nullopt;
         try {
             BeatSaver::UserDetail user;
             user.Deserialize(json.value().GetObject());
-            if (!exception.empty()) exception.clear();
+            return user;
+        }
+        catch (const std::exception& e) {
+            LOG_ERROR("%s", e.what());
+            exception = e.what();
+            return std::nullopt;
+        }
+    }
+
+    std::optional<BeatSaver::UserDetail> GetUserByName(std::string username) {
+        exception.clear();
+        auto json = WebUtils::GetJSON(API_URL + "/users/name/" + username);
+        if (!json.has_value())
+            return std::nullopt;
+        try {
+            BeatSaver::UserDetail user;
+            user.Deserialize(json.value().GetObject());
             return user;
         }
         catch (const std::exception& e) {
@@ -229,7 +246,7 @@ namespace BeatSaver::API {
     void GetBeatmapByUserIdAsync(int userID, int page, std::function<void(std::optional<BeatSaver::Page>)> finished) {
         exception.clear();
         std::string searchPath = API_URL + "/maps/uploader/" + std::to_string(userID) + "/" + std::to_string(page);
-        //LOG_DEBUG("%s", searchPath.c_str());
+        LOG_DEBUG("GetBeatmapByUserIdAsync: %s", searchPath.c_str());
         WebUtils::GetJSONAsync(searchPath,
             [finished](long httpCode, bool error, rapidjson::Document& document) {
                 if (error) {
@@ -256,9 +273,40 @@ namespace BeatSaver::API {
         );
     }
 
+    void GetUserByNameAsync(std::string username, std::function<void(std::optional<BeatSaver::UserDetail>)> finished) {
+        exception.clear();
+        std::string searchPath = API_URL + "/users/name/" + username;
+        LOG_DEBUG("GetUserByNameAsync: %s", searchPath.c_str());
+        WebUtils::GetJSONAsync(searchPath,
+            [finished](long httpCode, bool error, rapidjson::Document& document) {
+                if (error) {
+                    finished(std::nullopt);
+                }
+                else {
+                    // Convert the document into a string and log/write to file for debug purposes
+                    //rapidjson::StringBuffer buffer;
+                    //rapidjson::Writer<rapidjson::StringBuffer> writer(buffer);
+                    //document.Accept(writer);
+                    //writefile("/sdcard/ModData/GetUserByNameAsync.json", buffer.GetString());
+                    try {
+                        BeatSaver::UserDetail user;
+                        user.Deserialize(document.GetObject());
+                        finished(user);
+                    }
+                    catch (const std::exception& e) {
+                        LOG_ERROR("%s", e.what());
+                        exception = e.what();
+                        finished(std::nullopt);
+                    }
+                }
+            }
+        );
+    }
+
 
     void GetUserByIdAsync(int id, std::function<void(std::optional<BeatSaver::UserDetail>)> finished) {
         exception.clear();
+        LOG_DEBUG("GetUserByIdAsync: %s", (API_URL + "/users/id/" + std::to_string(id)).c_str());
         WebUtils::GetJSONAsync(API_URL + "/users/id/" + std::to_string(id),
             [finished](long httpCode, bool error, rapidjson::Document& document) {
                 if (error) {
@@ -294,7 +342,7 @@ namespace BeatSaver::API {
         if (!ME.empty()) searchPath += "&me=" + ME;
         if (!NE.empty()) searchPath += "&noodle=" + NE;
         if (!Chroma.empty()) searchPath += "&chroma=" + Chroma;
-        //LOG_DEBUG("%s", searchPath.c_str());
+        LOG_DEBUG("%s", searchPath.c_str());
         WebUtils::GetJSONAsync(searchPath,
             [finished](long httpCode, bool error, rapidjson::Document& document) {
                 if (error) {
@@ -324,6 +372,19 @@ namespace BeatSaver::API {
 
     void DownloadBeatmapAsync(const BeatSaver::Beatmap& beatmap, std::function<void(bool)> finished, std::function<void(float)> progressUpdate) {
         WebUtils::GetAsync(beatmap.GetVersions().front().GetDownloadURL(), FILE_DOWNLOAD_TIMEOUT,
+            [beatmap, finished](long httpCode, std::string data) {
+                auto targetFolder = RuntimeSongLoader::API::GetCustomLevelsPath() + FileUtils::FixIlegalName(beatmap.GetId() + " (" + beatmap.GetMetadata().GetSongName() + " - " + beatmap.GetMetadata().GetLevelAuthorName() + ")");
+                int args = 2;
+                int statusCode = zip_stream_extract(data.data(), data.length(), targetFolder.c_str(), +[](const char* name, void* arg) -> int {
+                    return 0;
+                    }, &args);
+                finished(statusCode);
+            }, progressUpdate
+        );
+    }
+
+    void DownloadBeatmapAsync(const BeatSaver::Beatmap& beatmap, const BeatSaver::BeatmapVersion& beatmapVer, std::function<void(bool)> finished, std::function<void(float)> progressUpdate) {
+        WebUtils::GetAsync(beatmapVer.GetDownloadURL(), FILE_DOWNLOAD_TIMEOUT,
             [beatmap, finished](long httpCode, std::string data) {
                 auto targetFolder = RuntimeSongLoader::API::GetCustomLevelsPath() + FileUtils::FixIlegalName(beatmap.GetId() + " (" + beatmap.GetMetadata().GetSongName() + " - " + beatmap.GetMetadata().GetLevelAuthorName() + ")");
                 int args = 2;
@@ -365,9 +426,39 @@ namespace BeatSaver::API {
         );
     }
 
+    void DownloadBeatmapAsync(const ScoreSaber::Leaderboard& ldb, std::function<void(bool)> finished, std::function<void(float)> progressUpdate) {
+        // Probably a deprecated method of downloading maps, but at least will work if map has isn't up to date https://api.beatsaver.com/download/key/1b236
+        GetBeatmapByHashAsync(ldb.GetSongHash(), [finished, progressUpdate](const std::optional<BeatSaver::Beatmap>& beatmap) {
+            if (beatmap.has_value())
+                DownloadBeatmapAsync(beatmap.value(), finished, progressUpdate);
+            else
+                finished(false);
+            }
+        );
+        
+        //WebUtils::GetAsync(CDN_URL + hash + ".zip", FILE_DOWNLOAD_TIMEOUT,
+        //    [song, finished](long httpCode, std::string data) {
+        //        auto targetFolder = RuntimeSongLoader::API::GetCustomLevelsPath() + FileUtils::FixIlegalName(std::to_string(song.GetUid()) + " (" + song.GetName() + " - " + song.GetLevelAuthorName() + ")");
+        //        int args = 2;
+        //        int statusCode = zip_stream_extract(data.data(), data.length(), targetFolder.c_str(), +[](const char* name, void* arg) -> int {
+        //            return 0;
+        //            }, &args);
+        //        finished(statusCode);
+        //    }, progressUpdate
+        //);
+    }
 
     void GetCoverImageAsync(const BeatSaver::Beatmap& beatmap, std::function<void(std::vector<uint8_t>)> finished, std::function<void(float)> progressUpdate) {
         WebUtils::GetAsync(beatmap.GetVersions().front().GetCoverURL(), FILE_DOWNLOAD_TIMEOUT,
+            [beatmap, finished](long httpCode, std::string data) {
+                std::vector<uint8_t> bytes(data.begin(), data.end());
+                finished(bytes);
+            }, progressUpdate
+        );
+    }
+
+    void GetCoverImageAsync(const BeatSaver::BeatmapVersion& beatmap, std::function<void(std::vector<uint8_t>)> finished, std::function<void(float)> progressUpdate) {
+        WebUtils::GetAsync(beatmap.GetCoverURL(), FILE_DOWNLOAD_TIMEOUT,
             [beatmap, finished](long httpCode, std::string data) {
                 std::vector<uint8_t> bytes(data.begin(), data.end());
                 finished(bytes);

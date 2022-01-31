@@ -1,0 +1,18 @@
+{
+    "_QPVersion": "0.1.1",
+    "id": "songdownloader",
+    "name": "SongDownloader",
+    "version": "1.0.0",
+    "author": "darknight1050, EnderdracheLP, Metalit",
+    "packageId": "com.beatgames.beatsaber",
+    "packageVersion": "1.19.0",
+    "coverImage": "cover.png",
+    "libraryFiles": [
+      "libbeatsaber-hook_3_6_1.so"
+    ],
+    "modFiles": [
+      "libsongdownloader.so"
+    ],
+    "dependencies": [],
+    "fileCopies": []
+  }

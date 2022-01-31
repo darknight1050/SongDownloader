@@ -15,6 +15,7 @@
 #include "Types/BeatSaver/Page.hpp"
 #include "Types/BeastSaber/Page.hpp"
 #include "Types/ScoreSaber/Page.hpp"
+#include "Types/ScoreSaber/Leaderboards.hpp"
 
 #include "songloader/shared/API.hpp"
 
@@ -35,7 +36,7 @@ namespace SongDownloader {
     class SearchEntry {
         BeatSaver::Beatmap map;
         BeastSaber::Song BSsong;
-        ScoreSaber::Song SSsong;
+        ScoreSaber::Leaderboard SSsong;
         UnityEngine::GameObject* gameObject;
         TMPro::TextMeshProUGUI* line1Component;
         TMPro::TextMeshProUGUI* line2Component;
@@ -57,7 +58,7 @@ namespace SongDownloader {
 
         const BeastSaber::Song& GetSongBeastSaber();
 
-        const ScoreSaber::Song& GetSongScoreSaber();
+        const ScoreSaber::Leaderboard& GetSongScoreSaber();
 
         MapType MapType;
         
@@ -65,7 +66,7 @@ namespace SongDownloader {
 
         void SetBeatmap(const BeastSaber::Song& _song);
 
-        void SetBeatmap(const ScoreSaber::Song& _song);
+        void SetBeatmap(const ScoreSaber::Leaderboard& _song);
         
         void UpdateDownloadProgress(bool checkLoaded);
 
@@ -82,7 +83,11 @@ DECLARE_CLASS_CODEGEN(SongDownloader, DownloadSongsSearchViewController, HMUI::V
 
     static void Search();
 
+    static void SetPage(int page);
+
     static int searchIndex;
+
+    static int searchPage;
 
     static std::string SearchQuery;
 
@@ -93,6 +98,8 @@ DECLARE_CLASS_CODEGEN(SongDownloader, DownloadSongsSearchViewController, HMUI::V
     DECLARE_INSTANCE_FIELD(GlobalNamespace::LoadingControl*, loadingControl);
 
     DECLARE_INSTANCE_FIELD(HMUI::InputFieldView*, SearchField);
+
+    DECLARE_INSTANCE_FIELD(QuestUI::IncrementSetting*, pageIncrement);
 
     DECLARE_INSTANCE_METHOD(void, SearchSongs, int);
 
