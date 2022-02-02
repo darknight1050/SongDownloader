@@ -42,7 +42,7 @@
     },
     {
       "id": "config-utils",
-      "versionRange": "^0.7.0",
+      "versionRange": "^0.7.1",
       "additionalData": {}
     },
     {
