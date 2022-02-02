@@ -31,7 +31,8 @@ void DownloadSongsOptionsViewController::DidActivate(bool firstActivation, bool 
 
         VerticalLayoutGroup* settingsLayout = QuestUI::BeatSaberUI::CreateVerticalLayoutGroup(parent);
         RectTransform* settingsLayoutTransform = settingsLayout->GetComponent<RectTransform*>();
-        settingsLayout->get_gameObject()->AddComponent<Backgroundable*>()->ApplyBackground(il2cpp_utils::newcsstr("round-rect-panel"));
+        static ConstString backgroundName("round-rect-panel");
+        settingsLayout->get_gameObject()->AddComponent<Backgroundable*>()->ApplyBackground(backgroundName);
         settingsLayout->set_spacing(1.2f);
         settingsLayout->set_padding(UnityEngine::RectOffset::New_ctor(3, 3, 2, 2));
 
@@ -39,8 +40,9 @@ void DownloadSongsOptionsViewController::DidActivate(bool firstActivation, bool 
         contentSizeFitter->set_horizontalFit(ContentSizeFitter::FitMode::PreferredSize);
         contentSizeFitter->set_verticalFit(ContentSizeFitter::FitMode::PreferredSize);       
 
+        static ConstString emptyString("");
         Service = QuestUI::BeatSaberUI::CreateDropdown(settingsLayoutTransform, getModConfig().Service.GetName(), getModConfig().Service.GetValue(), { "BeatSaver", "BeastSaber", "ScoreSaber" },
-            [this](std::string_view value) {
+            [this](StringW value) {
                 if (value != "BeatSaver") {
                     if (value == "ScoreSaber") {
                         if (getModConfig().ListType_ScoreSaber.GetValue() == "Top Ranked" || getModConfig().ListType_ScoreSaber.GetValue() == "Latest Ranked") {
@@ -89,9 +91,9 @@ void DownloadSongsOptionsViewController::DidActivate(bool firstActivation, bool 
                 }
                 else if (LastListType == "Bookmarks") {
                     DownloadSongsSearchViewController::SearchQuery.clear();
-                    searchViewController->SearchField->SetText(il2cpp_utils::newcsstr(""));
+                    searchViewController->SearchField->SetText(emptyString);
                 }
-                getModConfig().Service.SetValue(std::string(value));
+                getModConfig().Service.SetValue(static_cast<std::string>(value));
                 DownloadSongsSearchViewController::SetPage(0);
                 DownloadSongsSearchViewController::Search();
             }
@@ -100,13 +102,13 @@ void DownloadSongsOptionsViewController::DidActivate(bool firstActivation, bool 
         Service->get_transform()->GetParent()->GetComponent<LayoutElement*>()->set_preferredWidth(50.0f);
 
         ListType_BeatSaver = QuestUI::BeatSaberUI::CreateDropdown(settingsLayoutTransform, "List", getModConfig().ListType_BeatSaver.GetValue(), { "Key", "Search", "User"  },
-            [this](std::string_view value) {
+            [this](StringW value) {
                 if (LastListType == "Bookmarks") {
                     DownloadSongsSearchViewController::SearchQuery.clear();
-                    searchViewController->SearchField->SetText(il2cpp_utils::newcsstr(""));
+                    searchViewController->SearchField->SetText(emptyString);
                 }
-                LastListType = value;
-                getModConfig().ListType_BeatSaver.SetValue(std::string(value));
+                LastListType = static_cast<std::string>(value);
+                getModConfig().ListType_BeatSaver.SetValue(LastListType);
                 DownloadSongsSearchViewController::SetPage(0);
                 DownloadSongsSearchViewController::Search();
             }
@@ -115,17 +117,17 @@ void DownloadSongsOptionsViewController::DidActivate(bool firstActivation, bool 
         ListType_BeatSaver->get_transform()->GetParent()->GetComponent<LayoutElement*>()->set_preferredWidth(50.0f);
 
         ListType_BeastSaber = QuestUI::BeatSaberUI::CreateDropdown(settingsLayoutTransform, "List", getModConfig().ListType_BeastSaber.GetValue(), { "Curator Recommended", "Bookmarks" },
-            [this](std::string_view value) {
+            [this](StringW value) {
                 if (value == "Bookmarks") {
                     DownloadSongsSearchViewController::SearchQuery = getModConfig().BookmarkUsername.GetValue();
                     searchViewController->SearchField->SetText(il2cpp_utils::newcsstr(getModConfig().BookmarkUsername.GetValue()));
                 }
                 else if (getModConfig().ListType_BeastSaber.GetValue() == "Bookmarks") {
                     DownloadSongsSearchViewController::SearchQuery.clear();
-                    searchViewController->SearchField->SetText(il2cpp_utils::newcsstr(""));
+                    searchViewController->SearchField->SetText(emptyString);
                 }
-                LastListType = value;
-                getModConfig().ListType_BeastSaber.SetValue(std::string(value));
+                LastListType = static_cast<std::string>(value);
+                getModConfig().ListType_BeastSaber.SetValue(LastListType);
                 DownloadSongsSearchViewController::SetPage(0);
                 DownloadSongsSearchViewController::Search();
             }
@@ -134,7 +136,7 @@ void DownloadSongsOptionsViewController::DidActivate(bool firstActivation, bool 
         ListType_BeastSaber->get_transform()->GetParent()->GetComponent<LayoutElement*>()->set_preferredWidth(50.0f);
 
         ListType_ScoreSaber = QuestUI::BeatSaberUI::CreateDropdown(settingsLayoutTransform, "List", getModConfig().ListType_ScoreSaber.GetValue(), { "Trending", "Latest Ranked", "Top Played", "Top Ranked" },
-            [this](std::string_view value) {
+            [this](StringW value) {
                 if (LastListType == "Bookmarks") {
                     DownloadSongsSearchViewController::SearchQuery.clear();
                     searchViewController->SearchField->SetText(il2cpp_utils::newcsstr(""));
@@ -145,8 +147,8 @@ void DownloadSongsOptionsViewController::DidActivate(bool firstActivation, bool 
                 else {
                     Ranked->get_gameObject()->SetActive(true);
                 }
-                LastListType = value;
-                getModConfig().ListType_ScoreSaber.SetValue(std::string(value));
+                LastListType = static_cast<std::string>(value);
+                getModConfig().ListType_ScoreSaber.SetValue(LastListType);
                 DownloadSongsSearchViewController::SetPage(0);
                 DownloadSongsSearchViewController::Search();
             }
@@ -159,7 +161,7 @@ void DownloadSongsOptionsViewController::DidActivate(bool firstActivation, bool 
         else if (getModConfig().AutoMapper.GetValue() == "false") AutoMapperConfigSet = "Required";
 
         Automapper = QuestUI::BeatSaberUI::CreateDropdown(settingsLayoutTransform, getModConfig().AutoMapper.GetName(), AutoMapperConfigSet, { "Not Required", "Required", "Excluded" },
-            [](std::string_view value) {
+            [](StringW value) {
                 std::string setting = "";
                 if (value == "Not Required") setting = "true";
                 else if (value == "Required") setting = "false";
@@ -172,7 +174,7 @@ void DownloadSongsOptionsViewController::DidActivate(bool firstActivation, bool 
         Automapper->get_transform()->GetParent()->GetComponent<LayoutElement*>()->set_preferredWidth(50.0f);
 
         SortOrder = QuestUI::BeatSaberUI::CreateDropdown(settingsLayoutTransform, getModConfig().SortOrder.GetName(), getModConfig().SortOrder.GetValue(), { "Latest", "Relevance", "Rating" },
-            [](std::string_view value) {
+            [](StringW value) {
                 getModConfig().SortOrder.SetValue(std::string(value));
                 DownloadSongsSearchViewController::SetPage(0);
                 DownloadSongsSearchViewController::Search();
@@ -186,7 +188,7 @@ void DownloadSongsOptionsViewController::DidActivate(bool firstActivation, bool 
         else if (getModConfig().NE.GetValue() == "false") NEConfigSet = "Excluded";
 
         NEdropdown = QuestUI::BeatSaberUI::CreateDropdown(settingsLayoutTransform, getModConfig().NE.GetName(), NEConfigSet, { "Not Required", "Required", "Excluded" },
-            [](std::string_view value) {
+            [](StringW value) {
                 std::string setting = "";
                 if (value == "Required") setting = "true";
                 else if (value == "Excluded") setting = "false";
@@ -203,7 +205,7 @@ void DownloadSongsOptionsViewController::DidActivate(bool firstActivation, bool 
         else if (getModConfig().ME.GetValue() == "false") MEConfigSet = "Excluded";
 
         MEdropdown = QuestUI::BeatSaberUI::CreateDropdown(settingsLayoutTransform, getModConfig().ME.GetName(), MEConfigSet, { "Not Required", "Required", "Excluded" },
-            [](std::string_view value) {
+            [](StringW value) {
                 std::string setting = "";
                 if (value == "Required") setting = "true";
                 else if (value == "Excluded") setting = "false";
@@ -220,7 +222,7 @@ void DownloadSongsOptionsViewController::DidActivate(bool firstActivation, bool 
         else if (getModConfig().Chroma.GetValue() == "false") ChromaConfigSet = "Excluded";
 
         Chroma = QuestUI::BeatSaberUI::CreateDropdown(settingsLayoutTransform, getModConfig().Chroma.GetName(), ChromaConfigSet, { "Not Required", "Required", "Excluded" },
-            [](std::string_view value) {
+            [](StringW value) {
                 std::string setting = "";
                 if (value == "Required") setting = "true";
                 else if (value == "Excluded") setting = "false";
@@ -238,7 +240,7 @@ void DownloadSongsOptionsViewController::DidActivate(bool firstActivation, bool 
 
 
         Ranked = QuestUI::BeatSaberUI::CreateDropdown(settingsLayoutTransform, "Ranked", RankedConfigSet, { "Not Required", "Required", "Excluded" },
-            [](std::string_view value) {
+            [](StringW value) {
                 std::string setting = "";
                 if (value == "Required") setting = "true";
                 else if (value == "Excluded") setting = "false";

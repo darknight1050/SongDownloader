@@ -26,13 +26,18 @@
       "additionalData": {}
     },
     {
-      "id": "questui",
-      "versionRange": "^0.12.6",
+      "id": "custom-types",
+      "versionRange": "^0.15.6",
       "additionalData": {}
     },
     {
-      "id": "custom-types",
-      "versionRange": "^0.15.6",
+      "id": "modloader",
+      "versionRange": "^1.2.3",
+      "additionalData": {}
+    },
+    {
+      "id": "questui",
+      "versionRange": "^0.13.1",
       "additionalData": {}
     },
     {
@@ -47,7 +52,7 @@
     },
     {
       "id": "songloader",
-      "versionRange": "^0.8.2",
+      "versionRange": "^0.8.3",
       "additionalData": {}
     }
   ],

@@ -609,8 +609,8 @@ void DownloadSongsSearchViewController::DidActivate(bool firstActivation, bool a
         get_gameObject()->AddComponent<Touchable*>();
 
         SearchField = BeatSaberUI::CreateStringSetting(get_transform(), "Search", "", UnityEngine::Vector2(0.0f, 0.0f), UnityEngine::Vector3(0.0f, -38.0f, 0.0f),
-            [this](std::string_view value) {
-                DownloadSongsSearchViewController::SearchQuery = value;
+            [this](StringW value) {
+                DownloadSongsSearchViewController::SearchQuery = static_cast<std::string>(value);
                 if (getModConfig().Service.GetValue() == "BeastSaber" && getModConfig().ListType_BeastSaber.GetValue() == "Bookmarks") getModConfig().BookmarkUsername.SetValue(std::string(value));
                 Search();
             }
