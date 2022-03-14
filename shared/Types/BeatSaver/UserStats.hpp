@@ -10,7 +10,7 @@ DECLARE_JSON_CLASS(BeatSaver, UserStats,
     GETTER_VALUE(float, AvgBpm);
     GETTER_VALUE(float, AvgScore);
     GETTER_VALUE(float, AvgDuration);
-    GETTER_VALUE(std::string, FirstUpload);
-    GETTER_VALUE(std::string, LastUpload);
+    GETTER_VALUE_OPTIONAL(std::string, FirstUpload);
+    GETTER_VALUE_OPTIONAL(std::string, LastUpload);
     GETTER_VALUE(BeatSaver::UserDiffStats, DiffStats);
 )

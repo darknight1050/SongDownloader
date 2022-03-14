@@ -288,9 +288,8 @@ void DownloadSongsSearchViewController::SearchUser(int currentSearchIndex) {
                                                         }
                                                         mapIndex++;
                                                     }
-                                                }
-                                                else {
-                                                    if (BeatSaver::API::exception != "Not Found") loadingControl->ShowText(il2cpp_utils::newcsstr(BeatSaver::API::exception), true);
+                                                } else {
+                                                    if (!BeatSaver::API::exception.empty() && BeatSaver::API::exception != "Not Found") loadingControl->ShowText(il2cpp_utils::newcsstr(BeatSaver::API::exception), true);
                                                     else loadingControl->ShowText(il2cpp_utils::newcsstr("No Songs Found for given User!"), true);
                                                 }
                                             }
@@ -298,9 +297,8 @@ void DownloadSongsSearchViewController::SearchUser(int currentSearchIndex) {
                                     );
                                 }
                             );
-                        }
-                        else {
-                            if (BeatSaver::API::exception != "Not Found") loadingControl->ShowText(il2cpp_utils::newcsstr(BeatSaver::API::exception), true);
+                        } else {
+                            if (!BeatSaver::API::exception.empty() && BeatSaver::API::exception != "Not Found") loadingControl->ShowText(il2cpp_utils::newcsstr(BeatSaver::API::exception), true);
                             else loadingControl->ShowText(il2cpp_utils::newcsstr("No User Found!"), true);
                         }
                     }
