@@ -1,4 +1,3 @@
-
 # include some defines automatically made by qpm
 include(qpm_defines.cmake)
 
@@ -9,18 +8,17 @@ project(${COMPILE_ID})
 set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED 20)
 
+set(CMAKE_INTERPROCEDURAL_OPTIMIZATION TRUE)
+
 # define that stores the actual source directory
 set(SOURCE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/src)
 set(INCLUDE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/include)
 
 # compile options used
-add_compile_options(-frtti -fexceptions)
-add_compile_options(-O3)
+add_compile_options(-frtti -fPIE -fPIC -fexceptions -O3)
 # compile definitions used
 add_compile_definitions(VERSION=\"${MOD_VERSION}\")
 add_compile_definitions(ID=\"${MOD_ID}\")
-add_compile_definitions(MOD_ID=\"${MOD_ID}\")
-add_compile_definitions(USE_CODEGEN_FIELDS)
 
 # recursively get all src files
 RECURSE_FILES(cpp_file_list ${SOURCE_DIR}/*.cpp)
@@ -29,10 +27,10 @@ list(APPEND c_file_list ${INCLUDE_DIR}/zip/src/zip.c)
 
 # add all src files to compile
 add_library(
-        ${COMPILE_ID}
-        SHARED
-        ${cpp_file_list}
-        ${c_file_list}
+    ${COMPILE_ID} 
+    SHARED 
+    ${cpp_file_list}
+    ${c_file_list}
 )
 
 target_include_directories(${COMPILE_ID} PRIVATE .)

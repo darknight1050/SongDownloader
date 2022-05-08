@@ -70,12 +70,12 @@ void DownloadSongsSearchViewController::CreateEntries(Transform* parent) {
     levelBarTransform->FindChild(singleLineTextContainerName)->get_gameObject()->set_active(true);
 
     LevelBar* levelBar = levelBarGameObject->GetComponent<LevelBar*>();
-    auto songNameTextComponent = levelBar->dyn__songNameText();
+    auto songNameTextComponent = levelBar->songNameText;
     songNameTextComponent->set_fontSize(4.2f);
     songNameTextComponent->set_overflowMode(TextOverflowModes::Ellipsis);
     songNameTextComponent->set_margin(Vector4(-2.0f, 0.0f, 9.0f, 0.0f));
 
-    auto authorNameTextComponent = levelBar->dyn__authorNameText();
+    auto authorNameTextComponent = levelBar->authorNameText;
     authorNameTextComponent->set_richText(true);
     authorNameTextComponent->set_fontSize(3.2f);
     authorNameTextComponent->set_overflowMode(TextOverflowModes::Ellipsis);
@@ -99,7 +99,7 @@ void DownloadSongsSearchViewController::CreateEntries(Transform* parent) {
         Transform* artworkTransform = copyLevelBar->get_transform()->Find(songArtworkName);
         HMUI::ImageView* artwork = artworkTransform->GetComponent<HMUI::ImageView*>();
 
-        searchEntries[i] = SearchEntry(copy, copyLevelBar->dyn__songNameText(), copyLevelBar->dyn__authorNameText(), artwork, downloadButton);
+        searchEntries[i] = SearchEntry(copy, copyLevelBar->songNameText, copyLevelBar->authorNameText, artwork, downloadButton);
         auto entry = &searchEntries[i];
         downloadButton->get_onClick()->AddListener(il2cpp_utils::MakeDelegate<UnityAction*>(classof(UnityAction*), 
             (std::function<void()>) [this, entry] {
@@ -646,7 +646,7 @@ void DownloadSongsSearchViewController::DidActivate(bool firstActivation, bool a
                 Search();
             }
         ));
-        loadingControl->dyn__loadingText()->set_text(il2cpp_utils::newcsstr("Loading..."));
+        loadingControl->loadingText->set_text(il2cpp_utils::newcsstr("Loading..."));
         loadingControl->set_enabled(true);
 
         Search();
