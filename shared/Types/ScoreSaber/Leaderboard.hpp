@@ -27,7 +27,12 @@ DECLARE_JSON_CLASS(ScoreSaber, Leaderboard,
     GETTER_VALUE(bool, Qualified, "qualified");
     GETTER_VALUE(bool, Loved, "loved");
     GETTER_VALUE(int, MaxPP, "maxPP");
-    GETTER_VALUE(float, Stars, "stars");
+    // check optional for both potential types and resolve in the deserialize method
+    private:
+        NAMED_AUTO_VALUE_OPTIONAL(float, Stars, "stars");
+        NAMED_AUTO_VALUE_OPTIONAL(int, StarsInt, "stars");
+    public:
+        const float& GetStars() const { return Stars.value(); }
     GETTER_VALUE(int, Plays, "plays");
     GETTER_VALUE(int, DailyPlays, "dailyPlays");
     GETTER_VALUE(bool, PositiveModifiers, "positiveModifiers");
@@ -37,5 +42,11 @@ DECLARE_JSON_CLASS(ScoreSaber, Leaderboard,
     inline void GetCoverImageAsync(std::function<void(std::vector<uint8_t>)> finished, std::function<void(float)> progressUpdate = nullptr) {
         ScoreSaber::API::GetCoverImageAsync(*this, finished, progressUpdate);
     }
-    ERROR_CHECK
+    void Deserialize(const rapidjson::Value& jsonValue) {
+        if (jsonValue.HasMember("error") && jsonValue["error"].IsString())
+            throw SongDownloader::JsonException(SongDownloader::Exceptions::SiteError, jsonValue["error"].GetString());
+        _Deserialize(jsonValue);
+        if (!Stars.has_value() && !StarsInt.has_value())
+            throw SongDownloader::JsonException(SongDownloader::Exceptions::NoMember, "stars not found");
+    }
 )
