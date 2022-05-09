@@ -20,7 +20,7 @@ namespace BeastSaber::API {
 
     std::optional<BeastSaber::Page> CuratorRecommended(int pageIndex, int amount) {
         exception.clear();
-        std::string searchPath = BASE_URL + "?bookmarked_by=curatorrecommended&page=" + std::to_string(pageIndex) + "&count=" + std::to_string(amount);
+        std::string searchPath = BASE_URL + "?bookmarked_by=curatorrecommended&page=" + std::to_string(pageIndex + 1) + "&count=" + std::to_string(amount);
         auto json = WebUtils::GetJSON(searchPath);
         if (!json.has_value())
             return std::nullopt;
@@ -39,7 +39,7 @@ namespace BeastSaber::API {
     std::optional<BeastSaber::Page> Bookmarked(std::string username, int pageIndex, int amount) {
         exception.clear();
         std::optional<rapidjson::Document> json;
-        json = WebUtils::GetJSON(BASE_URL + "?bookmarked_by=" + username + "&page=" + std::to_string(pageIndex) + "&count=" + std::to_string(amount));
+        json = WebUtils::GetJSON(BASE_URL + "?bookmarked_by=" + username + "&page=" + std::to_string(pageIndex + 1) + "&count=" + std::to_string(amount));
         if (!json.has_value())
             return std::nullopt;
         try {
@@ -56,7 +56,7 @@ namespace BeastSaber::API {
 
     void CuratorRecommendedAsync(std::function<void(std::optional<BeastSaber::Page>)> finished, int pageIndex, int amount) {
         exception.clear();
-        std::string searchPath = BASE_URL + "?bookmarked_by=curatorrecommended&page=" + std::to_string(pageIndex) + "&count=" + std::to_string(amount);
+        std::string searchPath = BASE_URL + "?bookmarked_by=curatorrecommended&page=" + std::to_string(pageIndex + 1) + "&count=" + std::to_string(amount);
         //LOG_DEBUG("%s", searchPath.c_str());
         WebUtils::GetJSONAsync(searchPath,
             [finished](long httpCode, bool error, rapidjson::Document& document) {
@@ -87,7 +87,7 @@ namespace BeastSaber::API {
 
     void BookmarkedAsync(std::string username, std::function<void(std::optional<BeastSaber::Page>)> finished, int pageIndex, int amount) {
         exception.clear();
-        std::string searchPath = BASE_URL + "?bookmarked_by=" + username + "&page=" + std::to_string(pageIndex) + "&count=" + std::to_string(amount);
+        std::string searchPath = BASE_URL + "?bookmarked_by=" + username + "&page=" + std::to_string(pageIndex + 1) + "&count=" + std::to_string(amount);
         //LOG_DEBUG("%s", searchPath.c_str());
         WebUtils::GetJSONAsync(searchPath,
             [finished](long httpCode, bool error, rapidjson::Document& document) {
