@@ -4,7 +4,7 @@
 
 DECLARE_JSON_CLASS(BeatSaver, UserDetail, 
     GETTER_VALUE(int, Id, "id");
-    GETTER_VALUE(std::string, Username, "username");
+    GETTER_VALUE(std::string, Username, "name");
     GETTER_VALUE_OPTIONAL(std::string, Hash, "hash");
     GETTER_VALUE(std::string, AvatarURL, "avatar");
     GETTER_VALUE_OPTIONAL(bool, Testplay, "testplay");
