@@ -54,6 +54,11 @@
       "id": "libcurl",
       "versionRange": "^7.78.0",
       "additionalData": {}
+    },
+    {
+      "id": "rapidjson-macros",
+      "versionRange": "^0.2.0",
+      "additionalData": {}
     }
   ],
   "additionalData": {}

@@ -3,10 +3,11 @@
 #include <vector>
 
 DECLARE_JSON_CLASS(BeatSaver, Metadata, 
-    GETTER_VALUE(float, BPM);
-    GETTER_VALUE(int, Duration);
-    GETTER_VALUE(std::string, SongName);
-    GETTER_VALUE(std::string, SongSubName);
-    GETTER_VALUE(std::string, SongAuthorName);
-    GETTER_VALUE(std::string, LevelAuthorName);
+    GETTER_VALUE(float, BPM, "bpm");
+    GETTER_VALUE(int, Duration, "duration");
+    GETTER_VALUE(std::string, SongName, "songName");
+    GETTER_VALUE(std::string, SongSubName, "songSubName");
+    GETTER_VALUE(std::string, SongAuthorName, "songAuthorName");
+    GETTER_VALUE(std::string, LevelAuthorName, "levelAuthorName");
+    ERROR_CHECK
 )

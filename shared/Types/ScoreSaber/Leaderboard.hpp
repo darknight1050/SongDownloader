@@ -11,30 +11,31 @@ namespace ScoreSaber {
 }
 
 DECLARE_JSON_CLASS(ScoreSaber, Leaderboard, 
-    GETTER_VALUE(int, Id);
-    GETTER_VALUE(std::string, SongHash);
-    GETTER_VALUE(std::string, SongName);
-    GETTER_VALUE(std::string, SongSubName);
-    GETTER_VALUE(std::string, SongAuthorName);
-    GETTER_VALUE(std::string, LevelAuthorName);
-    GETTER_VALUE(Difficulty_t, Difficulty);
-    GETTER_VALUE(int, MaxScore);
-    GETTER_VALUE(std::string, CreatedDate);
-    GETTER_VALUE_OPTIONAL(int, RankedDate);
-    GETTER_VALUE_OPTIONAL(int, QualifiedDate);
-    GETTER_VALUE_OPTIONAL(int, LovedDate);
-    GETTER_VALUE(bool, Ranked);
-    GETTER_VALUE(bool, Qualified);
-    GETTER_VALUE(bool, Loved);
-    GETTER_VALUE(int, MaxPP);
-    GETTER_VALUE(float, Stars);
-    GETTER_VALUE(int, Plays);
-    GETTER_VALUE(int, DailyPlays);
-    GETTER_VALUE(bool, PositiveModifiers);
-    //DESERIALIZE_CLASS_OPTIONAL(PlayerScore, playerScore, Int);
-    GETTER_VALUE(std::string, CoverImage);
-    //DESERIALIZE_VECTOR_OPTIONAL(Difficulties, difficulties, );
+    GETTER_VALUE(int, Id, "id");
+    GETTER_VALUE(std::string, SongHash, "songHash");
+    GETTER_VALUE(std::string, SongName, "songName");
+    GETTER_VALUE(std::string, SongSubName, "songSubName");
+    GETTER_VALUE(std::string, SongAuthorName, "songAuthorName");
+    GETTER_VALUE(std::string, LevelAuthorName, "levelAuthorName");
+    GETTER_VALUE(Difficulty_t, Difficulty, "difficulty");
+    GETTER_VALUE(int, MaxScore, "maxScore");
+    GETTER_VALUE(std::string, CreatedDate, "createdDate");
+    GETTER_VALUE_OPTIONAL(int, RankedDate, "rankedDate");
+    GETTER_VALUE_OPTIONAL(int, QualifiedDate, "qualifiedDate");
+    GETTER_VALUE_OPTIONAL(int, LovedDate, "lovedDate");
+    GETTER_VALUE(bool, Ranked, "ranked");
+    GETTER_VALUE(bool, Qualified, "qualified");
+    GETTER_VALUE(bool, Loved, "loved");
+    GETTER_VALUE(int, MaxPP, "maxPP");
+    GETTER_VALUE(float, Stars, "stars");
+    GETTER_VALUE(int, Plays, "plays");
+    GETTER_VALUE(int, DailyPlays, "dailyPlays");
+    GETTER_VALUE(bool, PositiveModifiers, "positiveModifiers");
+    //GETTER_VALUE_OPTIONAL(PlayerScore, playerScore, Int, "int");
+    GETTER_VALUE(std::string, CoverImage, "coverImage");
+    //GETTER_VALUE_OPTIONAL(Difficulties, difficulties, );
     inline void GetCoverImageAsync(std::function<void(std::vector<uint8_t>)> finished, std::function<void(float)> progressUpdate = nullptr) {
         ScoreSaber::API::GetCoverImageAsync(*this, finished, progressUpdate);
     }
+    ERROR_CHECK
 )

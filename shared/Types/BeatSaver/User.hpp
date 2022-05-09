@@ -3,10 +3,11 @@
 #include "UserStats.hpp"
 
 DECLARE_JSON_CLASS(BeatSaver, UserDetail, 
-    GETTER_VALUE(int, Id);
-    GETTER_VALUE(std::string, Username);
-    GETTER_VALUE_OPTIONAL(std::string, Hash);
-    GETTER_VALUE(std::string, AvatarURL);
-    GETTER_VALUE_OPTIONAL(bool, Testplay);
-    GETTER_CLASS_OPTIONAL(BeatSaver::UserStats, Stats);
+    GETTER_VALUE(int, Id, "id");
+    GETTER_VALUE(std::string, Username, "username");
+    GETTER_VALUE_OPTIONAL(std::string, Hash, "hash");
+    GETTER_VALUE(std::string, AvatarURL, "avatar");
+    GETTER_VALUE_OPTIONAL(bool, Testplay, "testplay");
+    GETTER_CLASS_OPTIONAL(BeatSaver::UserStats, Stats, "stats");
+    ERROR_CHECK
 )

@@ -3,5 +3,6 @@
 #include "Song.hpp"
 
 DECLARE_JSON_CLASS(ScoreSaber, Page,
-    GETTER_VALUE(std::vector<ScoreSaber::Song>, Songs);
+    GETTER_VALUE(std::vector<ScoreSaber::Song>, Songs, "songs");
+    ERROR_CHECK
 )
