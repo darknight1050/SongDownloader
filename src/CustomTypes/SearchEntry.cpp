@@ -198,7 +198,7 @@ void SearchEntry::UpdateDownloadProgress(bool checkLoaded) {
             hash = BSsong.GetHash();
         }
         else {
-            hash = SSsong.GetId();
+            hash = SSsong.GetSongHash();
         }
         std::transform(hash.begin(), hash.end(), hash.begin(), toupper);
         for (auto& song : RuntimeSongLoader::API::GetLoadedSongs()) {
