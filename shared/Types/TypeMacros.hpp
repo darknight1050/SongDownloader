@@ -1,7 +1,7 @@
 #pragma once
 #include "rapidjson-macros/shared/macros.hpp"
 
-#include "Exceptions.hpp"
+#include "../Exceptions.hpp"
 
 #define GETTER_VALUE(type, name, jsonName) \
 private: \
