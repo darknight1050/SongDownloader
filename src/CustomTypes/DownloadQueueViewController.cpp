@@ -27,6 +27,8 @@
 #include "questui/shared/CustomTypes/Components/ExternalComponents.hpp"
 #include "questui/shared/QuestUI.hpp"
 
+#include "CustomLogger.hpp"
+
 //#include <sstream>
 //#include <iosfwd>
 //#include <iomanip>
@@ -70,8 +72,10 @@ void DownloadItem::Update() {
     }
 }
 
+DownloadQueueViewController* DownloadQueueViewController::instance = nullptr;
+
 void DownloadQueueViewController::PushDownload(SongDownloader::SearchEntry *entry) {
-    if(entry->pushed) return;
+    LOG_INFO("Downloading: %s", entry->GetBeatmap().GetName().c_str());
 
     auto imgSprite = entry->coverImageView->get_sprite();
 
@@ -131,9 +135,11 @@ void DownloadQueueViewController::DidActivate(bool firstActivation, bool addedTo
         auto downloadLayoutGroup = QuestUI::BeatSaberUI::CreateVerticalLayoutGroup(get_transform());
 
         scrollView = QuestUI::BeatSaberUI::CreateScrollView(downloadLayoutGroup->get_transform());
+
+        instance = this;
     }
 }
 
-void DownloadQueueViewController::DidDeactivate(bool firstActivation, bool addedToHierarchy, bool screenSystemEnabling) {
-    this->instance = nullptr;
+void DownloadQueueViewController::DidDeactivate(bool addedToHierarchy, bool screenSystemEnabling) {
+    instance = nullptr;
 }

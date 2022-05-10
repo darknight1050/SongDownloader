@@ -1,5 +1,4 @@
 #include "CustomTypes/DownloadSongsSearchViewController.hpp"
-#include "CustomTypes/DownloadQueueViewController.hpp"
 
 using namespace QuestUI;
 using namespace UnityEngine;
@@ -210,23 +209,18 @@ void SearchEntry::UpdateDownloadProgress(bool checkLoaded) {
         }
     }
 
-    if(DownloadQueueViewController::instance != nullptr && pushed) {
-        pushed = true;
-        DownloadQueueViewController::PushDownload(this);
+    if (downloadProgress <= -1.0f) {
+        BeatSaberUI::SetButtonText(downloadButton, "Download");
+        downloadButton->set_interactable(true);
     }
-
-//    if (downloadProgress <= -1.0f) {
-//        BeatSaberUI::SetButtonText(downloadButton, "Download");
-//        downloadButton->set_interactable(true);
-//    }
-//    else if (downloadProgress >= 100.0f) {
-//        BeatSaberUI::SetButtonText(downloadButton, "Loaded");
-//        downloadButton->set_interactable(false);
-//    }
-//    else {
-//        BeatSaberUI::SetButtonText(downloadButton, string_format("%.0f%%", downloadProgress));
-//        downloadButton->set_interactable(false);
-//    }
+    else if (downloadProgress >= 100.0f) {
+        BeatSaberUI::SetButtonText(downloadButton, "Loaded");
+        downloadButton->set_interactable(false);
+    }
+    else {
+        BeatSaberUI::SetButtonText(downloadButton, "Downloading...");
+        downloadButton->set_interactable(false);
+    }
 }
 
 void SearchEntry::Disable() {
