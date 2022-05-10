@@ -114,7 +114,9 @@ void DownloadQueueViewController::PushDownload(SongDownloader::SearchEntry *entr
 
     dlItem->text = BeatSaberUI::CreateText(vert, string_format("<size=4>%s</size>", entry->GetBeatmap().GetName().c_str()));
     dlItem->authorText = BeatSaberUI::CreateText(vert, string_format("<size=3>%s</size>", entry->GetBeatmap().GetCurator()->c_str()));
+    dlItem->entry = entry;
 }
+
 
 void DownloadQueueViewController::DidActivate(bool firstActivation, bool addedToHierarchy, bool screenSystemEnabling) {
     if(firstActivation) {
