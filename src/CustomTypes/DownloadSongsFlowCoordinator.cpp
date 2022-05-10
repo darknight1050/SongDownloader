@@ -17,13 +17,15 @@ void DownloadSongsFlowCoordinator::Awake(){
         DownloadSongsOptionsViewController = BeatSaberUI::CreateViewController<SongDownloader::DownloadSongsOptionsViewController*>();
     if(!DownloadSongsSearchViewController)
         DownloadSongsSearchViewController = BeatSaberUI::CreateViewController<SongDownloader::DownloadSongsSearchViewController*>();
+    if(!DownloadQueueViewController)
+        DownloadQueueViewController = BeatSaberUI::CreateViewController<SongDownloader::DownloadQueueViewController*>();
 }
 
 void DownloadSongsFlowCoordinator::DidActivate(bool firstActivation, bool addedToHierarchy, bool screenSystemEnabling){
     if(firstActivation){
         SetTitle(il2cpp_utils::newcsstr("Download Songs"), HMUI::ViewController::AnimationType::In);
         showBackButton = true;
-        ProvideInitialViewControllers(DownloadSongsSearchViewController, DownloadSongsOptionsViewController, nullptr, nullptr, nullptr);
+        ProvideInitialViewControllers(DownloadSongsSearchViewController, DownloadSongsOptionsViewController, nullptr, DownloadQueueViewController, nullptr);
     }
 }
 
