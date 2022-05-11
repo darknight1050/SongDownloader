@@ -12,22 +12,23 @@ namespace BeatSaver {
 }
 
 DECLARE_JSON_CLASS(BeatSaver, BeatmapVersion,
-    GETTER_VALUE(std::string, CreatedAt);
-    GETTER_VALUE_OPTIONAL(int, SageScore);
-    GETTER_VALUE(std::vector<BeatSaver::BeatmapDifficulty>, Diffs);
-    GETTER_VALUE_OPTIONAL(std::string, Feedback);
-    GETTER_VALUE(std::string, Hash);
-    GETTER_VALUE_OPTIONAL(std::string, Key);
-    GETTER_VALUE(std::string, State); // Enum with values Uploaded, Testplay, Published, Feedback
-    //GETTER_VALUE(BeatSaver::Instant, TestplayAt);
-    //GETTER_VALUE(BeatSaver::Testplays, Uploaded);
-    GETTER_VALUE(std::string, DownloadURL);
-    GETTER_VALUE(std::string, CoverURL);
-    GETTER_VALUE(std::string, PreviewURL);
+    GETTER_VALUE(std::string, CreatedAt, "createdAt");
+    GETTER_VALUE_OPTIONAL(int, SageScore, "sageScore");
+    GETTER_VALUE(std::vector<BeatSaver::BeatmapDifficulty>, Diffs, "diffs");
+    GETTER_VALUE_OPTIONAL(std::string, Feedback, "feedback");
+    GETTER_VALUE(std::string, Hash, "hash");
+    GETTER_VALUE_OPTIONAL(std::string, Key, "key");
+    GETTER_VALUE(std::string, State, "state"); // Enum with values Uploaded, Testplay, Published, Feedback
+    //GETTER_VALUE(BeatSaver::Instant, TestplayAt, "testplayAt");
+    //GETTER_VALUE(BeatSaver::Testplays, Uploaded, "uploaded");
+    GETTER_VALUE(std::string, DownloadURL, "downloadURL");
+    GETTER_VALUE(std::string, CoverURL, "coverURL");
+    GETTER_VALUE(std::string, PreviewURL, "previewURL");
     inline void DownloadBeatmapAsync(const BeatSaver::Beatmap& beatmap, std::function<void(bool)> finished, std::function<void(float)> progressUpdate) {
         BeatSaver::API::DownloadBeatmapAsync(beatmap, *this, finished, progressUpdate);
     }
     inline void GetCoverImageAsync(std::function<void(std::vector<uint8_t>)> finished, std::function<void(float)> progressUpdate) {
         BeatSaver::API::GetCoverImageAsync(*this, finished, progressUpdate);
     }
+    ERROR_CHECK
 )

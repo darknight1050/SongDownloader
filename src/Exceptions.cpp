@@ -2,7 +2,7 @@
 #include "Exceptions.hpp"
 
 namespace SongDownloader {
-    JsonException::JsonException(SongDownloader::Exceptions key, const std::string& message) : message(message) {
+    JsonException::JsonException(SongDownloader::Exceptions key, const std::string& _message) : message(_message) {
         switch (key) {
         case Exceptions::SiteError:
             error = message.c_str();

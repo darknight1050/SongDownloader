@@ -14,22 +14,23 @@ namespace BeatSaver {
 }
 
 DECLARE_JSON_CLASS(BeatSaver, Beatmap, 
-    GETTER_VALUE(std::string, Id);
-    GETTER_VALUE(std::string, Name);
-    GETTER_VALUE(std::string, Description);
-    GETTER_VALUE(BeatSaver::UserDetail, Uploader);
-    GETTER_VALUE(BeatSaver::Metadata, Metadata);
-    GETTER_VALUE(BeatSaver::Stats, Stats);
-    GETTER_VALUE(std::string, Uploaded);
-    GETTER_VALUE(bool, Automapper);
-    GETTER_VALUE(bool, Ranked);
-    GETTER_VALUE(bool, Qualified);
-    GETTER_VALUE(std::vector<BeatSaver::BeatmapVersion>, Versions);
-    GETTER_VALUE_OPTIONAL(std::string, Curator);
+    GETTER_VALUE(std::string, Id, "id");
+    GETTER_VALUE(std::string, Name, "name");
+    GETTER_VALUE(std::string, Description, "description");
+    GETTER_VALUE(BeatSaver::UserDetail, Uploader, "uploader");
+    GETTER_VALUE(BeatSaver::Metadata, Metadata, "metadata");
+    GETTER_VALUE(BeatSaver::Stats, Stats, "stats");
+    GETTER_VALUE(std::string, Uploaded, "uploaded");
+    GETTER_VALUE(bool, Automapper, "automapper");
+    GETTER_VALUE(bool, Ranked, "ranked");
+    GETTER_VALUE(bool, Qualified, "qualified");
+    GETTER_VALUE(std::vector<BeatSaver::BeatmapVersion>, Versions, "versions");
+    GETTER_VALUE_OPTIONAL(std::string, Curator, "curator");
     inline void DownloadLatestBeatmapAsync(std::function<void(bool)> finished, std::function<void(float)> progressUpdate) {
         BeatSaver::API::DownloadBeatmapAsync(*this, finished, progressUpdate);
     }
     inline void GetLatestCoverImageAsync(std::function<void(std::vector<uint8_t>)> finished, std::function<void(float)> progressUpdate) {
         BeatSaver::API::GetCoverImageAsync(*this, finished, progressUpdate);
     }
+    ERROR_CHECK
 )

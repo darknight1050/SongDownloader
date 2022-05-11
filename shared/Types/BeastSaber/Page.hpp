@@ -3,6 +3,7 @@
 #include "Song.hpp"
 
 DECLARE_JSON_CLASS(BeastSaber, Page,
-    GETTER_VALUE(std::vector<BeastSaber::Song>, Songs);
-    GETTER_VALUE_OPTIONAL(int, Next_page);
+    GETTER_VALUE(std::vector<BeastSaber::Song>, Songs, "songs");
+    GETTER_VALUE_OPTIONAL(int, Next_page, "next_page");
+    ERROR_CHECK
 )

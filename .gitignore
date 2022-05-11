@@ -50,6 +50,7 @@ extern/
 build/
 
 qpm.shared.json
+mod.json
 
 /.vs/SongDownloader/v16
 *.sqlite

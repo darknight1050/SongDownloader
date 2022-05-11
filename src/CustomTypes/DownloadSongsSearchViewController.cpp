@@ -419,7 +419,7 @@ void DownloadSongsSearchViewController::GetTrending(int currentSearchIndex) {
                 );
             }
         },
-        StringToBool(getModConfig().Ranked.GetValue()), std::nullopt, true, DownloadSongsSearchViewController::searchPage); // TODO: Possibly add option to search by qualified, for now just nullopt on that parameter
+        true, std::nullopt, true, DownloadSongsSearchViewController::searchPage); // TODO: Possibly add option to search by qualified, for now just nullopt on that parameter
 }
 
 void DownloadSongsSearchViewController::GetLatestRanked(int currentSearchIndex) {
