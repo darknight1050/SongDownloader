@@ -17,6 +17,7 @@
 #include "System/Action.hpp"
 
 #include "GlobalNamespace/LevelBar.hpp"
+#include "CustomTypes/DownloadQueueViewController.hpp"
 
 #include "questui/shared/CustomTypes/Components/ExternalComponents.hpp"
 #include "questui/shared/CustomTypes/Components/Backgroundable.hpp"
@@ -103,6 +104,10 @@ void DownloadSongsSearchViewController::CreateEntries(Transform* parent) {
         auto entry = &searchEntries[i];
         downloadButton->get_onClick()->AddListener(il2cpp_utils::MakeDelegate<UnityAction*>(classof(UnityAction*), 
             (std::function<void()>) [this, entry] {
+                if(DownloadQueueViewController::instance != nullptr && !entry->pushed) {
+                    entry->pushed = true;
+                    DownloadQueueViewController::PushDownload(entry);
+                }
                 if (entry->MapType == SearchEntry::MapType::BeatSaver) {
                     auto hash = entry->GetBeatmap().GetVersions().front().GetHash();
                     BeatSaver::API::DownloadBeatmapAsync(entry->GetBeatmap(),

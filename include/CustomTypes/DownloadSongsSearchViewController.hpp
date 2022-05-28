@@ -40,7 +40,6 @@ namespace SongDownloader {
         UnityEngine::GameObject* gameObject;
         TMPro::TextMeshProUGUI* line1Component;
         TMPro::TextMeshProUGUI* line2Component;
-        HMUI::ImageView* coverImageView;
         UnityEngine::UI::Button* downloadButton;
 
     public:        
@@ -51,6 +50,8 @@ namespace SongDownloader {
         };
 
         float downloadProgress = -1.0f;
+
+        bool pushed = false;
 
         SearchEntry(UnityEngine::GameObject* _gameObject, TMPro::TextMeshProUGUI* _line1Component, TMPro::TextMeshProUGUI* _line2Component, HMUI::ImageView* _coverImageView, UnityEngine::UI::Button* _downloadButton);
 
@@ -73,7 +74,9 @@ namespace SongDownloader {
         void Disable();
 
         bool IsEnabled();
-    }; 
+
+        HMUI::ImageView* coverImageView;
+    };
 
 }
 

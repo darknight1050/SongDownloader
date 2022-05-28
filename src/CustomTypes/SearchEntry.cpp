@@ -208,6 +208,7 @@ void SearchEntry::UpdateDownloadProgress(bool checkLoaded) {
             }
         }
     }
+
     if (downloadProgress <= -1.0f) {
         BeatSaberUI::SetButtonText(downloadButton, "Download");
         downloadButton->set_interactable(true);
@@ -217,7 +218,7 @@ void SearchEntry::UpdateDownloadProgress(bool checkLoaded) {
         downloadButton->set_interactable(false);
     }
     else {
-        BeatSaberUI::SetButtonText(downloadButton, string_format("%.0f%%", downloadProgress));
+        BeatSaberUI::SetButtonText(downloadButton, "Downloading...");
         downloadButton->set_interactable(false);
     }
 }
