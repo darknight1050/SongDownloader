@@ -50,7 +50,7 @@ int DownloadSongsSearchViewController::searchPage = 0;
 std::string DownloadSongsSearchViewController::SearchQuery = "";
 
 void DownloadSongsSearchViewController::CreateEntries(Transform* parent) {
-    static auto songArtworkName = il2cpp_utils::newcsstr<il2cpp_utils::CreationType::Manual>("SongArtwork");
+    static ConstString songArtworkName("SongArtwork");
     static GameObject* prefab = nullptr;
     if(!prefab) {
         GameObject* holder = GameObject::New_ctor();
@@ -68,9 +68,9 @@ void DownloadSongsSearchViewController::CreateEntries(Transform* parent) {
         GameObject* levelBarGameObject = UnityEngine::GameObject::Instantiate(existingLevelBar, levelBarLayout->get_transform());
         auto levelBarTransform = levelBarGameObject->get_transform();
 
-        static auto multipleLineTextContainerName = il2cpp_utils::newcsstr<il2cpp_utils::CreationType::Manual>("MultipleLineTextContainer");
+        static ConstString multipleLineTextContainerName("MultipleLineTextContainer");
         Object::Destroy(levelBarTransform->FindChild(multipleLineTextContainerName)->get_gameObject());
-        static auto singleLineTextContainerName = il2cpp_utils::newcsstr<il2cpp_utils::CreationType::Manual>("SingleLineTextContainer");
+        static ConstString singleLineTextContainerName("SingleLineTextContainer");
         levelBarTransform->FindChild(singleLineTextContainerName)->get_gameObject()->set_active(true);
         LevelBar* levelBar = levelBarGameObject->GetComponent<LevelBar*>();
         auto songNameTextComponent = levelBar->songNameText;
@@ -84,7 +84,7 @@ void DownloadSongsSearchViewController::CreateEntries(Transform* parent) {
         authorNameTextComponent->set_overflowMode(TextOverflowModes::Ellipsis);
         authorNameTextComponent->set_margin(Vector4(-2.0f, 0.0f, 9.0f, 0.0f));
 
-        static auto bgName = il2cpp_utils::newcsstr<il2cpp_utils::CreationType::Manual>("BG");
+        static ConstString bgName("BG");
         Transform* backgroundTransform = levelBarTransform->Find(bgName);
         backgroundTransform->set_localScale(Vector3(1.5f, 1.0f, 1.0f));
         levelBar->get_transform()->Find(songArtworkName)->set_localScale(Vector3(0.96f, 0.96f, 0.96f));
@@ -205,8 +205,8 @@ void DownloadSongsSearchViewController::SearchKey(int currentSearchIndex) {
                                     }
                                 }
                                 else {
-                                    if (!BeatSaver::API::exception.empty()) loadingControl->ShowText(il2cpp_utils::newcsstr(BeatSaver::API::exception), true);
-                                    else loadingControl->ShowText(il2cpp_utils::newcsstr("No Song Found for Key!"), true);
+                                    if (!BeatSaver::API::exception.empty()) loadingControl->ShowText(BeatSaver::API::exception, true);
+                                    else loadingControl->ShowText("No Song Found for Key!", true);
                                 }
                             }
                         }
@@ -215,7 +215,7 @@ void DownloadSongsSearchViewController::SearchKey(int currentSearchIndex) {
             }
         );
     }
-    else loadingControl->ShowText(il2cpp_utils::newcsstr("Please type in a key!"), false);
+    else loadingControl->ShowText("Please type in a key!", false);
 }
 
 void DownloadSongsSearchViewController::SearchSongs(int currentSearchIndex) {
@@ -243,9 +243,9 @@ void DownloadSongsSearchViewController::SearchSongs(int currentSearchIndex) {
                                 }
                             }
                             else {
-                                if (!BeatSaver::API::exception.empty()) loadingControl->ShowText(il2cpp_utils::newcsstr(BeatSaver::API::exception), true);
-                                else if (DownloadSongsSearchViewController::SearchQuery.empty()) loadingControl->ShowText(il2cpp_utils::newcsstr("No Results,\nis your Internet working?"), true);
-                                else loadingControl->ShowText(il2cpp_utils::newcsstr("No Songs Found!"), true);
+                                if (!BeatSaver::API::exception.empty()) loadingControl->ShowText(BeatSaver::API::exception, true);
+                                else if (DownloadSongsSearchViewController::SearchQuery.empty()) loadingControl->ShowText("No Results,\nis your Internet working?", true);
+                                else loadingControl->ShowText("No Songs Found!", true);
                             }
                         }
                     }
@@ -289,8 +289,8 @@ void DownloadSongsSearchViewController::SearchUser(int currentSearchIndex) {
                                                         mapIndex++;
                                                     }
                                                 } else {
-                                                    if (!BeatSaver::API::exception.empty() && BeatSaver::API::exception != "Not Found") loadingControl->ShowText(il2cpp_utils::newcsstr(BeatSaver::API::exception), true);
-                                                    else loadingControl->ShowText(il2cpp_utils::newcsstr("No Songs Found for given User!"), true);
+                                                    if (!BeatSaver::API::exception.empty() && BeatSaver::API::exception != "Not Found") loadingControl->ShowText(BeatSaver::API::exception, true);
+                                                    else loadingControl->ShowText("No Songs Found for given User!", true);
                                                 }
                                             }
                                         }
@@ -298,15 +298,15 @@ void DownloadSongsSearchViewController::SearchUser(int currentSearchIndex) {
                                 }
                             );
                         } else {
-                            if (!BeatSaver::API::exception.empty() && BeatSaver::API::exception != "Not Found") loadingControl->ShowText(il2cpp_utils::newcsstr(BeatSaver::API::exception), true);
-                            else loadingControl->ShowText(il2cpp_utils::newcsstr("No User Found!"), true);
+                            if (!BeatSaver::API::exception.empty() && BeatSaver::API::exception != "Not Found") loadingControl->ShowText(BeatSaver::API::exception, true);
+                            else loadingControl->ShowText("No User Found!", true);
                         }
                     }
                 );
             }
         );
     }
-    else loadingControl->ShowText(il2cpp_utils::newcsstr("Please type in a Username!"), false);
+    else loadingControl->ShowText("Please type in a Username!", false);
 }
 
 void DownloadSongsSearchViewController::GetCuratorRecommended(int currentSearchIndex) {
@@ -334,8 +334,8 @@ void DownloadSongsSearchViewController::GetCuratorRecommended(int currentSearchI
                                     }
                                 }
                                 else {
-                                    if (!BeastSaber::API::exception.empty()) loadingControl->ShowText(il2cpp_utils::newcsstr(BeastSaber::API::exception), true);
-                                    else loadingControl->ShowText(il2cpp_utils::newcsstr("Damn, Curators didn't recommend anything!"), true);
+                                    if (!BeastSaber::API::exception.empty()) loadingControl->ShowText(BeastSaber::API::exception, true);
+                                    else loadingControl->ShowText("Damn, Curators didn't recommend anything!", true);
                                 }
                             }
                         }
@@ -371,8 +371,8 @@ void DownloadSongsSearchViewController::GetBookmarks(int currentSearchIndex) {
                                     }
                                 }
                                 else {
-                                    if (!BeastSaber::API::exception.empty()) loadingControl->ShowText(il2cpp_utils::newcsstr(BeastSaber::API::exception), true);
-                                    else loadingControl->ShowText(il2cpp_utils::newcsstr("No bookmarks found\nfor given User!"), true);
+                                    if (!BeastSaber::API::exception.empty()) loadingControl->ShowText(BeastSaber::API::exception, true);
+                                    else loadingControl->ShowText("No bookmarks found\nfor given User!", true);
                                 }
                             }
                         }
@@ -381,7 +381,7 @@ void DownloadSongsSearchViewController::GetBookmarks(int currentSearchIndex) {
             }, 
         DownloadSongsSearchViewController::searchPage);
     }
-    else loadingControl->ShowText(il2cpp_utils::newcsstr("Please type in a Username!"), false);
+    else loadingControl->ShowText("Please type in a Username!", false);
 }
 
 void DownloadSongsSearchViewController::GetTrending(int currentSearchIndex) {
@@ -410,9 +410,9 @@ void DownloadSongsSearchViewController::GetTrending(int currentSearchIndex) {
                                 }
                             }
                             else {
-                                if (!ScoreSaber::API::exception.empty()) loadingControl->ShowText(il2cpp_utils::newcsstr(ScoreSaber::API::exception), true);
-                                else if (DownloadSongsSearchViewController::SearchQuery.empty()) loadingControl->ShowText(il2cpp_utils::newcsstr("No Results,\nis your Internet working?"), true);
-                                else loadingControl->ShowText(il2cpp_utils::newcsstr("No Songs Found!"), true);
+                                if (!ScoreSaber::API::exception.empty()) loadingControl->ShowText(ScoreSaber::API::exception, true);
+                                else if (DownloadSongsSearchViewController::SearchQuery.empty()) loadingControl->ShowText("No Results,\nis your Internet working?", true);
+                                else loadingControl->ShowText("No Songs Found!", true);
                             }
                         }
                     }
@@ -448,9 +448,9 @@ void DownloadSongsSearchViewController::GetLatestRanked(int currentSearchIndex) 
                                 }
                             }
                             else {
-                                if (!ScoreSaber::API::exception.empty()) loadingControl->ShowText(il2cpp_utils::newcsstr(ScoreSaber::API::exception), true);
-                                else if (DownloadSongsSearchViewController::SearchQuery.empty()) loadingControl->ShowText(il2cpp_utils::newcsstr("No Results,\nis your Internet working?"), true);
-                                else loadingControl->ShowText(il2cpp_utils::newcsstr("No Songs Found!"), true);
+                                if (!ScoreSaber::API::exception.empty()) loadingControl->ShowText(ScoreSaber::API::exception, true);
+                                else if (DownloadSongsSearchViewController::SearchQuery.empty()) loadingControl->ShowText("No Results,\nis your Internet working?", true);
+                                else loadingControl->ShowText("No Songs Found!", true);
                             }
                         }
                     }
@@ -486,9 +486,9 @@ void DownloadSongsSearchViewController::GetTopPlayed(int currentSearchIndex) {
                                 }
                             }
                             else {
-                                if (!ScoreSaber::API::exception.empty()) loadingControl->ShowText(il2cpp_utils::newcsstr(ScoreSaber::API::exception), true);
-                                else if (DownloadSongsSearchViewController::SearchQuery.empty()) loadingControl->ShowText(il2cpp_utils::newcsstr("No Results,\nis your Internet working?"), true);
-                                else loadingControl->ShowText(il2cpp_utils::newcsstr("No Songs Found!"), true);
+                                if (!ScoreSaber::API::exception.empty()) loadingControl->ShowText(ScoreSaber::API::exception, true);
+                                else if (DownloadSongsSearchViewController::SearchQuery.empty()) loadingControl->ShowText("No Results,\nis your Internet working?", true);
+                                else loadingControl->ShowText("No Songs Found!", true);
                             }
                         }
                     }
@@ -524,9 +524,9 @@ void DownloadSongsSearchViewController::GetTopRanked(int currentSearchIndex) {
                                 }
                             }
                             else {
-                                if (!ScoreSaber::API::exception.empty()) loadingControl->ShowText(il2cpp_utils::newcsstr(ScoreSaber::API::exception), true);
-                                else if (DownloadSongsSearchViewController::SearchQuery.empty()) loadingControl->ShowText(il2cpp_utils::newcsstr("No Results,\nis your Internet working?"), true);
-                                else loadingControl->ShowText(il2cpp_utils::newcsstr("No Songs Found!"), true);
+                                if (!ScoreSaber::API::exception.empty()) loadingControl->ShowText(ScoreSaber::API::exception, true);
+                                else if (DownloadSongsSearchViewController::SearchQuery.empty()) loadingControl->ShowText("No Results,\nis your Internet working?", true);
+                                else loadingControl->ShowText("No Songs Found!", true);
                             }
                         }
                     }
@@ -541,7 +541,7 @@ void DownloadSongsSearchViewController::Search() {
     for (int i = 0; i < ENTRIES_PER_PAGE; i++) {
         searchViewController->searchEntries[i].Disable();
     }
-    searchViewController->loadingControl->ShowLoading(il2cpp_utils::newcsstr("Loading..."));
+    searchViewController->loadingControl->ShowLoading("Loading...");
     DownloadSongsSearchViewController::searchIndex++;
     int currentSearchIndex = DownloadSongsSearchViewController::searchIndex;
     searchViewController->SearchField->get_gameObject()->SetActive(true);
@@ -556,7 +556,7 @@ void DownloadSongsSearchViewController::Search() {
             searchViewController->SearchUser(currentSearchIndex);
         }
         else {
-            searchViewController->loadingControl->ShowText(il2cpp_utils::newcsstr("Invalid Selection for\nService BeatSaver!"), false);
+            searchViewController->loadingControl->ShowText("Invalid Selection for\nService BeatSaver!", false);
         }
     }
     else if (getModConfig().Service.GetValue() == "BeastSaber") {
@@ -568,7 +568,7 @@ void DownloadSongsSearchViewController::Search() {
             searchViewController->GetBookmarks(currentSearchIndex);
         }
         else {
-            searchViewController->loadingControl->ShowText(il2cpp_utils::newcsstr("Invalid Selection for\nService BeastSaber!"), false);
+            searchViewController->loadingControl->ShowText("Invalid Selection for\nService BeastSaber!", false);
         }
     }
     else if (getModConfig().Service.GetValue() == "ScoreSaber") {
@@ -586,11 +586,11 @@ void DownloadSongsSearchViewController::Search() {
             searchViewController->GetTopRanked(currentSearchIndex);
         }
         else {
-            searchViewController->loadingControl->ShowText(il2cpp_utils::newcsstr("Invalid Selection for\nService ScoreSaber!"), false);
+            searchViewController->loadingControl->ShowText("Invalid Selection for\nService ScoreSaber!", false);
         }
     }
     else {
-        searchViewController->loadingControl->ShowText(il2cpp_utils::newcsstr("Invalid Selection\nselected Service Unknown!"), false);
+        searchViewController->loadingControl->ShowText("Invalid Selection\nselected Service Unknown!", false);
     }
 }
 
@@ -615,7 +615,7 @@ void DownloadSongsSearchViewController::DidActivate(bool firstActivation, bool a
         );
         if (getModConfig().Service.GetValue() == "BeastSaber" && getModConfig().ListType_BeastSaber.GetValue() == "Bookmarks") {
             DownloadSongsSearchViewController::SearchQuery = getModConfig().BookmarkUsername.GetValue();
-            searchViewController->SearchField->SetText(il2cpp_utils::newcsstr(getModConfig().BookmarkUsername.GetValue()));
+            searchViewController->SearchField->SetText(getModConfig().BookmarkUsername.GetValue());
         }
         auto container = BeatSaberUI::CreateScrollView(get_transform());
         
@@ -647,7 +647,7 @@ void DownloadSongsSearchViewController::DidActivate(bool firstActivation, bool a
                 Search();
             }
         ));
-        loadingControl->loadingText->set_text(il2cpp_utils::newcsstr("Loading..."));
+        loadingControl->loadingText->set_text("Loading...");
         loadingControl->set_enabled(true);
 
         Search();

@@ -87,7 +87,7 @@ void DownloadSongsOptionsViewController::DidActivate(bool firstActivation, bool 
                 }
                 if (value == "BeastSaber" && getModConfig().ListType_BeastSaber.GetValue() == "Bookmarks") {
                     DownloadSongsSearchViewController::SearchQuery = getModConfig().BookmarkUsername.GetValue();
-                    searchViewController->SearchField->SetText(il2cpp_utils::newcsstr(getModConfig().BookmarkUsername.GetValue()));
+                    searchViewController->SearchField->SetText(getModConfig().BookmarkUsername.GetValue());
                 }
                 else if (LastListType == "Bookmarks") {
                     DownloadSongsSearchViewController::SearchQuery.clear();
@@ -120,7 +120,7 @@ void DownloadSongsOptionsViewController::DidActivate(bool firstActivation, bool 
             [this](StringW value) {
                 if (value == "Bookmarks") {
                     DownloadSongsSearchViewController::SearchQuery = getModConfig().BookmarkUsername.GetValue();
-                    searchViewController->SearchField->SetText(il2cpp_utils::newcsstr(getModConfig().BookmarkUsername.GetValue()));
+                    searchViewController->SearchField->SetText(getModConfig().BookmarkUsername.GetValue());
                 }
                 else if (getModConfig().ListType_BeastSaber.GetValue() == "Bookmarks") {
                     DownloadSongsSearchViewController::SearchQuery.clear();
@@ -139,7 +139,7 @@ void DownloadSongsOptionsViewController::DidActivate(bool firstActivation, bool 
             [this](StringW value) {
                 if (LastListType == "Bookmarks") {
                     DownloadSongsSearchViewController::SearchQuery.clear();
-                    searchViewController->SearchField->SetText(il2cpp_utils::newcsstr(""));
+                    searchViewController->SearchField->SetText("");
                 }
                 if (value == "Top Ranked" || value == "Latest Ranked") {
                     Ranked->get_gameObject()->SetActive(false);

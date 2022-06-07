@@ -32,7 +32,7 @@ void SearchEntry::SetBeatmap(const BeatSaver::Beatmap& _map) {
     gameObject->SetActive(true);
     MapType = SearchEntry::MapType::BeatSaver;
 
-    line1Component->SetText(il2cpp_utils::newcsstr(map.GetMetadata().GetSongName()));
+    line1Component->SetText(map.GetMetadata().GetSongName());
 
     if (map.GetRanked()) {
         line1Component->set_color(UnityEngine::Color(1, 0.68f, 0, 1));
@@ -51,10 +51,10 @@ void SearchEntry::SetBeatmap(const BeatSaver::Beatmap& _map) {
     }
     if (ModsUsed.ends_with(", ")) ModsUsed.erase(ModsUsed.length() - 2);
     if (ModsUsed.empty()) {
-        line2Component->SetText(il2cpp_utils::newcsstr("<size=80%><noparse>" + map.GetMetadata().GetSongAuthorName() + "</noparse>" + " <size=90%>[<color=#67c16f><noparse>" + map.GetMetadata().GetLevelAuthorName() + "</noparse></color>]"));
+        line2Component->SetText("<size=80%><noparse>" + map.GetMetadata().GetSongAuthorName() + "</noparse>" + " <size=90%>[<color=#67c16f><noparse>" + map.GetMetadata().GetLevelAuthorName() + "</noparse></color>]");
     }
     else {
-        line2Component->SetText(il2cpp_utils::newcsstr("<size=80%><noparse>" + map.GetMetadata().GetSongAuthorName() + "</noparse>" + " <size=90%>[<color=#67c16f><noparse>" + map.GetMetadata().GetLevelAuthorName() + "</noparse></color>] [" + ModsUsed + "]"));
+        line2Component->SetText("<size=80%><noparse>" + map.GetMetadata().GetSongAuthorName() + "</noparse>" + " <size=90%>[<color=#67c16f><noparse>" + map.GetMetadata().GetLevelAuthorName() + "</noparse></color>] [" + ModsUsed + "]");
     }
 
     int currentSearchIndex = DownloadSongsSearchViewController::searchIndex;
@@ -82,15 +82,15 @@ void SearchEntry::SetBeatmap(const BeastSaber::Song& _song) {
     gameObject->SetActive(true);
     MapType = SearchEntry::MapType::BeastSaber;
 
-    line1Component->SetText(il2cpp_utils::newcsstr(BSsong.GetTitle()));
+    line1Component->SetText(BSsong.GetTitle());
 
     line1Component->set_color(UnityEngine::Color(1, 1, 1, 1));
 
     if (BSsong.GetCurated_by().has_value()) {
-        line2Component->SetText(il2cpp_utils::newcsstr("<size=90%>[<color=#67c16f><noparse>" + BSsong.GetLevel_author_name() + "</noparse></color>] " + "<color=#FFFFFFFF><size=75%>Curated by:</color> <color=#ADADADFF><size=80%><noparse>" + BSsong.GetCurated_by().value() + "</noparse></color>"));
+        line2Component->SetText("<size=90%>[<color=#67c16f><noparse>" + BSsong.GetLevel_author_name() + "</noparse></color>] " + "<color=#FFFFFFFF><size=75%>Curated by:</color> <color=#ADADADFF><size=80%><noparse>" + BSsong.GetCurated_by().value() + "</noparse></color>");
     }
     else {
-        line2Component->SetText(il2cpp_utils::newcsstr("<size=90%>[<color=#67c16f><noparse>" + BSsong.GetLevel_author_name() + "</noparse></color>]"));
+        line2Component->SetText("<size=90%>[<color=#67c16f><noparse>" + BSsong.GetLevel_author_name() + "</noparse></color>]");
     }
 
     int currentSearchIndex = DownloadSongsSearchViewController::searchIndex;
@@ -118,7 +118,7 @@ void SearchEntry::SetBeatmap(const BeastSaber::Song& _song) {
 //    gameObject->SetActive(true);
 //    MapType = SearchEntry::MapType::ScoreSaber;
 //
-//    line1Component->SetText(il2cpp_utils::newcsstr(SSsong.GetName()));
+//    line1Component->SetText(SSsong.GetName());
 //
 //    if (SSsong.GetRanked() > 0) {
 //        line1Component->set_color(UnityEngine::Color(1, 0.68f, 0, 1));
@@ -127,7 +127,7 @@ void SearchEntry::SetBeatmap(const BeastSaber::Song& _song) {
 //        line1Component->set_color(UnityEngine::Color(1, 1, 1, 1));
 //    }
 //
-//    line2Component->SetText(il2cpp_utils::newcsstr("<size=80%><noparse>" + SSsong.GetSongAuthorName() + "</noparse>" + " <size=90%>[<color=#67c16f><noparse>" + SSsong.GetLevelAuthorName() + "</noparse></color>]"));
+//    line2Component->SetText("<size=80%><noparse>" + SSsong.GetSongAuthorName() + "</noparse>" + " <size=90%>[<color=#67c16f><noparse>" + SSsong.GetLevelAuthorName() + "</noparse></color>]");
 //
 //    int currentSearchIndex = DownloadSongsSearchViewController::searchIndex;
 //
@@ -154,7 +154,7 @@ void SearchEntry::SetBeatmap(const ScoreSaber::Leaderboard& _song) {
     gameObject->SetActive(true);
     MapType = SearchEntry::MapType::ScoreSaber;
 
-    line1Component->SetText(il2cpp_utils::newcsstr(SSsong.GetSongName()));
+    line1Component->SetText(SSsong.GetSongName());
 
     if (SSsong.GetRanked() > 0) {
         line1Component->set_color(UnityEngine::Color(1, 0.68f, 0, 1));
@@ -163,7 +163,7 @@ void SearchEntry::SetBeatmap(const ScoreSaber::Leaderboard& _song) {
         line1Component->set_color(UnityEngine::Color(1, 1, 1, 1));
     }
 
-    line2Component->SetText(il2cpp_utils::newcsstr("<size=80%><noparse>" + SSsong.GetSongAuthorName() + "</noparse>" + " <size=90%>[<color=#67c16f><noparse>" + SSsong.GetLevelAuthorName() + "</noparse></color>]"));
+    line2Component->SetText("<size=80%><noparse>" + SSsong.GetSongAuthorName() + "</noparse>" + " <size=90%>[<color=#67c16f><noparse>" + SSsong.GetLevelAuthorName() + "</noparse></color>]");
 
     int currentSearchIndex = DownloadSongsSearchViewController::searchIndex;
 
