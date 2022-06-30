@@ -30,6 +30,6 @@ extern "C" void load() {
     il2cpp_functions::Init();
     QuestUI::Init();
     custom_types::Register::AutoRegister();
-    QuestUI::Register::RegisterMainMenuModSettingsFlowCoordinator<SongDownloader::DownloadSongsFlowCoordinator*>(modInfo);
+    QuestUI::Register::RegisterMainMenuModSettingsFlowCoordinator<SongDownloader::DownloadSongsFlowCoordinator*>(modInfo, "More Songs");
     LOG_INFO("Successfully installed SongDownloader!");
 }
