@@ -3,6 +3,8 @@
 #include "CustomLogger.hpp"
 #include "ModConfig.hpp"
 
+#include "custom-types/shared/delegate.hpp" 
+
 #include "UnityEngine/RectOffset.hpp"
 #include "UnityEngine/Rect.hpp"
 #include "UnityEngine/SpriteMeshType.hpp"
@@ -102,7 +104,7 @@ void DownloadSongsSearchViewController::CreateEntries(Transform* parent) {
 
         searchEntries[i] = SearchEntry(copy, copyLevelBar->songNameText, copyLevelBar->authorNameText, artwork, downloadButton);
         auto& entry = searchEntries[i];
-        downloadButton->get_onClick()->AddListener(il2cpp_utils::MakeDelegate<UnityAction*>(classof(UnityAction*), 
+        downloadButton->get_onClick()->AddListener(custom_types::MakeDelegate<UnityAction*>(
             (std::function<void()>) [this, &entry] {
                 if (entry.MapType == SearchEntry::MapType::BeatSaver) {
                     auto hash = entry.GetBeatmap().GetVersions().front().GetHash();
@@ -642,7 +644,7 @@ void DownloadSongsSearchViewController::DidActivate(bool firstActivation, bool a
         auto loadingControlTransform = loadingControlGameObject->get_transform();
         loadingControlTransform->set_localPosition(Vector3(0.f, 0.0f, 0.0f));
         loadingControl = loadingControlGameObject->GetComponent<LoadingControl*>();
-        loadingControl->add_didPressRefreshButtonEvent(il2cpp_utils::MakeDelegate<System::Action*>(classof(System::Action*),
+        loadingControl->add_didPressRefreshButtonEvent(custom_types::MakeDelegate<System::Action*>(
             (std::function<void()>) [this]() {
                 Search();
             }
