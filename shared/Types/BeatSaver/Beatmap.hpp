@@ -14,6 +14,7 @@ namespace BeatSaver {
 }
 
 DECLARE_JSON_CLASS(BeatSaver, Beatmap, 
+    ERROR_CHECK
     GETTER_VALUE(std::string, Id, "id");
     GETTER_VALUE(std::string, Name, "name");
     GETTER_VALUE(std::string, Description, "description");
@@ -32,5 +33,4 @@ DECLARE_JSON_CLASS(BeatSaver, Beatmap,
     inline void GetLatestCoverImageAsync(std::function<void(std::vector<uint8_t>)> finished, std::function<void(float)> progressUpdate) {
         BeatSaver::API::GetCoverImageAsync(*this, finished, progressUpdate);
     }
-    ERROR_CHECK
 )

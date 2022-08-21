@@ -3,6 +3,7 @@
 #include "ParitySummary.hpp"
 
 DECLARE_JSON_CLASS(BeatSaver, BeatmapDifficulty, 
+    ERROR_CHECK
     GETTER_VALUE(float, NJS, "njs");
     GETTER_VALUE(float, Offset, "offset");
     GETTER_VALUE(int, Notes, "notes");
@@ -20,5 +21,4 @@ DECLARE_JSON_CLASS(BeatSaver, BeatmapDifficulty,
     GETTER_VALUE(double, Seconds, "seconds");
     GETTER_VALUE(BeatSaver::BeatmapParitySummary, ParitySummary, "paritySummary");
     GETTER_VALUE_OPTIONAL(float, Stars, "stars"); // No idea what that value really is for, but it sure exists on some maps
-    ERROR_CHECK
 )

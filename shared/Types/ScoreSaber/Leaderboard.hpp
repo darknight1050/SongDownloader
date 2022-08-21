@@ -11,6 +11,7 @@ namespace ScoreSaber {
 }
 
 DECLARE_JSON_CLASS(ScoreSaber, Leaderboard, 
+    ERROR_CHECK
     GETTER_VALUE(int, Id, "id");
     GETTER_VALUE(std::string, SongHash, "songHash");
     GETTER_VALUE(std::string, SongName, "songName");
@@ -29,8 +30,8 @@ DECLARE_JSON_CLASS(ScoreSaber, Leaderboard,
     GETTER_VALUE(int, MaxPP, "maxPP");
     // check optional for both potential types and resolve in the deserialize method
     private:
-        NAMED_AUTO_VALUE_OPTIONAL(float, Stars, "stars");
-        NAMED_AUTO_VALUE_OPTIONAL(int, StarsInt, "stars");
+        NAMED_VALUE_OPTIONAL(float, Stars, "stars");
+        NAMED_VALUE_OPTIONAL(int, StarsInt, "stars");
     public:
         const float& GetStars() const { return Stars.value(); }
     GETTER_VALUE(int, Plays, "plays");
@@ -39,14 +40,13 @@ DECLARE_JSON_CLASS(ScoreSaber, Leaderboard,
     //GETTER_VALUE_OPTIONAL(PlayerScore, playerScore, Int, "int");
     GETTER_VALUE(std::string, CoverImage, "coverImage");
     //GETTER_VALUE_OPTIONAL(Difficulties, difficulties, );
+    DESERIALIZE_ACTION(SetStars,
+        if (!self->Stars.has_value() && !self->StarsInt.has_value())
+            throw SongDownloader::JsonException(SongDownloader::Exceptions::NoMember, "stars not found");
+        else if (!self->Stars.has_value())
+            self->Stars = self->StarsInt.value();
+    )
     inline void GetCoverImageAsync(std::function<void(std::vector<uint8_t>)> finished, std::function<void(float)> progressUpdate = nullptr) {
         ScoreSaber::API::GetCoverImageAsync(*this, finished, progressUpdate);
-    }
-    void Deserialize(const rapidjson::Value& jsonValue) {
-        if (jsonValue.HasMember("error") && jsonValue["error"].IsString())
-            throw SongDownloader::JsonException(SongDownloader::Exceptions::SiteError, jsonValue["error"].GetString());
-        _Deserialize(jsonValue);
-        if (!Stars.has_value() && !StarsInt.has_value())
-            throw SongDownloader::JsonException(SongDownloader::Exceptions::NoMember, "stars not found");
     }
 )

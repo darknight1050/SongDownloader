@@ -3,6 +3,7 @@
 #include "UserDiffStats.hpp"
 
 DECLARE_JSON_CLASS(BeatSaver, UserStats,
+    ERROR_CHECK
     GETTER_VALUE(int, TotalUpvotes, "totalUpvotes");
     GETTER_VALUE(int, TotalDownvotes, "totalDownvotes");
     GETTER_VALUE(int, TotalMaps, "totalMaps");
@@ -13,5 +14,4 @@ DECLARE_JSON_CLASS(BeatSaver, UserStats,
     GETTER_VALUE_OPTIONAL(std::string, FirstUpload, "firstUpload");
     GETTER_VALUE_OPTIONAL(std::string, LastUpload, "lastUpload");
     GETTER_VALUE(BeatSaver::UserDiffStats, DiffStats, "diffStats");
-    ERROR_CHECK
 )

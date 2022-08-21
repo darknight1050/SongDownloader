@@ -5,28 +5,27 @@
 
 #define GETTER_VALUE(type, name, jsonName) \
 private: \
-    NAMED_AUTO_VALUE(type, name, jsonName) \
+    NAMED_VALUE(type, name, jsonName) \
 public: \
     const type& Get##name() const { return name; }
 
 #define GETTER_VALUE_OPTIONAL(type, name, jsonName) \
 private: \
-    NAMED_AUTO_VALUE_OPTIONAL(type, name, jsonName) \
+    NAMED_VALUE_OPTIONAL(type, name, jsonName) \
 public: \
     std::optional<type> Get##name() const { return name; }
 
 #define GETTER_CLASS_OPTIONAL(type, name, jsonName) \
 private: \
-    NAMED_AUTO_VALUE_OPTIONAL(type, name, jsonName) \
+    NAMED_VALUE_OPTIONAL(type, name, jsonName) \
 public: \
     std::optional<type> Get##name() const { return name; }
 
 #define ERROR_CHECK \
-void Deserialize(const rapidjson::Value& jsonValue) { \
+DESERIALIZE_ACTION(ErrorCheck, \
     if (jsonValue.HasMember("error") && jsonValue["error"].IsString()) \
         throw SongDownloader::JsonException(SongDownloader::Exceptions::SiteError, jsonValue["error"].GetString()); \
-    _Deserialize(jsonValue); \
-}
+)
 
 // #define DESERIALIZE_VALUE_2TYPES(name, jsonName, returnType, checkType2) \
 // if (!jsonValue.HasMember(#jsonName)) throw SongDownloader::JsonException(SongDownloader::Exceptions::NoMember, #jsonName); \
