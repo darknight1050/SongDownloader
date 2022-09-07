@@ -1,25 +1,26 @@
 #pragma once
+#include "CustomLogger.hpp"
 #include "rapidjson-macros/shared/macros.hpp"
 
 #include "../Exceptions.hpp"
 
 #define GETTER_VALUE(type, name, jsonName) \
 private: \
-    NAMED_VALUE(type, name, jsonName) \
+    NAMED_VALUE(type, _##name, jsonName) \
 public: \
-    const type& Get##name() const { return name; }
+    const type& Get##name() const { return _##name; }
 
 #define GETTER_VALUE_OPTIONAL(type, name, jsonName) \
 private: \
-    NAMED_VALUE_OPTIONAL(type, name, jsonName) \
+    NAMED_VALUE_OPTIONAL(type, _##name, jsonName) \
 public: \
-    std::optional<type> Get##name() const { return name; }
+    std::optional<type> Get##name() const { return _##name; }
 
 #define GETTER_CLASS_OPTIONAL(type, name, jsonName) \
 private: \
-    NAMED_VALUE_OPTIONAL(type, name, jsonName) \
+    NAMED_VALUE_OPTIONAL(type, _##name, jsonName) \
 public: \
-    std::optional<type> Get##name() const { return name; }
+    std::optional<type> Get##name() const { return _##name; }
 
 #define ERROR_CHECK \
 DESERIALIZE_ACTION(ErrorCheck, \

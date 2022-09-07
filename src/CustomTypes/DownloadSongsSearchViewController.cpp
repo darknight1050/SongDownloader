@@ -66,7 +66,7 @@ void DownloadSongsSearchViewController::CreateEntries(Transform* parent) {
         levelBarLayoutElement->set_minHeight(15.0f);
         levelBarLayoutElement->set_minWidth(90.0f);
 
-        GameObject* existingLevelBar = Resources::FindObjectsOfTypeAll<LevelBar*>().FirstOrDefault()->get_gameObject();
+        GameObject* existingLevelBar = Resources::FindObjectsOfTypeAll<LevelBar*>().First([](LevelBar* x) { return x->get_name() == "LevelBarBig"; })->get_gameObject();
         GameObject* levelBarGameObject = UnityEngine::GameObject::Instantiate(existingLevelBar, levelBarLayout->get_transform());
         auto levelBarTransform = levelBarGameObject->get_transform();
 
