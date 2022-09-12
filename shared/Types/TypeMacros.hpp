@@ -1,5 +1,4 @@
 #pragma once
-#include "CustomLogger.hpp"
 #include "rapidjson-macros/shared/macros.hpp"
 
 #include "../Exceptions.hpp"
