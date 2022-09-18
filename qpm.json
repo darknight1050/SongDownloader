@@ -7,7 +7,11 @@
     "version": "0.4.13",
     "url": "https://github.com/darknight1050/SongDownloader",
     "additionalData": {
-      "overrideSoName": "libsongdownloader.so"
+      "soLink": "https://github.com/darknight1050/SongDownloader/releases/download/v0.4.13/libsongdownloader.so",
+      "debugSoLink": "https://github.com/darknight1050/SongDownloader/releases/download/v0.4.13/debug_libsongdownloader.so",
+      "overrideSoName": "libsongdownloader.so",
+      "modLink": "https://github.com/darknight1050/SongDownloader/releases/download/v0.4.13/SongDownloader.qmod",
+      "branchName": "version-v0.4.13"
     }
   },
   "dependencies": [
