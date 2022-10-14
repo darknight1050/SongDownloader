@@ -22,7 +22,7 @@
     },
     {
       "id": "codegen",
-      "versionRange": "^0.27.0",
+      "versionRange": "^0.28.0",
       "additionalData": {}
     },
     {
@@ -32,12 +32,12 @@
     },
     {
       "id": "questui",
-      "versionRange": "^0.17.1",
+      "versionRange": "^0.17.3",
       "additionalData": {}
     },
     {
       "id": "songloader",
-      "versionRange": "^0.10.7",
+      "versionRange": "^0.10.9",
       "additionalData": {}
     },
     {
