@@ -52,6 +52,8 @@ namespace SongDownloader {
 
         float downloadProgress = -1.0f;
 
+        SearchEntry() = default;
+
         SearchEntry(UnityEngine::GameObject* _gameObject, TMPro::TextMeshProUGUI* _line1Component, TMPro::TextMeshProUGUI* _line2Component, HMUI::ImageView* _coverImageView, UnityEngine::UI::Button* _downloadButton);
 
         const BeatSaver::Beatmap& GetBeatmap();
@@ -118,6 +120,8 @@ DECLARE_CLASS_CODEGEN(SongDownloader, DownloadSongsSearchViewController, HMUI::V
     DECLARE_INSTANCE_METHOD(void, GetTopPlayed, int);
 
     DECLARE_INSTANCE_METHOD(void, GetTopRanked, int);
+
+    DECLARE_DEFAULT_CTOR();
 )
 
 namespace SongDownloader {
