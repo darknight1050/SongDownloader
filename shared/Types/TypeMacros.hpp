@@ -9,6 +9,12 @@ private: \
 public: \
     const type& Get##name() const { return _##name; }
 
+#define GETTER_VALUE_DEFAULT(type, name, def, jsonName) \
+private: \
+    NAMED_VALUE_DEFAULT(type, _##name, def, jsonName) \
+public: \
+    const type& Get##name() const { return _##name; }
+
 #define GETTER_VALUE_OPTIONAL(type, name, jsonName) \
 private: \
     NAMED_VALUE_OPTIONAL(type, _##name, jsonName) \
