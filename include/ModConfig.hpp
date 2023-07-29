@@ -15,19 +15,4 @@ DECLARE_CONFIG(ModConfig,
     CONFIG_VALUE(Ranked, std::string, "Ranked_BeatSaver", "", "If Ranked maps should be included in search results");
 
     CONFIG_VALUE(BookmarkUsername, std::string, "BookmarkUsername", "");
-
-    CONFIG_INIT_FUNCTION(
-        CONFIG_INIT_VALUE(Service);
-        CONFIG_INIT_VALUE(ListType_BeatSaver);
-        CONFIG_INIT_VALUE(ListType_BeastSaber);
-        CONFIG_INIT_VALUE(ListType_ScoreSaber);
-        CONFIG_INIT_VALUE(AutoMapper);
-        CONFIG_INIT_VALUE(SortOrder);
-        CONFIG_INIT_VALUE(NE);
-        CONFIG_INIT_VALUE(ME);
-        CONFIG_INIT_VALUE(Chroma);
-        CONFIG_INIT_VALUE(Ranked);
-
-        CONFIG_INIT_VALUE(BookmarkUsername);
-    )
 )

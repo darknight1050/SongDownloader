@@ -4,7 +4,7 @@
   "info": {
     "name": "SongDownloader",
     "id": "songdownloader",
-    "version": "0.0.1",
+    "version": "0.6.0",
     "url": "https://github.com/darknight1050/SongDownloader",
     "additionalData": {
       "overrideSoName": "libsongdownloader.so"
@@ -42,7 +42,7 @@
     },
     {
       "id": "config-utils",
-      "versionRange": "^0.8.0",
+      "versionRange": "^1.1.0",
       "additionalData": {}
     },
     {
@@ -57,7 +57,7 @@
     },
     {
       "id": "rapidjson-macros",
-      "versionRange": "^0.3.0",
+      "versionRange": "^1.0.0",
       "additionalData": {}
     }
   ],
