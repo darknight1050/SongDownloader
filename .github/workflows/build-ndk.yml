@@ -1,8 +1,8 @@
-name: NDK build
+name: NDK Build
 
 env:
-    module_id: songdownloader
-    qmodName: SongDownloader
+  module_id: songdownloader
+  qmodName: SongDownloader
 
 on:
   workflow_dispatch:
@@ -14,14 +14,14 @@ on:
 jobs:
   build:
     runs-on: ubuntu-latest
-    
+
     steps:
     - uses: actions/checkout@v2
       name: Checkout
       with:
         submodules: true
         lfs: true
-    
+
     - uses: seanmiddleditch/gha-setup-ninja@v3
 
     - name: Create ndkpath.txt
@@ -29,37 +29,15 @@ jobs:
         echo "$ANDROID_NDK_LATEST_HOME" > ${GITHUB_WORKSPACE}/ndkpath.txt
         cat ${GITHUB_WORKSPACE}/ndkpath.txt
 
-    - name: Get QPM
-      if: steps.cache-qpm.outputs.cache-hit != 'true'
-      uses: dawidd6/action-download-artifact@v2
+    - name: QPM Action
+      uses: Fernthedev/qpm-action@main
       with:
-        github_token: ${{secrets.GITHUB_TOKEN}}
-        workflow: cargo-build.yml
-        name: linux-qpm-rust
-        path: QPM
-        repo: RedBrumbler/QuestPackageManager-Rust
-        
-    - name: QPM Collapse
-      run: |
-        chmod +x ./QPM/qpm-rust
-        ./QPM/qpm-rust collapse
-    
-    - name: QPM Dependencies Cache
-      id: cache-qpm-deps
-      uses: actions/cache@v2
-      env:
-        cache-name: cache-qpm-deps
-      with:
-        path: /home/runner/.local/share/QPM-Rust/cache
-        key: ${{ runner.os }}-build-${{ env.cache-name }}-${{ hashFiles('qpm.json') }}
-        restore-keys: |
-          ${{ runner.os }}-build-${{ env.cache-name }}-
-          ${{ runner.os }}-build-
-          ${{ runner.os }}-
+        workflow_token: ${{ secrets.GITHUB_TOKEN }}
 
-    - name: QPM Restore
-      run: |
-        ./QPM/qpm-rust restore
+        restore: true
+        cache: true
+
+        publish: false
 
     - name: List Post Restore
       run: |
@@ -67,17 +45,10 @@ jobs:
         ls -la ${GITHUB_WORKSPACE}/extern/includes
         echo libs:
         ls -la ${GITHUB_WORKSPACE}/extern/libs
-        echo cache:
-        ls -la $HOME/.local/share/QPM-Rust/cache
-        
-    - name: Apply Legacy Fix
-      run: |
-        ./QPM/qpm-rust cache legacy-fix
 
     - name: Build
       run: |
         cd ${GITHUB_WORKSPACE}
-        ./QPM/qpm-rust qmod build
         pwsh -Command ./build.ps1
 
     - name: Create Qmod
@@ -90,8 +61,8 @@ jobs:
         cd ./build/
         pattern="lib${module_id}*.so"
         files=( $pattern )
-        echo ::set-output name=NAME::"${files[0]}"
-    
+        echo NAME="${files[0]}" >> $GITHUB_OUTPUT
+
     - name: Upload non-debug artifact
       uses: actions/upload-artifact@v2
       with:
@@ -109,6 +80,6 @@ jobs:
     - name: Upload qmod artifact
       uses: actions/upload-artifact@v2
       with:
-        name: ${{env.qmodName}}.qmod
+        name: ${{ env.qmodName }}.qmod
         path: ./${{ env.qmodName }}.qmod
         if-no-files-found: error

@@ -12,11 +12,9 @@
 ModInfo modInfo;
 
 Logger& getLogger() {
-    static auto logger = new Logger(modInfo, LoggerOptions(false, true)); 
-    return *logger; 
+    static auto logger = new Logger(modInfo, LoggerOptions(false, true));
+    return *logger;
 }
-
-DEFINE_CONFIG(ModConfig);
 
 extern "C" void setup(ModInfo& info) {
     modInfo.id = "SongDownloader";
