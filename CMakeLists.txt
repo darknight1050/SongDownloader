@@ -20,7 +20,8 @@ set(INCLUDE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/include)
 add_compile_options(-frtti -fPIE -fPIC -fexceptions -O3)
 # compile definitions used
 add_compile_definitions(VERSION=\"${MOD_VERSION}\")
-add_compile_definitions(ID=\"${MOD_ID}\")
+add_compile_definitions(MOD_ID=\"${MOD_ID}\")
+add_compile_definitions(VERSION_LONG=0)
 
 # recursively get all src files
 RECURSE_FILES(cpp_file_list ${SOURCE_DIR}/*.cpp)
@@ -29,8 +30,8 @@ list(APPEND c_file_list ${INCLUDE_DIR}/zip/src/zip.c)
 
 # add all src files to compile
 add_library(
-    ${COMPILE_ID} 
-    SHARED 
+    ${COMPILE_ID}
+    SHARED
     ${cpp_file_list}
     ${c_file_list}
 )
@@ -43,9 +44,7 @@ target_include_directories(${COMPILE_ID} PRIVATE ${SOURCE_DIR})
 target_include_directories(${COMPILE_ID} PRIVATE ${INCLUDE_DIR})
 # add shared dir as include dir
 target_include_directories(${COMPILE_ID} PUBLIC ${SHARED_DIR})
-# codegen includes 
-target_include_directories(${COMPILE_ID} PRIVATE ${EXTERN_DIR}/includes/${CODEGEN_ID}/include)
-# rapidjson includes 
+# rapidjson includes
 target_include_directories(${COMPILE_ID} PRIVATE ${EXTERN_DIR}/includes/beatsaber-hook/shared/rapidjson/include)
 # zip includes
 target_include_directories(${COMPILE_ID} PRIVATE include/zip/src)
@@ -58,7 +57,7 @@ add_custom_command(TARGET ${COMPILE_ID} POST_BUILD
             COMMAND ${CMAKE_STRIP} -g -S -d --strip-all
             "lib${COMPILE_ID}.so" -o "stripped_lib${COMPILE_ID}.so"
             COMMENT "Strip debug symbols done on final binary.")
-        
+
 add_custom_command(TARGET ${COMPILE_ID} POST_BUILD
         COMMAND ${CMAKE_COMMAND} -E make_directory debug
         COMMENT "Make directory for debug symbols"

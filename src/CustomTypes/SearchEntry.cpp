@@ -1,8 +1,11 @@
 #include "CustomTypes/DownloadSongsSearchViewController.hpp"
 
-using namespace QuestUI;
+#include "bsml/shared/BSML/MainThreadScheduler.hpp"
+#include "bsml/shared/BSML-Lite/Creation/Image.hpp"
+
 using namespace UnityEngine;
 using namespace UnityEngine::UI;
+using namespace BSML::Lite;
 using namespace TMPro;
 using namespace SongDownloader;
 
@@ -32,7 +35,7 @@ void SearchEntry::SetBeatmap(const BeatSaver::Beatmap& _map) {
     gameObject->SetActive(true);
     MapType = SearchEntry::MapType::BeatSaver;
 
-    line1Component->SetText(map.GetMetadata().GetSongName());
+    line1Component->SetText(map.GetMetadata().GetSongName(), true);
 
     if (map.GetRanked()) {
         line1Component->set_color(UnityEngine::Color(1, 0.68f, 0, 1));
@@ -50,24 +53,27 @@ void SearchEntry::SetBeatmap(const BeatSaver::Beatmap& _map) {
         if (elem.GetCinema() && ModsUsed.find("Cinema") == std::string::npos) ModsUsed += "<color=#ADADADFF>Cinema</color>, ";
     }
     if (ModsUsed.ends_with(", ")) ModsUsed.erase(ModsUsed.length() - 2);
-    if (ModsUsed.empty()) {
-        line2Component->SetText("<size=80%><noparse>" + map.GetMetadata().GetSongAuthorName() + "</noparse>" + " <size=90%>[<color=#67c16f><noparse>" + map.GetMetadata().GetLevelAuthorName() + "</noparse></color>]");
+
+    std::stringstream line2;
+    line2 << "<size=80%><noparse>" << map.GetMetadata().GetSongAuthorName() << "</noparse>";
+    line2 << " " << "<size=90%>[<color=#67c16f><noparse>" << map.GetMetadata().GetLevelAuthorName() << "</noparse></color>]";
+    if (!ModsUsed.empty()) {
+        line2 << " " << "[" << ModsUsed << "]";
     }
-    else {
-        line2Component->SetText("<size=80%><noparse>" + map.GetMetadata().GetSongAuthorName() + "</noparse>" + " <size=90%>[<color=#67c16f><noparse>" + map.GetMetadata().GetLevelAuthorName() + "</noparse></color>] [" + ModsUsed + "]");
-    }
+
+    line2Component->SetText(line2.str(), true);
 
     int currentSearchIndex = DownloadSongsSearchViewController::searchIndex;
 
     coverImageView->set_enabled(false);
     BeatSaver::API::GetCoverImageAsync(map, [this, currentSearchIndex](std::vector<uint8_t> bytes) {
         if (currentSearchIndex == DownloadSongsSearchViewController::searchIndex) {
-            MainThreadScheduler::Schedule([this, currentSearchIndex, bytes] {
+            BSML::MainThreadScheduler::Schedule([this, currentSearchIndex, bytes] {
                 if (currentSearchIndex == DownloadSongsSearchViewController::searchIndex) {
                     std::vector<uint8_t> data = bytes;
 
                     Array<uint8_t>* spriteArray = il2cpp_utils::vectorToArray(data);
-                    Sprite* sprite = BeatSaberUI::ArrayToSprite(spriteArray);
+                    Sprite* sprite = ArrayToSprite(spriteArray);
                     coverImageView->set_sprite(sprite);
                     coverImageView->set_enabled(true);
                 }
@@ -82,28 +88,28 @@ void SearchEntry::SetBeatmap(const BeastSaber::Song& _song) {
     gameObject->SetActive(true);
     MapType = SearchEntry::MapType::BeastSaber;
 
-    line1Component->SetText(BSsong.GetTitle());
-
+    line1Component->SetText(BSsong.GetTitle(), true);
     line1Component->set_color(UnityEngine::Color(1, 1, 1, 1));
 
+    std::stringstream line2;
+    line2 << "<size=90%>[<color=#67c16f><noparse>" << BSsong.GetLevel_author_name() << "</noparse></color>]";
     if (BSsong.GetCurated_by().has_value()) {
-        line2Component->SetText("<size=90%>[<color=#67c16f><noparse>" + BSsong.GetLevel_author_name() + "</noparse></color>] " + "<color=#FFFFFFFF><size=75%>Curated by:</color> <color=#ADADADFF><size=80%><noparse>" + BSsong.GetCurated_by().value() + "</noparse></color>");
+        line2 << " " << "<color=#FFFFFFFF><size=75%>Curated by:</color> <color=#ADADADFF><size=80%><noparse>" << BSsong.GetCurated_by().value() << "</noparse></color>";
     }
-    else {
-        line2Component->SetText("<size=90%>[<color=#67c16f><noparse>" + BSsong.GetLevel_author_name() + "</noparse></color>]");
-    }
+
+    line2Component->SetText(line2.str(), true);
 
     int currentSearchIndex = DownloadSongsSearchViewController::searchIndex;
 
     coverImageView->set_enabled(false);
     BeatSaver::API::GetCoverImageByHashAsync(BSsong.GetHash(), [this, currentSearchIndex](std::vector<uint8_t> bytes) {
         if (currentSearchIndex == DownloadSongsSearchViewController::searchIndex) {
-            MainThreadScheduler::Schedule([this, currentSearchIndex, bytes] {
+            BSML::MainThreadScheduler::Schedule([this, currentSearchIndex, bytes] {
                 if (currentSearchIndex == DownloadSongsSearchViewController::searchIndex) {
                     std::vector<uint8_t> data = bytes;
 
                     Array<uint8_t>* spriteArray = il2cpp_utils::vectorToArray(data);
-                    Sprite* sprite = BeatSaberUI::ArrayToSprite(spriteArray);
+                    Sprite* sprite = ArrayToSprite(spriteArray);
                     coverImageView->set_sprite(sprite);
                     coverImageView->set_enabled(true);
                 }
@@ -154,7 +160,7 @@ void SearchEntry::SetBeatmap(const ScoreSaber::Leaderboard& _song) {
     gameObject->SetActive(true);
     MapType = SearchEntry::MapType::ScoreSaber;
 
-    line1Component->SetText(SSsong.GetSongName());
+    line1Component->SetText(SSsong.GetSongName(), true);
 
     if (SSsong.GetRanked() > 0) {
         line1Component->set_color(UnityEngine::Color(1, 0.68f, 0, 1));
@@ -163,19 +169,19 @@ void SearchEntry::SetBeatmap(const ScoreSaber::Leaderboard& _song) {
         line1Component->set_color(UnityEngine::Color(1, 1, 1, 1));
     }
 
-    line2Component->SetText("<size=80%><noparse>" + SSsong.GetSongAuthorName() + "</noparse>" + " <size=90%>[<color=#67c16f><noparse>" + SSsong.GetLevelAuthorName() + "</noparse></color>]");
+    line2Component->SetText("<size=80%><noparse>" + SSsong.GetSongAuthorName() + "</noparse>" + " <size=90%>[<color=#67c16f><noparse>" + SSsong.GetLevelAuthorName() + "</noparse></color>]", true);
 
     int currentSearchIndex = DownloadSongsSearchViewController::searchIndex;
 
     coverImageView->set_enabled(false);
     ScoreSaber::API::GetCoverImageAsync(SSsong, [this, currentSearchIndex](std::vector<uint8_t> bytes) {
         if (currentSearchIndex == DownloadSongsSearchViewController::searchIndex) {
-            MainThreadScheduler::Schedule([this, currentSearchIndex, bytes] {
+            BSML::MainThreadScheduler::Schedule([this, currentSearchIndex, bytes] {
                 if (currentSearchIndex == DownloadSongsSearchViewController::searchIndex) {
                     std::vector<uint8_t> data = bytes;
 
                     Array<uint8_t>* spriteArray = il2cpp_utils::vectorToArray(data);
-                    Sprite* sprite = BeatSaberUI::ArrayToSprite(spriteArray);
+                    Sprite* sprite = ArrayToSprite(spriteArray);
                     coverImageView->set_sprite(sprite);
                     coverImageView->set_enabled(true);
                 }
@@ -209,15 +215,15 @@ void SearchEntry::UpdateDownloadProgress(bool checkLoaded) {
         }
     }
     if (downloadProgress <= -1.0f) {
-        BeatSaberUI::SetButtonText(downloadButton, "Download");
+        SetButtonText(downloadButton, "Download");
         downloadButton->set_interactable(true);
     }
     else if (downloadProgress >= 100.0f) {
-        BeatSaberUI::SetButtonText(downloadButton, "Loaded");
+        SetButtonText(downloadButton, "Loaded");
         downloadButton->set_interactable(false);
     }
     else {
-        BeatSaberUI::SetButtonText(downloadButton, string_format("%.0f%%", downloadProgress));
+        SetButtonText(downloadButton, string_format("%.0f%%", downloadProgress));
         downloadButton->set_interactable(false);
     }
 }

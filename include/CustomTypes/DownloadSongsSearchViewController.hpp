@@ -23,8 +23,8 @@
 #include "BeastSaberAPI.hpp"
 #include "ScoreSaberAPI.hpp"
 
-#include "questui/shared/BeatSaberUI.hpp"
-#include "questui/shared/CustomTypes/Components/MainThreadScheduler.hpp"
+#include "bsml/shared/BSML.hpp"
+#include "bsml/shared/BSML/MainThreadScheduler.hpp"
 
 #include <vector>
 
@@ -43,7 +43,7 @@ namespace SongDownloader {
         HMUI::ImageView* coverImageView;
         UnityEngine::UI::Button* downloadButton;
 
-    public:        
+    public:
         enum class MapType {
             BeatSaver,
             BeastSaber,
@@ -63,19 +63,19 @@ namespace SongDownloader {
         const ScoreSaber::Leaderboard& GetSongScoreSaber();
 
         MapType MapType;
-        
+
         void SetBeatmap(const BeatSaver::Beatmap& _map);
 
         void SetBeatmap(const BeastSaber::Song& _song);
 
         void SetBeatmap(const ScoreSaber::Leaderboard& _song);
-        
+
         void UpdateDownloadProgress(bool checkLoaded);
 
         void Disable();
 
         bool IsEnabled();
-    }; 
+    };
 
 }
 
@@ -94,14 +94,14 @@ DECLARE_CLASS_CODEGEN(SongDownloader, DownloadSongsSearchViewController, HMUI::V
     static std::string SearchQuery;
 
     SearchEntry searchEntries[ENTRIES_PER_PAGE];
-    
-    DECLARE_OVERRIDE_METHOD(void, DidActivate, il2cpp_utils::FindMethodUnsafe("HMUI", "ViewController", "DidActivate", 3), bool firstActivation, bool addedToHierarchy, bool screenSystemEnabling);
-    
+
+    DECLARE_OVERRIDE_METHOD_MATCH(void, DidActivate, &HMUI::ViewController::DidActivate, bool firstActivation, bool addedToHierarchy, bool screenSystemEnabling);
+
     DECLARE_INSTANCE_FIELD(GlobalNamespace::LoadingControl*, loadingControl);
 
     DECLARE_INSTANCE_FIELD(HMUI::InputFieldView*, SearchField);
 
-    DECLARE_INSTANCE_FIELD(QuestUI::IncrementSetting*, pageIncrement);
+    DECLARE_INSTANCE_FIELD(BSML::IncrementSetting*, pageIncrement);
 
     DECLARE_INSTANCE_METHOD(void, SearchSongs, int);
 

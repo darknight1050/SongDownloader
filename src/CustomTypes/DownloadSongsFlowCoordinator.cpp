@@ -2,21 +2,18 @@
 
 #include "CustomLogger.hpp"
 
-#include "questui/shared/BeatSaberUI.hpp"
+#include "bsml/shared/Helpers/creation.hpp"
 
-#include "HMUI/ViewController_AnimationDirection.hpp"
-#include "HMUI/ViewController_AnimationType.hpp"
-
-using namespace QuestUI;
+using namespace BSML::Helpers;
 using namespace SongDownloader;
 
 DEFINE_TYPE(SongDownloader, DownloadSongsFlowCoordinator);
 
 void DownloadSongsFlowCoordinator::Awake(){
     if(!DownloadSongsOptionsViewController)
-        DownloadSongsOptionsViewController = BeatSaberUI::CreateViewController<SongDownloader::DownloadSongsOptionsViewController*>();
+        DownloadSongsOptionsViewController = CreateViewController<SongDownloader::DownloadSongsOptionsViewController*>();
     if(!DownloadSongsSearchViewController)
-        DownloadSongsSearchViewController = BeatSaberUI::CreateViewController<SongDownloader::DownloadSongsSearchViewController*>();
+        DownloadSongsSearchViewController = CreateViewController<SongDownloader::DownloadSongsSearchViewController*>();
 }
 
 void DownloadSongsFlowCoordinator::DidActivate(bool firstActivation, bool addedToHierarchy, bool screenSystemEnabling){
@@ -28,5 +25,5 @@ void DownloadSongsFlowCoordinator::DidActivate(bool firstActivation, bool addedT
 }
 
 void DownloadSongsFlowCoordinator::BackButtonWasPressed(HMUI::ViewController* topViewController){
-    this->parentFlowCoordinator->DismissFlowCoordinator(this, HMUI::ViewController::AnimationDirection::Horizontal, nullptr, false);
+    this->_parentFlowCoordinator->DismissFlowCoordinator(this, HMUI::ViewController::AnimationDirection::Horizontal, nullptr, false);
 }
