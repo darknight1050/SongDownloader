@@ -41,7 +41,8 @@ void DownloadSongsOptionsViewController::DidActivate(bool firstActivation, bool 
         contentSizeFitter->set_verticalFit(ContentSizeFitter::FitMode::PreferredSize);
 
         static ConstString emptyString("");
-        Service = BSML::Lite::CreateDropdown(settingsLayoutTransform, getModConfig().Service.GetName(), getModConfig().Service.GetValue(), { "BeatSaver", "BeastSaber", "ScoreSaber" },
+        std::vector<std::string_view> Service_labels = { "BeatSaver", "BeastSaber", "ScoreSaber" };
+        Service = BSML::Lite::CreateDropdown(settingsLayoutTransform, getModConfig().Service.GetName(), getModConfig().Service.GetValue(), Service_labels,
             [this](StringW value) {
                 if (value != "BeatSaver") {
                     if (value == "ScoreSaber") {
@@ -101,7 +102,8 @@ void DownloadSongsOptionsViewController::DidActivate(bool firstActivation, bool 
         BSML::Lite::AddHoverHint(Service->get_gameObject(), getModConfig().Service.GetHoverHint());
         Service->get_transform()->GetParent()->GetComponent<LayoutElement*>()->set_preferredWidth(50.0f);
 
-        ListType_BeatSaver = BSML::Lite::CreateDropdown(settingsLayoutTransform, "List", getModConfig().ListType_BeatSaver.GetValue(), { "Key", "Search", "User"  },
+        std::vector<std::string_view> ListType_BeatSaver_labels = { "Key", "Search", "User" };
+        ListType_BeatSaver = BSML::Lite::CreateDropdown(settingsLayoutTransform, "List", getModConfig().ListType_BeatSaver.GetValue(), ListType_BeatSaver_labels,
             [this](StringW value) {
                 if (LastListType == "Bookmarks") {
                     DownloadSongsSearchViewController::SearchQuery.clear();
@@ -116,7 +118,8 @@ void DownloadSongsOptionsViewController::DidActivate(bool firstActivation, bool 
         BSML::Lite::AddHoverHint(ListType_BeatSaver->get_gameObject(), getModConfig().ListType_BeatSaver.GetHoverHint());
         ListType_BeatSaver->get_transform()->GetParent()->GetComponent<LayoutElement*>()->set_preferredWidth(50.0f);
 
-        ListType_BeastSaber = BSML::Lite::CreateDropdown(settingsLayoutTransform, "List", getModConfig().ListType_BeastSaber.GetValue(), { "Curator Recommended", "Bookmarks" },
+        std::vector<std::string_view> ListType_BeastSaber_labels = { "Curator Recommended", "Bookmarks" };
+        ListType_BeastSaber = BSML::Lite::CreateDropdown(settingsLayoutTransform, "List", getModConfig().ListType_BeastSaber.GetValue(), ListType_BeastSaber_labels,
             [this](StringW value) {
                 if (value == "Bookmarks") {
                     DownloadSongsSearchViewController::SearchQuery = getModConfig().BookmarkUsername.GetValue();
@@ -135,7 +138,8 @@ void DownloadSongsOptionsViewController::DidActivate(bool firstActivation, bool 
         BSML::Lite::AddHoverHint(ListType_BeastSaber->get_gameObject(), getModConfig().ListType_BeastSaber.GetHoverHint());
         ListType_BeastSaber->get_transform()->GetParent()->GetComponent<LayoutElement*>()->set_preferredWidth(50.0f);
 
-        ListType_ScoreSaber = BSML::Lite::CreateDropdown(settingsLayoutTransform, "List", getModConfig().ListType_ScoreSaber.GetValue(), { "Trending", "Latest Ranked", "Top Played", "Top Ranked" },
+        std::vector<std::string_view> ScoreSaber_labels = { "Trending", "Latest Ranked", "Top Played", "Top Ranked" };
+        ListType_ScoreSaber = BSML::Lite::CreateDropdown(settingsLayoutTransform, "List", getModConfig().ListType_ScoreSaber.GetValue(), ScoreSaber_labels,
             [this](StringW value) {
                 if (LastListType == "Bookmarks") {
                     DownloadSongsSearchViewController::SearchQuery.clear();
@@ -160,7 +164,8 @@ void DownloadSongsOptionsViewController::DidActivate(bool firstActivation, bool 
         if (getModConfig().AutoMapper.GetValue() == "true") AutoMapperConfigSet = "Not Required";
         else if (getModConfig().AutoMapper.GetValue() == "false") AutoMapperConfigSet = "Required";
 
-        Automapper = BSML::Lite::CreateDropdown(settingsLayoutTransform, getModConfig().AutoMapper.GetName(), AutoMapperConfigSet, { "Not Required", "Required", "Excluded" },
+        std::vector<std::string_view> Automapper_labels = { "Not Required", "Required", "Excluded" };
+        Automapper = BSML::Lite::CreateDropdown(settingsLayoutTransform, getModConfig().AutoMapper.GetName(), AutoMapperConfigSet, Automapper_labels,
             [](StringW value) {
                 std::string setting = "";
                 if (value == "Not Required") setting = "true";
@@ -173,7 +178,8 @@ void DownloadSongsOptionsViewController::DidActivate(bool firstActivation, bool 
         BSML::Lite::AddHoverHint(Automapper->get_gameObject(), getModConfig().AutoMapper.GetHoverHint());
         Automapper->get_transform()->GetParent()->GetComponent<LayoutElement*>()->set_preferredWidth(50.0f);
 
-        SortOrder = BSML::Lite::CreateDropdown(settingsLayoutTransform, getModConfig().SortOrder.GetName(), getModConfig().SortOrder.GetValue(), { "Latest", "Relevance", "Rating" },
+        std::vector<std::string_view> SortOrder_labels = { "Latest", "Relevance", "Rating" };
+        SortOrder = BSML::Lite::CreateDropdown(settingsLayoutTransform, getModConfig().SortOrder.GetName(), getModConfig().SortOrder.GetValue(), SortOrder_labels,
             [](StringW value) {
                 getModConfig().SortOrder.SetValue(std::string(value));
                 DownloadSongsSearchViewController::SetPage(0);
@@ -187,7 +193,8 @@ void DownloadSongsOptionsViewController::DidActivate(bool firstActivation, bool 
         if (getModConfig().NE.GetValue() == "true") NEConfigSet = "Required";
         else if (getModConfig().NE.GetValue() == "false") NEConfigSet = "Excluded";
 
-        NEdropdown = BSML::Lite::CreateDropdown(settingsLayoutTransform, getModConfig().NE.GetName(), NEConfigSet, { "Not Required", "Required", "Excluded" },
+        std::vector<std::string_view> NEdropdown_labels = { "Not Required", "Required", "Excluded" };
+        NEdropdown = BSML::Lite::CreateDropdown(settingsLayoutTransform, getModConfig().NE.GetName(), NEConfigSet, NEdropdown_labels,
             [](StringW value) {
                 std::string setting = "";
                 if (value == "Required") setting = "true";
@@ -204,7 +211,8 @@ void DownloadSongsOptionsViewController::DidActivate(bool firstActivation, bool 
         if (getModConfig().ME.GetValue() == "true") MEConfigSet = "Required";
         else if (getModConfig().ME.GetValue() == "false") MEConfigSet = "Excluded";
 
-        MEdropdown = BSML::Lite::CreateDropdown(settingsLayoutTransform, getModConfig().ME.GetName(), MEConfigSet, { "Not Required", "Required", "Excluded" },
+        std::vector<std::string_view> MEdropdown_labels = { "Not Required", "Required", "Excluded" };
+        MEdropdown = BSML::Lite::CreateDropdown(settingsLayoutTransform, getModConfig().ME.GetName(), MEConfigSet, MEdropdown_labels,
             [](StringW value) {
                 std::string setting = "";
                 if (value == "Required") setting = "true";
@@ -221,7 +229,8 @@ void DownloadSongsOptionsViewController::DidActivate(bool firstActivation, bool 
         if (getModConfig().Chroma.GetValue() == "true") ChromaConfigSet = "Required";
         else if (getModConfig().Chroma.GetValue() == "false") ChromaConfigSet = "Excluded";
 
-        Chroma = BSML::Lite::CreateDropdown(settingsLayoutTransform, getModConfig().Chroma.GetName(), ChromaConfigSet, { "Not Required", "Required", "Excluded" },
+        std::vector<std::string_view> Chroma_labels = { "Not Required", "Required", "Excluded" };
+        Chroma = BSML::Lite::CreateDropdown(settingsLayoutTransform, getModConfig().Chroma.GetName(), ChromaConfigSet, Chroma_labels,
             [](StringW value) {
                 std::string setting = "";
                 if (value == "Required") setting = "true";
@@ -238,8 +247,8 @@ void DownloadSongsOptionsViewController::DidActivate(bool firstActivation, bool 
         if (getModConfig().Ranked.GetValue() == "true") RankedConfigSet = "Required";
         else if (getModConfig().Ranked.GetValue() == "false") RankedConfigSet = "Excluded";
 
-
-        Ranked = BSML::Lite::CreateDropdown(settingsLayoutTransform, "Ranked", RankedConfigSet, { "Not Required", "Required", "Excluded" },
+        std::vector<std::string_view> Ranked_labels = { "Not Required", "Required", "Excluded" };
+        Ranked = BSML::Lite::CreateDropdown(settingsLayoutTransform, "Ranked", RankedConfigSet, Ranked_labels,
             [](StringW value) {
                 std::string setting = "";
                 if (value == "Required") setting = "true";

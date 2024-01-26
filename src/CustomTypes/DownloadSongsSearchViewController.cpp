@@ -68,10 +68,9 @@ void DownloadSongsSearchViewController::CreateEntries(Transform* parent) {
         levelBarLayoutElement->set_minHeight(15.0f);
         levelBarLayoutElement->set_minWidth(90.0f);
 
-        GameObject* existingLevelBar = Resources::FindObjectsOfTypeAll<LevelBar*>().First(
+        GameObject* existingLevelBar = Resources::FindObjectsOfTypeAll<LevelBar*>()->First(
             [](LevelBar* x) {
-                return x->get_name() == "LevelBarBig" &&
-                    x->GetComponentInParent<GlobalNamespace::LevelSelectionNavigationController*>();
+                return x->get_name() == "LevelBarBig";
             })->get_gameObject();
         GameObject* levelBarGameObject = UnityEngine::GameObject::Instantiate(existingLevelBar, levelBarLayout->get_transform());
         auto levelBarTransform = levelBarGameObject->get_transform();
@@ -644,7 +643,7 @@ void DownloadSongsSearchViewController::DidActivate(bool firstActivation, bool a
         Object::Destroy(pageIncrement->GetComponentInChildren<LayoutElement*>());
 
         // LoadingControl has to be added after the ScrollView, as otherwise it will be behind it and the RefreshButton unselectable
-        GameObject* existingLoadingControl = Resources::FindObjectsOfTypeAll<LoadingControl*>().First()->get_gameObject();
+        GameObject* existingLoadingControl = Resources::FindObjectsOfTypeAll<LoadingControl*>()->First()->get_gameObject();
         GameObject* loadingControlGameObject = UnityEngine::GameObject::Instantiate(existingLoadingControl, get_transform());
         auto loadingControlTransform = loadingControlGameObject->get_transform();
         loadingControlTransform->set_localPosition(Vector3(0.f, 0.0f, 0.0f));
