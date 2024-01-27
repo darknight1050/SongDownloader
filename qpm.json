@@ -61,5 +61,13 @@
       "additionalData": {}
     }
   ],
-  "additionalData": {}
+  "workspace": {
+    "scripts": {
+      "qmod": [
+        "pwsh ./build.ps1 -clean",
+        "qpm qmod build",
+        "pwsh ./createqmod.ps1 SongDownloader -clean"
+      ]
+    }
+  }
 }
