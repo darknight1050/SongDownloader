@@ -24,7 +24,7 @@ extern "C" void setup(CModInfo* info) {
     getModConfig().Init(modInfo);
 }
 
-extern "C" void load() {
+extern "C" void late_load() {
     LOG_INFO("Starting SongDownloader installation...");
     il2cpp_functions::Init();
     BSML::Init();
