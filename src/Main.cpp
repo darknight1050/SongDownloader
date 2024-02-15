@@ -1,4 +1,5 @@
 #include "beatsaber-hook/shared/utils/il2cpp-utils.hpp"
+#include "_config.h"
 
 #include "custom-types/shared/register.hpp"
 
@@ -16,7 +17,7 @@ Logger& getLogger() {
     return *logger;
 }
 
-extern "C" void setup(CModInfo* info) {
+SONGDOWNLOADER_EXPORT_FUNC void setup(CModInfo* info) {
     info->id = "SongDownloader";
     info->version = VERSION;
     info->version_long = VERSION_LONG;
@@ -24,7 +25,7 @@ extern "C" void setup(CModInfo* info) {
     getModConfig().Init(modInfo);
 }
 
-extern "C" void late_load() {
+SONGDOWNLOADER_EXPORT_FUNC void late_load() {
     LOG_INFO("Starting SongDownloader installation...");
     il2cpp_functions::Init();
     BSML::Init();

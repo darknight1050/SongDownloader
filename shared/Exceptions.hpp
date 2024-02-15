@@ -1,14 +1,17 @@
 #pragma once
+
+#include <string>
 #include <exception>
+#include "./_config.h"
 
 namespace SongDownloader {
-    enum class Exceptions {
+    enum class SONGDOWNLOADER_EXPORT Exceptions {
         SiteError,
         NoMember,
         WrongType
     };
 
-    class JsonException : public std::exception {
+    class SONGDOWNLOADER_EXPORT JsonException : public std::exception {
     private:
         const char* error;
         std::string message;
