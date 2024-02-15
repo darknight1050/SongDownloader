@@ -1,5 +1,6 @@
 #pragma once
 
+#include "./_config.h"
 #include "Types/ScoreSaber/Page.hpp"
 #include "Types/ScoreSaber/Leaderboards.hpp"
 
@@ -12,7 +13,7 @@ namespace ScoreSaber::API {
     /// Enum of categories supported by ScoreSaber
     /// Search is not supported on TopPlayed and TopRanked
     /// </summary>
-    enum class ListCategory {
+    enum class SONGDOWNLOADER_EXPORT ListCategory {
         Trending,
         LatestRanked,
         TopPlayed,
@@ -36,7 +37,7 @@ namespace ScoreSaber::API {
     /// <param name="amount">Amount of Songs to get default: 20</param>
     /// <returns>An optional that can contain a ScoreSaber::Page or a std::nullopt if an error was encountered or no map found</returns>
     [[deprecated("Use GetList(ListCategory list, std::optional<bool> ranked, int pageIndex) instead!")]]
-    std::optional<ScoreSaber::Page> GetTrending(bool ranked = false, int pageIndex = 0, int amount = 20);
+    SONGDOWNLOADER_EXPORT std::optional<ScoreSaber::Page> GetTrending(bool ranked = false, int pageIndex = 0, int amount = 20);
 
     /// <summary>
     /// Retrieves the latest ranked songs.
@@ -47,7 +48,7 @@ namespace ScoreSaber::API {
     /// <param name="amount">Amount of Songs to get default: 20</param>
     /// <returns>An optional that can contain a ScoreSaber::Page or a std::nullopt if an error was encountered or no map found</returns>
     [[deprecated("Use GetList(ListCategory list, std::optional<bool> ranked, int pageIndex) instead!")]]
-    std::optional<ScoreSaber::Page> GetLatestRanked(bool ranked = false, int pageIndex = 0, int amount = 20);
+    SONGDOWNLOADER_EXPORT std::optional<ScoreSaber::Page> GetLatestRanked(bool ranked = false, int pageIndex = 0, int amount = 20);
 
     /// <summary>
     /// Retrieves the songs that have the most plays as determined by ScoreSaber.
@@ -58,7 +59,7 @@ namespace ScoreSaber::API {
     /// <param name="amount">Amount of Songs to get default: 20</param>
     /// <returns>An optional that can contain a ScoreSaber::Page or a std::nullopt if an error was encountered or no map found</returns>
     [[deprecated("Use GetList(ListCategory list, std::optional<bool> ranked, int pageIndex) instead!")]]
-    std::optional<ScoreSaber::Page> GetTopPlayed(bool ranked = false, int pageIndex = 0, int amount = 20);
+    SONGDOWNLOADER_EXPORT std::optional<ScoreSaber::Page> GetTopPlayed(bool ranked = false, int pageIndex = 0, int amount = 20);
 
     /// <summary>
     /// Retrieves songs ordered from highest ranked value to lowest.
@@ -69,7 +70,7 @@ namespace ScoreSaber::API {
     /// <param name="amount">Amount of Songs to get default: 20</param>
     /// <returns>An optional that can contain a ScoreSaber::Page or a std::nullopt if an error was encountered or no map found</returns>
     [[deprecated("Use GetList(ListCategory list, std::optional<bool> ranked, std::optional<bool> qualified, std::optional<bool> unique,  int pageIndex) instead!")]]
-    std::optional<ScoreSaber::Page> GetTopRanked(bool ranked = false, int pageIndex = 0, int amount = 20);
+    SONGDOWNLOADER_EXPORT std::optional<ScoreSaber::Page> GetTopRanked(bool ranked = false, int pageIndex = 0, int amount = 20);
 
     /// <summary>
     /// Retrieves specified list from ScoreSaber.
@@ -79,22 +80,21 @@ namespace ScoreSaber::API {
     /// <param name="unique">Only return one leaderboard of each id</param>
     /// <param name="pageIndex">Index of the pages search results default: 0</param>
     /// <returns>An optional that can contain a ScoreSaber::Page or a std::nullopt if an error was encountered or no map found</returns>
-    std::optional<ScoreSaber::Leaderboards> GetList(ListCategory list, std::optional<bool> ranked = std::nullopt, std::optional<bool> qualified = std::nullopt, std::optional<bool> unique = std::nullopt, int pageIndex = 0);
+    SONGDOWNLOADER_EXPORT std::optional<ScoreSaber::Leaderboards> GetList(ListCategory list, std::optional<bool> ranked = std::nullopt, std::optional<bool> qualified = std::nullopt, std::optional<bool> unique = std::nullopt, int pageIndex = 0);
 
     /// <summary>
     /// Retrieves CoverImage as uint8_t bytes
     /// </summary>
     /// <param name="song">Reference to a scoresaber song</param>
     /// <returns>The bytes for the coverImage, check if valid</returns>
-    std::vector<uint8_t> GetCoverImage(const ScoreSaber::Song& song);
+    SONGDOWNLOADER_EXPORT std::vector<uint8_t> GetCoverImage(const ScoreSaber::Song& song);
 
     /// <summary>
     /// Retrieves CoverImage as uint8_t bytes
     /// </summary>
     /// <param name="ldb">Reference to a scoresaber leaderboard</param>
     /// <returns>The bytes for the coverImage, check if valid</returns>
-    std::vector<uint8_t> GetCoverImage(const ScoreSaber::Leaderboard& ldb);
-
+    SONGDOWNLOADER_EXPORT std::vector<uint8_t> GetCoverImage(const ScoreSaber::Leaderboard& ldb);
 
     /// <summary>
     /// Retrieves songs that are Trending as determined by ScoreSaber.
@@ -105,7 +105,7 @@ namespace ScoreSaber::API {
     /// <param name="pageIndex">Index of the pages search results default: 0</param>
     /// <param name="amount">Amount of Songs to get default: 20</param>
     [[deprecated("Use GetListAsync(ListCategory list, std::function<void(std::optional<ScoreSaber::Page>)> finished, std::optional<bool> ranked, std::optional<bool> qualified, std::optional<bool> unique, int pageIndex) instead!")]]
-    void GetTrendingAsync(std::function<void(std::optional<ScoreSaber::Page>)> finished, bool ranked = false, int pageIndex = 0, int amount = 20);
+    SONGDOWNLOADER_EXPORT void GetTrendingAsync(std::function<void(std::optional<ScoreSaber::Page>)> finished, bool ranked = false, int pageIndex = 0, int amount = 20);
 
     /// <summary>
     /// Retrieves the latest ranked songs.
@@ -116,7 +116,7 @@ namespace ScoreSaber::API {
     /// <param name="pageIndex">Index of the pages search results default: 0</param>
     /// <param name="amount">Amount of Songs to get default: 20</param>
     [[deprecated("Use GetListAsync(ListCategory list, std::function<void(std::optional<ScoreSaber::Page>)> finished, std::optional<bool> ranked, std::optional<bool> qualified, std::optional<bool> unique, int pageIndex) instead!")]]
-    void GetLatestRankedAsync(std::function<void(std::optional<ScoreSaber::Page>)> finished, bool ranked = false, int pageIndex = 0, int amount = 20);
+    SONGDOWNLOADER_EXPORT void GetLatestRankedAsync(std::function<void(std::optional<ScoreSaber::Page>)> finished, bool ranked = false, int pageIndex = 0, int amount = 20);
 
     /// <summary>
     /// Retrieves the songs that have the most plays as determined by ScoreSaber.
@@ -127,7 +127,7 @@ namespace ScoreSaber::API {
     /// <param name="pageIndex">Index of the pages search results default: 0</param>
     /// <param name="amount">Amount of Songs to get default: 20</param>
     [[deprecated("Use GetListAsync(ListCategory list, std::function<void(std::optional<ScoreSaber::Page>)> finished, std::optional<bool> ranked, std::optional<bool> qualified, std::optional<bool> unique, int pageIndex) instead!")]]
-    void GetTopPlayedAsync(std::function<void(std::optional<ScoreSaber::Page>)> finished, bool ranked = false, int pageIndex = 0, int amount = 20);
+    SONGDOWNLOADER_EXPORT void GetTopPlayedAsync(std::function<void(std::optional<ScoreSaber::Page>)> finished, bool ranked = false, int pageIndex = 0, int amount = 20);
 
     /// <summary>
     /// Retrieves the songs that have the most plays as determined by ScoreSaber.
@@ -138,8 +138,8 @@ namespace ScoreSaber::API {
     /// <param name="pageIndex">Index of the pages search results default: 0</param>
     /// <param name="amount">Amount of Songs to get default: 20</param>
     [[deprecated("Use GetListAsync(ListCategory list, std::function<void(std::optional<ScoreSaber::Page>)> finished, std::optional<bool> ranked, std::optional<bool> qualified, std::optional<bool> unique, int pageIndex) instead!")]]
-    void GetTopRankedAsync(std::function<void(std::optional<ScoreSaber::Page>)> finished, bool ranked = false, int pageIndex = 0, int amount = 20);
-    
+    SONGDOWNLOADER_EXPORT void GetTopRankedAsync(std::function<void(std::optional<ScoreSaber::Page>)> finished, bool ranked = false, int pageIndex = 0, int amount = 20);
+
     /// <summary>
     /// Retrieves the list specified in SearchType
     /// </summary>
@@ -149,10 +149,10 @@ namespace ScoreSaber::API {
     /// <param name="qualified">If return value should contain qualified, mixed or non-qualified default: std::nullopt (mixed)</param>
     /// <param name="unique">Only return one leaderboard of each id</param>
     /// <param name="pageIndex">Index of the pages search results default: 0</param>
-    void GetListAsync(ListCategory list, std::function<void(std::optional<ScoreSaber::Leaderboards>)> finished, std::optional<bool> ranked = std::nullopt, std::optional<bool> qualified = std::nullopt, std::optional<bool> unique = std::nullopt, int pageIndex = 0);
+    SONGDOWNLOADER_EXPORT void GetListAsync(ListCategory list, std::function<void(std::optional<ScoreSaber::Leaderboards>)> finished, std::optional<bool> ranked = std::nullopt, std::optional<bool> qualified = std::nullopt, std::optional<bool> unique = std::nullopt, int pageIndex = 0);
 
     /// <summary>
-    /// [Deprecated] Searches on ScoreSaber 
+    /// [Deprecated] Searches on ScoreSaber
     /// </summary>
     /// <param name="query">Searh Query</param>
     /// <param name="finished"></param>
@@ -160,10 +160,10 @@ namespace ScoreSaber::API {
     /// <param name="pageIndex">Index of the pages search results default: 0</param>
     /// <param name="amount">Amount of Songs to get default: 20</param>
     [[deprecated("Use SearchAsync(std::string query, ListCategory list, std::function<void(std::optional<ScoreSaber::Page>)> finished, std::optional<bool> ranked, std::optional<bool> qualified, std::optional<bool> unique, int pageIndex) instead!")]]
-    void SearchSSAsync(std::string query, SearchType list, std::function<void(std::optional<ScoreSaber::Page>)> finished, bool ranked = false, int pageIndex = 0, int amount = 20);
+    SONGDOWNLOADER_EXPORT void SearchSSAsync(std::string query, SearchType list, std::function<void(std::optional<ScoreSaber::Page>)> finished, bool ranked = false, int pageIndex = 0, int amount = 20);
 
     /// <summary>
-    /// Searches on ScoreSaber 
+    /// Searches on ScoreSaber
     /// </summary>
     /// <param name="query">Searh Query</param>
     /// <param name="list">Category to seach in</param>
@@ -173,15 +173,7 @@ namespace ScoreSaber::API {
     /// <param name="unique">If return value should contain each leaderboard only once or not default: std::nullopt</param>
     /// <param name="pageIndex">Index of the pages search results default: 0</param>
     /// <param name="amount">Amount of Songs to get default: 20</param>
-    void SearchAsync(std::string query, ListCategory list, std::function<void(std::optional<ScoreSaber::Leaderboards>)> finished, std::optional<bool> ranked =  std::nullopt, std::optional<bool> qualified = std::nullopt, std::optional<bool> unique = std::nullopt, int pageIndex = 1);
-    
-    /// <summary>
-    /// Gets CoverImage from ScoreSaber song
-    /// </summary>
-    /// <param name="song">Reference to a ScoreSaber Song</param>
-    /// <param name="finished"></param>
-    /// <param name="progressUpdate"></param>
-    void GetCoverImageAsync(const ScoreSaber::Song& song, std::function<void(std::vector<uint8_t>)> finished, std::function<void(float)> progressUpdate = nullptr);
+    SONGDOWNLOADER_EXPORT void SearchAsync(std::string query, ListCategory list, std::function<void(std::optional<ScoreSaber::Leaderboards>)> finished, std::optional<bool> ranked =  std::nullopt, std::optional<bool> qualified = std::nullopt, std::optional<bool> unique = std::nullopt, int pageIndex = 1);
 
     /// <summary>
     /// Gets CoverImage from ScoreSaber song
@@ -189,11 +181,18 @@ namespace ScoreSaber::API {
     /// <param name="song">Reference to a ScoreSaber Song</param>
     /// <param name="finished"></param>
     /// <param name="progressUpdate"></param>
-    void GetCoverImageAsync(const ScoreSaber::Leaderboard& ldb, std::function<void(std::vector<uint8_t>)> finished, std::function<void(float)> progressUpdate = nullptr);
+    SONGDOWNLOADER_EXPORT void GetCoverImageAsync(const ScoreSaber::Song& song, std::function<void(std::vector<uint8_t>)> finished, std::function<void(float)> progressUpdate = nullptr);
+
+    /// <summary>
+    /// Gets CoverImage from ScoreSaber song
+    /// </summary>
+    /// <param name="song">Reference to a ScoreSaber Song</param>
+    /// <param name="finished"></param>
+    /// <param name="progressUpdate"></param>
+    SONGDOWNLOADER_EXPORT void GetCoverImageAsync(const ScoreSaber::Leaderboard& ldb, std::function<void(std::vector<uint8_t>)> finished, std::function<void(float)> progressUpdate = nullptr);
 
     /// <summary>
     /// String containing any exceptions that were encountered during the request, empty otherwise
     /// </summary>
-    extern std::string exception;
-
+    SONGDOWNLOADER_EXPORT extern std::string exception;
 }

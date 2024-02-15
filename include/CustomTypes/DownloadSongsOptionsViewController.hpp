@@ -1,24 +1,23 @@
 #pragma once
 
-#include "HMUI/ViewController.hpp"
-#include "HMUI/SimpleTextDropdown.hpp"
-
 #include "custom-types/shared/macros.hpp"
 
+#include "HMUI/ViewController.hpp"
+#include "bsml/shared/BSML/Components/Settings/DropdownListSetting.hpp"
+
 DECLARE_CLASS_CODEGEN(SongDownloader, DownloadSongsOptionsViewController, HMUI::ViewController,
+    DECLARE_INSTANCE_FIELD(BSML::DropdownListSetting*, Automapper);
+    DECLARE_INSTANCE_FIELD(BSML::DropdownListSetting*, Service);
+    DECLARE_INSTANCE_FIELD(BSML::DropdownListSetting*, ListType_BeatSaver);
+    DECLARE_INSTANCE_FIELD(BSML::DropdownListSetting*, ListType_BeastSaber);
+    DECLARE_INSTANCE_FIELD(BSML::DropdownListSetting*, ListType_ScoreSaber);
+    DECLARE_INSTANCE_FIELD(BSML::DropdownListSetting*, SortOrder);
+    DECLARE_INSTANCE_FIELD(BSML::DropdownListSetting*, NEdropdown);
+    DECLARE_INSTANCE_FIELD(BSML::DropdownListSetting*, MEdropdown);
+    DECLARE_INSTANCE_FIELD(BSML::DropdownListSetting*, Chroma);
+    DECLARE_INSTANCE_FIELD(BSML::DropdownListSetting*, Ranked);
 
     std::string LastListType;
 
-    DECLARE_INSTANCE_FIELD(HMUI::SimpleTextDropdown*, Automapper);
-    DECLARE_INSTANCE_FIELD(HMUI::SimpleTextDropdown*, Service);
-    DECLARE_INSTANCE_FIELD(HMUI::SimpleTextDropdown*, ListType_BeatSaver);
-    DECLARE_INSTANCE_FIELD(HMUI::SimpleTextDropdown*, ListType_BeastSaber);
-    DECLARE_INSTANCE_FIELD(HMUI::SimpleTextDropdown*, ListType_ScoreSaber);
-    DECLARE_INSTANCE_FIELD(HMUI::SimpleTextDropdown*, SortOrder);
-    DECLARE_INSTANCE_FIELD(HMUI::SimpleTextDropdown*, NEdropdown);
-    DECLARE_INSTANCE_FIELD(HMUI::SimpleTextDropdown*, MEdropdown);
-    DECLARE_INSTANCE_FIELD(HMUI::SimpleTextDropdown*, Chroma);
-    DECLARE_INSTANCE_FIELD(HMUI::SimpleTextDropdown*, Ranked);
-
-    DECLARE_OVERRIDE_METHOD(void, DidActivate, il2cpp_utils::FindMethodUnsafe("HMUI", "ViewController", "DidActivate", 3), bool firstActivation, bool addedToHierarchy, bool screenSystemEnabling);
+    DECLARE_OVERRIDE_METHOD_MATCH(void, DidActivate, &HMUI::ViewController::DidActivate, bool firstActivation, bool addedToHierarchy, bool screenSystemEnabling);
 )

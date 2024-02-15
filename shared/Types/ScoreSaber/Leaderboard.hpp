@@ -1,4 +1,6 @@
 #pragma once
+
+#include "../../_config.h"
 #include "../TypeMacros.hpp"
 #include "Difficulty.hpp"
 
@@ -6,7 +8,7 @@
 namespace ScoreSaber {
     class Leaderboard;
     namespace API {
-        void GetCoverImageAsync(const ScoreSaber::Leaderboard& ldb, std::function<void(std::vector<uint8_t>)> finished, std::function<void(float)> progressUpdate);
+        SONGDOWNLOADER_EXPORT void GetCoverImageAsync(const ScoreSaber::Leaderboard& ldb, std::function<void(std::vector<uint8_t>)> finished, std::function<void(float)> progressUpdate);
     }
 
     DECLARE_JSON_CLASS(Leaderboard,

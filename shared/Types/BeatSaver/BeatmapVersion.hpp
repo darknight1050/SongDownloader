@@ -1,4 +1,6 @@
 #pragma once
+
+#include "../../_config.h"
 #include "../TypeMacros.hpp"
 #include "Difficulty.hpp"
 
@@ -6,8 +8,8 @@ namespace BeatSaver {
     class Beatmap;
     class BeatmapVersion;
     namespace API {
-        void DownloadBeatmapAsync(const BeatSaver::Beatmap& beatmap, const BeatSaver::BeatmapVersion& beatmapVer, std::function<void(bool)> finished, std::function<void(float)> progressUpdate);
-        void GetCoverImageAsync(const BeatSaver::BeatmapVersion& beatmap, std::function<void(std::vector<uint8_t>)> finished, std::function<void(float)> progressUpdate);
+        SONGDOWNLOADER_EXPORT void DownloadBeatmapAsync(const BeatSaver::Beatmap& beatmap, const BeatSaver::BeatmapVersion& beatmapVer, std::function<void(bool)> finished, std::function<void(float)> progressUpdate);
+        SONGDOWNLOADER_EXPORT void GetCoverImageAsync(const BeatSaver::BeatmapVersion& beatmap, std::function<void(std::vector<uint8_t>)> finished, std::function<void(float)> progressUpdate);
     }
 
     DECLARE_JSON_CLASS(BeatmapVersion,

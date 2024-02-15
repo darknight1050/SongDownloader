@@ -3,7 +3,7 @@
 #include "CustomLogger.hpp"
 #include "ModConfig.hpp"
 
-#include "custom-types/shared/delegate.hpp" 
+#include "custom-types/shared/delegate.hpp"
 
 #include "UnityEngine/RectOffset.hpp"
 #include "UnityEngine/Rect.hpp"
@@ -14,28 +14,30 @@
 #include "UnityEngine/Resources.hpp"
 #include "UnityEngine/Events/UnityAction.hpp"
 #include "UnityEngine/Resources.hpp"
+#include "UnityEngine/UI/LayoutElement.hpp"
+#include "GlobalNamespace/LevelSelectionNavigationController.hpp"
 #include "HMUI/ScrollView.hpp"
 #include "HMUI/Touchable.hpp"
 #include "System/Action.hpp"
 
 #include "GlobalNamespace/LevelBar.hpp"
 
-#include "questui/shared/CustomTypes/Components/ExternalComponents.hpp"
-#include "questui/shared/CustomTypes/Components/Backgroundable.hpp"
-#include "questui/shared/QuestUI.hpp"
+#include "bsml/shared/BSML/Components/ExternalComponents.hpp"
+#include "bsml/shared/BSML/Components/Backgroundable.hpp"
+#include "bsml/shared/BSML.hpp"
 
 #include <iomanip>
 #include <sstream>
 #include <string>
 #include <vector>
 
-using namespace QuestUI;
 using namespace UnityEngine;
 using namespace UnityEngine::UI;
 using namespace UnityEngine::Events;
 using namespace HMUI;
 using namespace TMPro;
 using namespace GlobalNamespace;
+using namespace BSML::Lite;
 
 using namespace SongDownloader;
 
@@ -57,7 +59,7 @@ void DownloadSongsSearchViewController::CreateEntries(Transform* parent) {
     if(!prefab) {
         GameObject* holder = GameObject::New_ctor();
         Object::DontDestroyOnLoad(holder);
-        HorizontalLayoutGroup* levelBarLayout = BeatSaberUI::CreateHorizontalLayoutGroup(holder->get_transform());
+        auto levelBarLayout = CreateHorizontalLayoutGroup(holder->get_transform());
         prefab = levelBarLayout->get_gameObject();
         levelBarLayout->set_childControlWidth(false);
         levelBarLayout->set_childForceExpandWidth(true);
@@ -66,7 +68,10 @@ void DownloadSongsSearchViewController::CreateEntries(Transform* parent) {
         levelBarLayoutElement->set_minHeight(15.0f);
         levelBarLayoutElement->set_minWidth(90.0f);
 
-        GameObject* existingLevelBar = Resources::FindObjectsOfTypeAll<LevelBar*>().First([](LevelBar* x) { return x->get_name() == "LevelBarBig"; })->get_gameObject();
+        GameObject* existingLevelBar = Resources::FindObjectsOfTypeAll<LevelBar*>()->First(
+            [](LevelBar* x) {
+                return x->get_name() == "LevelBarBig";
+            })->get_gameObject();
         GameObject* levelBarGameObject = UnityEngine::GameObject::Instantiate(existingLevelBar, levelBarLayout->get_transform());
         auto levelBarTransform = levelBarGameObject->get_transform();
 
@@ -75,12 +80,12 @@ void DownloadSongsSearchViewController::CreateEntries(Transform* parent) {
         static ConstString singleLineTextContainerName("SingleLineTextContainer");
         levelBarTransform->FindChild(singleLineTextContainerName)->get_gameObject()->set_active(true);
         LevelBar* levelBar = levelBarGameObject->GetComponent<LevelBar*>();
-        auto songNameTextComponent = levelBar->songNameText;
+        auto songNameTextComponent = levelBar->_songNameText;
         songNameTextComponent->set_fontSize(4.2f);
         songNameTextComponent->set_overflowMode(TextOverflowModes::Ellipsis);
         songNameTextComponent->set_margin(Vector4(-2.0f, 0.0f, 9.0f, 0.0f));
 
-        auto authorNameTextComponent = levelBar->authorNameText;
+        auto authorNameTextComponent = levelBar->_authorNameText;
         authorNameTextComponent->set_richText(true);
         authorNameTextComponent->set_fontSize(3.2f);
         authorNameTextComponent->set_overflowMode(TextOverflowModes::Ellipsis);
@@ -91,7 +96,7 @@ void DownloadSongsSearchViewController::CreateEntries(Transform* parent) {
         backgroundTransform->set_localScale(Vector3(1.5f, 1.0f, 1.0f));
         levelBar->get_transform()->Find(songArtworkName)->set_localScale(Vector3(0.96f, 0.96f, 0.96f));
 
-        Button* prefabDownloadButton = BeatSaberUI::CreateUIButton(levelBarTransform, "Download");
+        Button* prefabDownloadButton = CreateUIButton(levelBarTransform, "Download");
         prefab->SetActive(false);
     }
     for(int i = 0; i < ENTRIES_PER_PAGE; i++) {
@@ -102,7 +107,7 @@ void DownloadSongsSearchViewController::CreateEntries(Transform* parent) {
         Transform* artworkTransform = copyLevelBar->get_transform()->Find(songArtworkName);
         HMUI::ImageView* artwork = artworkTransform->GetComponent<HMUI::ImageView*>();
 
-        searchEntries[i] = SearchEntry(copy, copyLevelBar->songNameText, copyLevelBar->authorNameText, artwork, downloadButton);
+        searchEntries[i] = SearchEntry(copy, copyLevelBar->_songNameText, copyLevelBar->_authorNameText, artwork, downloadButton);
         auto& entry = searchEntries[i];
         downloadButton->get_onClick()->AddListener(custom_types::MakeDelegate<UnityAction*>(
             (std::function<void()>) [this, &entry] {
@@ -111,7 +116,7 @@ void DownloadSongsSearchViewController::CreateEntries(Transform* parent) {
                     BeatSaver::API::DownloadBeatmapAsync(entry.GetBeatmap(),
                         [this](bool error) {
                             if (!error) {
-                                QuestUI::MainThreadScheduler::Schedule(
+                                BSML::MainThreadScheduler::Schedule(
                                     [] {
                                         RuntimeSongLoader::API::RefreshSongs(false);
                                     }
@@ -121,7 +126,7 @@ void DownloadSongsSearchViewController::CreateEntries(Transform* parent) {
                         [&entry, hash](float percentage) {
                             if (entry.GetBeatmap().GetVersions().front().GetHash() == hash) {
                                 entry.downloadProgress = percentage;
-                                QuestUI::MainThreadScheduler::Schedule(
+                                BSML::MainThreadScheduler::Schedule(
                                     [&entry] {
                                         entry.UpdateDownloadProgress(false);
                                     }
@@ -135,7 +140,7 @@ void DownloadSongsSearchViewController::CreateEntries(Transform* parent) {
                     BeatSaver::API::DownloadBeatmapAsync(entry.GetSongBeastSaber(),
                         [this](bool error) {
                             if (!error) {
-                                QuestUI::MainThreadScheduler::Schedule(
+                                BSML::MainThreadScheduler::Schedule(
                                     [] {
                                         RuntimeSongLoader::API::RefreshSongs(false);
                                     }
@@ -145,7 +150,7 @@ void DownloadSongsSearchViewController::CreateEntries(Transform* parent) {
                         [&entry, hash](float percentage) {
                             if (entry.GetSongBeastSaber().GetHash() == hash) {
                                 entry.downloadProgress = percentage;
-                                QuestUI::MainThreadScheduler::Schedule(
+                                BSML::MainThreadScheduler::Schedule(
                                     [&entry] {
                                         entry.UpdateDownloadProgress(false);
                                     }
@@ -159,7 +164,7 @@ void DownloadSongsSearchViewController::CreateEntries(Transform* parent) {
                     BeatSaver::API::DownloadBeatmapAsync(entry.GetSongScoreSaber(),
                         [this](bool error) {
                             if (!error) {
-                                QuestUI::MainThreadScheduler::Schedule(
+                                BSML::MainThreadScheduler::Schedule(
                                     [] {
                                         RuntimeSongLoader::API::RefreshSongs(false);
                                     }
@@ -169,7 +174,7 @@ void DownloadSongsSearchViewController::CreateEntries(Transform* parent) {
                         [&entry, hash](float percentage) {
                             if (entry.GetSongScoreSaber().GetId() == hash) {
                                 entry.downloadProgress = percentage;
-                                QuestUI::MainThreadScheduler::Schedule(
+                                BSML::MainThreadScheduler::Schedule(
                                     [&entry] {
                                         entry.UpdateDownloadProgress(false);
                                     }
@@ -196,7 +201,7 @@ void DownloadSongsSearchViewController::SearchKey(int currentSearchIndex) {
         BeatSaver::API::GetBeatmapByKeyAsync(DownloadSongsSearchViewController::SearchQuery,
             [this, currentSearchIndex](std::optional<BeatSaver::Beatmap> beatmap) {
                 if (currentSearchIndex == DownloadSongsSearchViewController::searchIndex) {
-                    QuestUI::MainThreadScheduler::Schedule(
+                    BSML::MainThreadScheduler::Schedule(
                         [this, currentSearchIndex, beatmap] {
                             if (currentSearchIndex == DownloadSongsSearchViewController::searchIndex) {
                                 if (beatmap.has_value()) {
@@ -224,7 +229,7 @@ void DownloadSongsSearchViewController::SearchSongs(int currentSearchIndex) {
     BeatSaver::API::SearchPagedAsync(DownloadSongsSearchViewController::SearchQuery, DownloadSongsSearchViewController::searchPage,
         [this, currentSearchIndex](std::optional<BeatSaver::Page> page) {
             if (currentSearchIndex == DownloadSongsSearchViewController::searchIndex) {
-                QuestUI::MainThreadScheduler::Schedule(
+                BSML::MainThreadScheduler::Schedule(
                     [this, currentSearchIndex, page] {
                         if (currentSearchIndex == DownloadSongsSearchViewController::searchIndex) {
                             if (page.has_value() && !page.value().GetDocs().empty()) {
@@ -266,12 +271,12 @@ void DownloadSongsSearchViewController::SearchUser(int currentSearchIndex) {
     if (!DownloadSongsSearchViewController::SearchQuery.empty()) {
         BeatSaver::API::GetUserByNameAsync(DownloadSongsSearchViewController::SearchQuery,
             [this, currentSearchIndex](std::optional<BeatSaver::UserDetail> User) {
-                QuestUI::MainThreadScheduler::Schedule(
+                BSML::MainThreadScheduler::Schedule(
                     [this, currentSearchIndex, User]() {
                         if (User.has_value()) {
                             BeatSaver::API::GetBeatmapByUserIdAsync(User.value().GetId(), DownloadSongsSearchViewController::searchPage,
                                 [this, currentSearchIndex](std::optional<BeatSaver::Page> page) {
-                                    QuestUI::MainThreadScheduler::Schedule(
+                                    BSML::MainThreadScheduler::Schedule(
                                         [this, currentSearchIndex, page]() {
                                             if (currentSearchIndex == DownloadSongsSearchViewController::searchIndex) {
                                                 if (page.has_value() && !page.value().GetDocs().empty()) {
@@ -315,7 +320,7 @@ void DownloadSongsSearchViewController::GetCuratorRecommended(int currentSearchI
         BeastSaber::API::CuratorRecommendedAsync(
             [this, currentSearchIndex](std::optional<BeastSaber::Page> page) {
                 if (currentSearchIndex == DownloadSongsSearchViewController::searchIndex) {
-                    QuestUI::MainThreadScheduler::Schedule(
+                    BSML::MainThreadScheduler::Schedule(
                         [this, currentSearchIndex, page] {
                             if (currentSearchIndex == DownloadSongsSearchViewController::searchIndex) {
                                 if (page.has_value()) {
@@ -352,7 +357,7 @@ void DownloadSongsSearchViewController::GetBookmarks(int currentSearchIndex) {
         BeastSaber::API::BookmarkedAsync(DownloadSongsSearchViewController::SearchQuery,
             [this, currentSearchIndex](std::optional<BeastSaber::Page> page) {
                 if (currentSearchIndex == DownloadSongsSearchViewController::searchIndex) {
-                    QuestUI::MainThreadScheduler::Schedule(
+                    BSML::MainThreadScheduler::Schedule(
                         [this, currentSearchIndex, page] {
                             if (currentSearchIndex == DownloadSongsSearchViewController::searchIndex) {
                                 if (page.has_value() && !page.value().GetSongs().empty()) {
@@ -380,7 +385,7 @@ void DownloadSongsSearchViewController::GetBookmarks(int currentSearchIndex) {
                         }
                     );
                 }
-            }, 
+            },
         DownloadSongsSearchViewController::searchPage);
     }
     else loadingControl->ShowText("Please type in a Username!", false);
@@ -391,7 +396,7 @@ void DownloadSongsSearchViewController::GetTrending(int currentSearchIndex) {
     //ScoreSaber::API::GetTrendingAsync(
         [this, currentSearchIndex](std::optional<ScoreSaber::Leaderboards> page) {
             if (currentSearchIndex == DownloadSongsSearchViewController::searchIndex) {
-                QuestUI::MainThreadScheduler::Schedule(
+                BSML::MainThreadScheduler::Schedule(
                     [this, currentSearchIndex, page] {
                         if (currentSearchIndex == DownloadSongsSearchViewController::searchIndex) {
                             if (page.has_value() && !page.value().GetLeaderboards().empty()) {
@@ -429,7 +434,7 @@ void DownloadSongsSearchViewController::GetLatestRanked(int currentSearchIndex) 
     //ScoreSaber::API::SearchSSAsync(DownloadSongsSearchViewController::SearchQuery, ScoreSaber::API::SearchType::LatestRanked,
         [this, currentSearchIndex](std::optional<ScoreSaber::Leaderboards> page) {
             if (currentSearchIndex == DownloadSongsSearchViewController::searchIndex) {
-                QuestUI::MainThreadScheduler::Schedule(
+                BSML::MainThreadScheduler::Schedule(
                     [this, currentSearchIndex, page] {
                         if (currentSearchIndex == DownloadSongsSearchViewController::searchIndex) {
                             if (page.has_value() && !page.value().GetLeaderboards().empty()) {
@@ -467,7 +472,7 @@ void DownloadSongsSearchViewController::GetTopPlayed(int currentSearchIndex) {
     ScoreSaber::API::SearchSSAsync(DownloadSongsSearchViewController::SearchQuery, ScoreSaber::API::SearchType::TopPlayed,*/
         [this, currentSearchIndex](std::optional<ScoreSaber::Leaderboards> page) {
             if (currentSearchIndex == DownloadSongsSearchViewController::searchIndex) {
-                QuestUI::MainThreadScheduler::Schedule(
+                BSML::MainThreadScheduler::Schedule(
                     [this, currentSearchIndex, page] {
                         if (currentSearchIndex == DownloadSongsSearchViewController::searchIndex) {
                             if (page.has_value() && !page.value().GetLeaderboards().empty()) {
@@ -505,7 +510,7 @@ void DownloadSongsSearchViewController::GetTopRanked(int currentSearchIndex) {
     //ScoreSaber::API::SearchSSAsync(DownloadSongsSearchViewController::SearchQuery, ScoreSaber::API::SearchType::TopRanked,
         [this, currentSearchIndex](std::optional<ScoreSaber::Leaderboards> page) {
             if (currentSearchIndex == DownloadSongsSearchViewController::searchIndex) {
-                QuestUI::MainThreadScheduler::Schedule(
+                BSML::MainThreadScheduler::Schedule(
                     [this, currentSearchIndex, page] {
                         if (currentSearchIndex == DownloadSongsSearchViewController::searchIndex) {
                             if (page.has_value() && !page.value().GetLeaderboards().empty()) {
@@ -599,8 +604,7 @@ void DownloadSongsSearchViewController::Search() {
 void DownloadSongsSearchViewController::SetPage(int page) {
     DownloadSongsSearchViewController::searchPage = page;
 
-    searchViewController->pageIncrement->CurrentValue = page + 1;
-    searchViewController->pageIncrement->UpdateValue();
+    searchViewController->pageIncrement->set_Value(page + 1);
 }
 
 void DownloadSongsSearchViewController::DidActivate(bool firstActivation, bool addedToHierarchy, bool screenSystemEnabling) {
@@ -608,7 +612,7 @@ void DownloadSongsSearchViewController::DidActivate(bool firstActivation, bool a
         searchViewController = this;
         get_gameObject()->AddComponent<Touchable*>();
 
-        SearchField = BeatSaberUI::CreateStringSetting(get_transform(), "Search", "", UnityEngine::Vector2(0.0f, 0.0f), UnityEngine::Vector3(0.0f, -38.0f, 0.0f),
+        SearchField = CreateStringSetting(get_transform(), "Search", "", UnityEngine::Vector2(0.0f, 0.0f), UnityEngine::Vector3(0.0f, -38.0f, 0.0f),
             [this](StringW value) {
                 DownloadSongsSearchViewController::SearchQuery = static_cast<std::string>(value);
                 if (getModConfig().Service.GetValue() == "BeastSaber" && getModConfig().ListType_BeastSaber.GetValue() == "Bookmarks") getModConfig().BookmarkUsername.SetValue(std::string(value));
@@ -619,15 +623,15 @@ void DownloadSongsSearchViewController::DidActivate(bool firstActivation, bool a
             DownloadSongsSearchViewController::SearchQuery = getModConfig().BookmarkUsername.GetValue();
             searchViewController->SearchField->SetText(getModConfig().BookmarkUsername.GetValue());
         }
-        auto container = BeatSaberUI::CreateScrollView(get_transform());
-        
-        ExternalComponents* externalComponents = container->GetComponent<ExternalComponents*>();
+        auto container = CreateScrollView(get_transform());
+
+        auto externalComponents = container->GetComponent<BSML::ExternalComponents*>();
         RectTransform* scrollTransform = externalComponents->Get<RectTransform*>();
         scrollTransform->set_anchoredPosition(UnityEngine::Vector2(0.0f, -1.0f));
         scrollTransform->set_sizeDelta(UnityEngine::Vector2(-54.0f, -12.0f));
         CreateEntries(container->get_transform());
 
-        pageIncrement = BeatSaberUI::CreateIncrementSetting(get_transform(), "", 0, 1, DownloadSongsSearchViewController::searchPage + 1, true, false, 1, 0, UnityEngine::Vector2(-60.0f, -72.0f),
+        pageIncrement = CreateIncrementSetting(get_transform(), "", 0, 1, DownloadSongsSearchViewController::searchPage + 1, true, false, 1, 0, UnityEngine::Vector2(-60.0f, -72.0f),
             [this](float newValue){
                 if(newValue - 1 != DownloadSongsSearchViewController::searchPage) {
                     DownloadSongsSearchViewController::searchPage = newValue - 1;
@@ -639,7 +643,7 @@ void DownloadSongsSearchViewController::DidActivate(bool firstActivation, bool a
         Object::Destroy(pageIncrement->GetComponentInChildren<LayoutElement*>());
 
         // LoadingControl has to be added after the ScrollView, as otherwise it will be behind it and the RefreshButton unselectable
-        GameObject* existingLoadingControl = Resources::FindObjectsOfTypeAll<LoadingControl*>().First()->get_gameObject();
+        GameObject* existingLoadingControl = Resources::FindObjectsOfTypeAll<LoadingControl*>()->First()->get_gameObject();
         GameObject* loadingControlGameObject = UnityEngine::GameObject::Instantiate(existingLoadingControl, get_transform());
         auto loadingControlTransform = loadingControlGameObject->get_transform();
         loadingControlTransform->set_localPosition(Vector3(0.f, 0.0f, 0.0f));
@@ -649,7 +653,7 @@ void DownloadSongsSearchViewController::DidActivate(bool firstActivation, bool a
                 Search();
             }
         ));
-        loadingControl->loadingText->set_text("Loading...");
+        loadingControl->_loadingText->set_text("Loading...");
         loadingControl->set_enabled(true);
 
         Search();
