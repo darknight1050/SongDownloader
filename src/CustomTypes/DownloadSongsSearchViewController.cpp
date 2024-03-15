@@ -77,6 +77,8 @@ void DownloadSongsSearchViewController::CreateEntries(Transform* parent) {
 
         static ConstString multipleLineTextContainerName("MultipleLineTextContainer");
         Object::Destroy(levelBarTransform->FindChild(multipleLineTextContainerName)->get_gameObject());
+        static ConstString favoriteToggleName("FavoriteToggle");
+        Object::Destroy(levelBarTransform->FindChild(favoriteToggleName)->get_gameObject()); 
         static ConstString singleLineTextContainerName("SingleLineTextContainer");
         levelBarTransform->FindChild(singleLineTextContainerName)->get_gameObject()->set_active(true);
         LevelBar* levelBar = levelBarGameObject->GetComponent<LevelBar*>();
@@ -96,7 +98,7 @@ void DownloadSongsSearchViewController::CreateEntries(Transform* parent) {
         backgroundTransform->set_localScale(Vector3(1.5f, 1.0f, 1.0f));
         levelBar->get_transform()->Find(songArtworkName)->set_localScale(Vector3(0.96f, 0.96f, 0.96f));
 
-        Button* prefabDownloadButton = CreateUIButton(levelBarTransform, "Download");
+        Button* prefabDownloadButton = CreateUIButton(levelBarTransform, "Download", "PracticeButton", {0, 0}, {-5, 5}, nullptr);
         prefab->SetActive(false);
     }
     for(int i = 0; i < ENTRIES_PER_PAGE; i++) {

@@ -1,7 +1,6 @@
 #pragma once
 
 #include "GlobalNamespace/LoadingControl.hpp"
-#include "GlobalNamespace/CustomPreviewBeatmapLevel.hpp"
 #include "UnityEngine/GameObject.hpp"
 #include "UnityEngine/Transform.hpp"
 #include "UnityEngine/UI/Button.hpp"
