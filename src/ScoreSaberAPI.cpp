@@ -7,7 +7,7 @@
 
 #include "zip.h"
 
-#include "songloader/shared/API.hpp"
+#include "songcore/shared/SongCore.hpp"
 
 #include "Exceptions.hpp"
 

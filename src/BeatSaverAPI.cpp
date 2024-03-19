@@ -7,7 +7,7 @@
 
 #include "zip.h"
 
-#include "songloader/shared/API.hpp"
+#include "songcore/shared/SongCore.hpp"
 
 #include "Exceptions.hpp"
 
@@ -18,9 +18,9 @@
 #define FILE_DOWNLOAD_TIMEOUT 64
 
 namespace BeatSaver::API {
-    
+
     std::string exception;
-                   
+
     std::optional<BeatSaver::Beatmap> GetBeatmapByKey(std::string key) {
         exception.clear();
         auto json = WebUtils::GetJSON(API_URL + "/maps/id/" + key);
@@ -153,7 +153,7 @@ namespace BeatSaver::API {
     }
 
     bool DownloadBeatmap(const BeatSaver::Beatmap& beatmap) {
-        auto targetFolder = RuntimeSongLoader::API::GetCustomLevelsPath() + beatmap.GetId() + " ()[]{}%&.:,;=!-_ (" + beatmap.GetMetadata().GetSongName() + " - " + beatmap.GetMetadata().GetLevelAuthorName() + ")";
+        auto targetFolder = SongCore::API::Loading::GetPreferredCustomLevelPath().string() + beatmap.GetId() + " ()[]{}%&.:,;=!-_ (" + beatmap.GetMetadata().GetSongName() + " - " + beatmap.GetMetadata().GetLevelAuthorName() + ")";
         std::string data;
         WebUtils::Get(beatmap.GetVersions().front().GetDownloadURL(), FILE_DOWNLOAD_TIMEOUT, data);
         int args = 2;
@@ -373,7 +373,7 @@ namespace BeatSaver::API {
     void DownloadBeatmapAsync(const BeatSaver::Beatmap& beatmap, std::function<void(bool)> finished, std::function<void(float)> progressUpdate) {
         WebUtils::GetAsync(beatmap.GetVersions().front().GetDownloadURL(), FILE_DOWNLOAD_TIMEOUT,
             [beatmap, finished](long httpCode, std::string data) {
-                auto targetFolder = RuntimeSongLoader::API::GetCustomLevelsPath() + FileUtils::FixIlegalName(beatmap.GetId() + " (" + beatmap.GetMetadata().GetSongName() + " - " + beatmap.GetMetadata().GetLevelAuthorName() + ")");
+                auto targetFolder = SongCore::API::Loading::GetPreferredCustomLevelPath().string() + FileUtils::FixIlegalName(beatmap.GetId() + " (" + beatmap.GetMetadata().GetSongName() + " - " + beatmap.GetMetadata().GetLevelAuthorName() + ")");
                 int args = 2;
                 int statusCode = zip_stream_extract(data.data(), data.length(), targetFolder.c_str(), +[](const char* name, void* arg) -> int {
                     return 0;
@@ -386,7 +386,7 @@ namespace BeatSaver::API {
     void DownloadBeatmapAsync(const BeatSaver::Beatmap& beatmap, const BeatSaver::BeatmapVersion& beatmapVer, std::function<void(bool)> finished, std::function<void(float)> progressUpdate) {
         WebUtils::GetAsync(beatmapVer.GetDownloadURL(), FILE_DOWNLOAD_TIMEOUT,
             [beatmap, finished](long httpCode, std::string data) {
-                auto targetFolder = RuntimeSongLoader::API::GetCustomLevelsPath() + FileUtils::FixIlegalName(beatmap.GetId() + " (" + beatmap.GetMetadata().GetSongName() + " - " + beatmap.GetMetadata().GetLevelAuthorName() + ")");
+                auto targetFolder = SongCore::API::Loading::GetPreferredCustomLevelPath().string() + FileUtils::FixIlegalName(beatmap.GetId() + " (" + beatmap.GetMetadata().GetSongName() + " - " + beatmap.GetMetadata().GetLevelAuthorName() + ")");
                 int args = 2;
                 int statusCode = zip_stream_extract(data.data(), data.length(), targetFolder.c_str(), +[](const char* name, void* arg) -> int {
                     return 0;
@@ -400,7 +400,7 @@ namespace BeatSaver::API {
         // Probably a deprecated method of downloading maps, but at least will work if map has isn't up to date https://api.beatsaver.com/download/key/1b236
         WebUtils::GetAsync(API_URL + "/download/key/" + song.GetSong_key(), FILE_DOWNLOAD_TIMEOUT,
             [song, finished](long httpCode, std::string data) {
-                auto targetFolder = RuntimeSongLoader::API::GetCustomLevelsPath() + FileUtils::FixIlegalName(song.GetSong_key() + " (" + song.GetTitle() + " - " + song.GetLevel_author_name() + ")");
+                auto targetFolder = SongCore::API::Loading::GetPreferredCustomLevelPath().string() + FileUtils::FixIlegalName(song.GetSong_key() + " (" + song.GetTitle() + " - " + song.GetLevel_author_name() + ")");
                 int args = 2;
                 int statusCode = zip_stream_extract(data.data(), data.length(), targetFolder.c_str(), +[](const char* name, void* arg) -> int {
                     return 0;
@@ -416,7 +416,7 @@ namespace BeatSaver::API {
         std::transform(hash.begin(), hash.end(), hash.begin(), tolower);
         WebUtils::GetAsync(CDN_URL + hash + ".zip", FILE_DOWNLOAD_TIMEOUT,
             [song, finished](long httpCode, std::string data) {
-                auto targetFolder = RuntimeSongLoader::API::GetCustomLevelsPath() + FileUtils::FixIlegalName(std::to_string(song.GetUid()) + " (" + song.GetName() + " - " + song.GetLevelAuthorName() + ")");
+                auto targetFolder = SongCore::API::Loading::GetPreferredCustomLevelPath().string() + FileUtils::FixIlegalName(std::to_string(song.GetUid()) + " (" + song.GetName() + " - " + song.GetLevelAuthorName() + ")");
                 int args = 2;
                 int statusCode = zip_stream_extract(data.data(), data.length(), targetFolder.c_str(), +[](const char* name, void* arg) -> int {
                     return 0;
@@ -435,10 +435,10 @@ namespace BeatSaver::API {
                 finished(false);
             }
         );
-        
+
         //WebUtils::GetAsync(CDN_URL + hash + ".zip", FILE_DOWNLOAD_TIMEOUT,
         //    [song, finished](long httpCode, std::string data) {
-        //        auto targetFolder = RuntimeSongLoader::API::GetCustomLevelsPath() + FileUtils::FixIlegalName(std::to_string(song.GetUid()) + " (" + song.GetName() + " - " + song.GetLevelAuthorName() + ")");
+        //        auto targetFolder = SongCore::API::Loading::GetPreferredCustomLevelPath().string() + FileUtils::FixIlegalName(std::to_string(song.GetUid()) + " (" + song.GetName() + " - " + song.GetLevelAuthorName() + ")");
         //        int args = 2;
         //        int statusCode = zip_stream_extract(data.data(), data.length(), targetFolder.c_str(), +[](const char* name, void* arg) -> int {
         //            return 0;
