@@ -24,7 +24,7 @@
     },
     {
       "id": "bs-cordl",
-      "versionRange": "^3402.*",
+      "versionRange": "^3402.0.0",
       "additionalData": {}
     },
     {
@@ -34,7 +34,7 @@
     },
     {
       "id": "songcore",
-      "versionRange": "^0.0.6",
+      "versionRange": "^0.1.0",
       "additionalData": {}
     },
     {
