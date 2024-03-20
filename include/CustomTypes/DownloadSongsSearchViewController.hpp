@@ -17,7 +17,7 @@
 #include "Types/ScoreSaber/Page.hpp"
 #include "Types/ScoreSaber/Leaderboards.hpp"
 
-#include "songloader/shared/API.hpp"
+#include "songcore/shared/SongCore.hpp"
 
 #include "BeatSaverAPI.hpp"
 #include "BeastSaberAPI.hpp"
