@@ -118,11 +118,7 @@ void DownloadSongsSearchViewController::CreateEntries(Transform* parent) {
                     BeatSaver::API::DownloadBeatmapAsync(entry.GetBeatmap(),
                         [this](bool error) {
                             if (!error) {
-                                BSML::MainThreadScheduler::Schedule(
-                                    [] {
-                                        RuntimeSongLoader::API::RefreshSongs(false);
-                                    }
-                                );
+                                SongCore::API::Loading::RefreshSongs(false);
                             }
                         },
                         [&entry, hash](float percentage) {
@@ -142,11 +138,7 @@ void DownloadSongsSearchViewController::CreateEntries(Transform* parent) {
                     BeatSaver::API::DownloadBeatmapAsync(entry.GetSongBeastSaber(),
                         [this](bool error) {
                             if (!error) {
-                                BSML::MainThreadScheduler::Schedule(
-                                    [] {
-                                        RuntimeSongLoader::API::RefreshSongs(false);
-                                    }
-                                );
+                                SongCore::API::Loading::RefreshSongs(false);
                             }
                         },
                         [&entry, hash](float percentage) {
@@ -166,11 +158,7 @@ void DownloadSongsSearchViewController::CreateEntries(Transform* parent) {
                     BeatSaver::API::DownloadBeatmapAsync(entry.GetSongScoreSaber(),
                         [this](bool error) {
                             if (!error) {
-                                BSML::MainThreadScheduler::Schedule(
-                                    [] {
-                                        RuntimeSongLoader::API::RefreshSongs(false);
-                                    }
-                                );
+                                SongCore::API::Loading::RefreshSongs(false);
                             }
                         },
                         [&entry, hash](float percentage) {

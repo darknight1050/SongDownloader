@@ -4,7 +4,7 @@
   "info": {
     "name": "SongDownloader",
     "id": "songdownloader",
-    "version": "0.0.1",
+    "version": "0.6.0",
     "url": "https://github.com/darknight1050/SongDownloader",
     "additionalData": {
       "cmake": true,
@@ -14,7 +14,7 @@
   "dependencies": [
     {
       "id": "beatsaber-hook",
-      "versionRange": "^5.0.0",
+      "versionRange": "^5.0.9",
       "additionalData": {}
     },
     {
@@ -24,7 +24,7 @@
     },
     {
       "id": "bs-cordl",
-      "versionRange": "3500.*",
+      "versionRange": "^3500.1.0",
       "additionalData": {}
     },
     {
@@ -33,8 +33,8 @@
       "additionalData": {}
     },
     {
-      "id": "songloader",
-      "versionRange": "^0.12.0",
+      "id": "songcore",
+      "versionRange": "^0.2.0",
       "additionalData": {}
     },
     {

@@ -207,8 +207,8 @@ void SearchEntry::UpdateDownloadProgress(bool checkLoaded) {
             hash = SSsong.GetSongHash();
         }
         std::transform(hash.begin(), hash.end(), hash.begin(), toupper);
-        for (auto& song : RuntimeSongLoader::API::GetLoadedSongs()) {
-            if (to_utf8(csstrtostr(song->levelID)).ends_with(hash)) {
+        for (auto& song : SongCore::API::Loading::GetAllLevels()) {
+            if (to_utf8(csstrtostr(song->get_levelID())).ends_with(hash)) {
                 downloadProgress = 100.0f;
                 break;
             }
