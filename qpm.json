@@ -19,12 +19,12 @@
     },
     {
       "id": "bsml",
-      "versionRange": "^0.4.4",
+      "versionRange": "^0.5.0",
       "additionalData": {}
     },
     {
       "id": "bs-cordl",
-      "versionRange": "^3402.0.0",
+      "versionRange": "^3500.1.0",
       "additionalData": {}
     },
     {
@@ -34,7 +34,7 @@
     },
     {
       "id": "songcore",
-      "versionRange": "^0.1.0",
+      "versionRange": "^0.2.0",
       "additionalData": {}
     },
     {
