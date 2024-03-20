@@ -11,10 +11,10 @@
 
 #include "Exceptions.hpp"
 
-#define BASE_URL std::string("https://scoresaber.com")
-#define API_URL_DEPRECATED BASE_URL + std::string("/api.php?function=get-leaderboards")
-#define API_URL BASE_URL + std::string("/api")
-#define API_LEADERBOARD API_URL + std::string("/leaderboards")
+#define BASE_URL "https://scoresaber.com"
+#define API_URL_DEPRECATED BASE_URL "/api.php?function=get-leaderboards"
+#define API_URL BASE_URL "/api"
+#define API_LEADERBOARD API_URL "/leaderboards"
 #define FILE_DOWNLOAD_TIMEOUT 64
 
 namespace ScoreSaber::API {
@@ -25,7 +25,7 @@ namespace ScoreSaber::API {
 
     std::optional<ScoreSaber::Page> GetTrending(bool ranked, int pageIndex, int amount) {
         exception.clear();
-        auto json = WebUtils::GetJSON(API_URL_DEPRECATED + "&cat=0&limit=" + std::to_string(amount) + "&page=" + std::to_string(++pageIndex) + "&ranked=" + std::to_string(int(ranked)));
+        auto json = WebUtils::GetJSON(fmt::format(API_URL_DEPRECATED "&cat=0&limit={}&page={}&ranked={}", amount, ++pageIndex, int(ranked)));
         if (!json.has_value())
             return std::nullopt;
         try {
@@ -34,7 +34,7 @@ namespace ScoreSaber::API {
             return page;
         }
         catch (const std::exception& e) {
-            LOG_ERROR("%s", e.what());
+            LOG_ERROR("{}", e.what());
             exception = e.what();
             return std::nullopt;
         }
@@ -42,7 +42,7 @@ namespace ScoreSaber::API {
 
     std::optional<ScoreSaber::Page> GetLatestRanked(bool ranked, int pageIndex, int amount) {
         exception.clear();
-        auto json = WebUtils::GetJSON(API_URL_DEPRECATED + "&cat=1&limit=" + std::to_string(amount) + "&page=" + std::to_string(++pageIndex) + "&ranked=" + std::to_string(int(ranked)));
+        auto json = WebUtils::GetJSON(fmt::format(API_URL_DEPRECATED "&cat=1&limit={}&page={}&ranke={}", amount, ++pageIndex, int(ranked)));
         if (!json.has_value())
             return std::nullopt;
         try {
@@ -51,7 +51,7 @@ namespace ScoreSaber::API {
             return page;
         }
         catch (const std::exception& e) {
-            LOG_ERROR("%s", e.what());
+            LOG_ERROR("{}", e.what());
             exception = e.what();
             return std::nullopt;
         }
@@ -59,7 +59,7 @@ namespace ScoreSaber::API {
 
     std::optional<ScoreSaber::Page> GetTopPlayed(bool ranked, int pageIndex, int amount) {
         exception.clear();
-        auto json = WebUtils::GetJSON(API_URL_DEPRECATED + "&cat=2&limit=" + std::to_string(amount) + "&page=" + std::to_string(++pageIndex) + "&ranked=" + std::to_string(int(ranked)));
+        auto json = WebUtils::GetJSON(fmt::format(API_URL_DEPRECATED "&cat=2&limit={}&page={}&ranked={}", amount, ++pageIndex, int(ranked)));
         if (!json.has_value())
             return std::nullopt;
         try {
@@ -68,7 +68,7 @@ namespace ScoreSaber::API {
             return page;
         }
         catch (const std::exception& e) {
-            LOG_ERROR("%s", e.what());
+            LOG_ERROR("{}", e.what());
             exception = e.what();
             return std::nullopt;
         }
@@ -76,7 +76,7 @@ namespace ScoreSaber::API {
 
     std::optional<ScoreSaber::Page> GetTopRanked(bool ranked, int pageIndex, int amount) {
         exception.clear();
-        auto json = WebUtils::GetJSON(API_URL_DEPRECATED + "&cat=3&limit=" + std::to_string(amount) + "&page=" + std::to_string(++pageIndex) + "&ranked=" + std::to_string(int(ranked)));
+        auto json = WebUtils::GetJSON(fmt::format(API_URL_DEPRECATED "&cat=3&limit={}&page={}&ranked={}", amount, ++pageIndex, int(ranked)));
         if (!json.has_value())
             return std::nullopt;
         try {
@@ -85,7 +85,7 @@ namespace ScoreSaber::API {
             return page;
         }
         catch (const std::exception& e) {
-            LOG_ERROR("%s", e.what());
+            LOG_ERROR("{}", e.what());
             exception = e.what();
             return std::nullopt;
         }
@@ -93,12 +93,16 @@ namespace ScoreSaber::API {
 
     std::optional<ScoreSaber::Leaderboards> GetList(ListCategory list, std::optional<bool> ranked, std::optional<bool> qualified, std::optional<bool> unique, int pageIndex) {
         exception.clear();
-        std::string request = "?category=" + std::to_string(static_cast<int>(list)) + "&page=" + std::to_string(++pageIndex);
-        if (ranked.has_value()) request += "&ranked=" + std::string(ranked.value() ? "true" : "false");
-        if (qualified.has_value()) request += "&qualified=" + std::string(qualified.value() ? "true" : "false");
-        if (unique.has_value()) request += "&unique=" + std::string(unique.value() ? "true" : "false");
-        LOG_DEBUG("Request: %s", (API_LEADERBOARD + request).c_str());
-        auto json = WebUtils::GetJSON(API_LEADERBOARD + request);
+        std::stringstream requeststream;
+        requeststream << API_LEADERBOARD;
+        requeststream << fmt::format("?category={}", static_cast<int>(list));
+        requeststream << fmt::format("&page={}", ++pageIndex);
+        if (ranked.has_value()) requeststream << fmt::format("&ranked={}", ranked.value());
+        if (qualified.has_value()) requeststream << fmt::format("&qualified={}", qualified.value());
+        if (unique.has_value()) requeststream << fmt::format("&unique={}", unique.value());
+        auto requestURL = requeststream.str();
+        LOG_DEBUG("Request: {}", requestURL);
+        auto json = WebUtils::GetJSON(requestURL);
         if (!json.has_value())
             return std::nullopt;
         if (json.value().GetObject().HasMember("errorMessage") && json.value().GetObject()["errorMessage"].IsString()) {
@@ -111,7 +115,7 @@ namespace ScoreSaber::API {
             return page;
         }
         catch (const std::exception& e) {
-            LOG_ERROR("%s", e.what());
+            LOG_ERROR("{}", e.what());
             exception = e.what();
             return std::nullopt;
         }
@@ -136,7 +140,7 @@ namespace ScoreSaber::API {
 
     void GetTrendingAsync(std::function<void(std::optional<ScoreSaber::Page>)> finished, bool ranked, int pageIndex, int amount) {
         exception.clear();
-        WebUtils::GetJSONAsync(API_URL_DEPRECATED + "&cat=0&limit=" + std::to_string(amount) + "&page=" + std::to_string(++pageIndex) + "&ranked=" + std::to_string(int(ranked)),
+        WebUtils::GetJSONAsync(fmt::format(API_URL_DEPRECATED "&cat=0&limit={}&page={}&ranked={}", amount, ++pageIndex, int(ranked)),
             [finished](long httpCode, bool error, rapidjson::Document& document) {
                 if (error) {
                     finished(std::nullopt);
@@ -148,7 +152,7 @@ namespace ScoreSaber::API {
                         finished(page);
                     }
                     catch (const std::exception& e) {
-                        LOG_ERROR("%s", e.what());
+                        LOG_ERROR("{}", e.what());
                         exception = e.what();
                         finished(std::nullopt);
                         //// Convert the document into a string and log/write to file for debug purposes
@@ -164,7 +168,7 @@ namespace ScoreSaber::API {
 
     void GetLatestRankedAsync(std::function<void(std::optional<ScoreSaber::Page>)> finished, bool ranked, int pageIndex, int amount) {
         exception.clear();
-        WebUtils::GetJSONAsync(API_URL_DEPRECATED + "&cat=1&limit=" + std::to_string(amount) + "&page=" + std::to_string(++pageIndex) + "&ranked=" + std::to_string(int(ranked)),
+        WebUtils::GetJSONAsync(fmt::format(API_URL_DEPRECATED "&cat=1&limit={}&page={}&ranked={}", amount, ++pageIndex, int(ranked)),
             [finished](long httpCode, bool error, rapidjson::Document& document) {
                 if (error) {
                     finished(std::nullopt);
@@ -176,7 +180,7 @@ namespace ScoreSaber::API {
                         finished(page);
                     }
                     catch (const std::exception& e) {
-                        LOG_ERROR("%s", e.what());
+                        LOG_ERROR("{}", e.what());
                         exception = e.what();
                         finished(std::nullopt);
                         //// Convert the document into a string and log/write to file for debug purposes
@@ -192,7 +196,7 @@ namespace ScoreSaber::API {
 
     void GetTopPlayedAsync(std::function<void(std::optional<ScoreSaber::Page>)> finished, bool ranked, int pageIndex, int amount) {
         exception.clear();
-        WebUtils::GetJSONAsync(API_URL_DEPRECATED + "&cat=2&limit=" + std::to_string(amount) + "&page=" + std::to_string(++pageIndex) + "&ranked=" + std::to_string(int(ranked)),
+        WebUtils::GetJSONAsync(fmt::format(API_URL_DEPRECATED "&cat=2&limit={}&page={}&ranked={}", amount, ++pageIndex, int(ranked)),
             [finished](long httpCode, bool error, rapidjson::Document& document) {
                 if (error) {
                     finished(std::nullopt);
@@ -204,7 +208,7 @@ namespace ScoreSaber::API {
                         finished(page);
                     }
                     catch (const std::exception& e) {
-                        LOG_ERROR("%s", e.what());
+                        LOG_ERROR("{}", e.what());
                         exception = e.what();
                         finished(std::nullopt);
                         //// Convert the document into a string and log/write to file for debug purposes
@@ -220,7 +224,7 @@ namespace ScoreSaber::API {
 
     void GetTopRankedAsync(std::function<void(std::optional<ScoreSaber::Page>)> finished, bool ranked, int pageIndex, int amount) {
         exception.clear();
-        WebUtils::GetJSONAsync(API_URL_DEPRECATED + "&cat=3&limit=" + std::to_string(amount) + "&page=" + std::to_string(++pageIndex) + "&ranked=" + std::to_string(int(ranked)),
+        WebUtils::GetJSONAsync(fmt::format(API_URL_DEPRECATED "&cat=3&limit={}&page={}&ranked={}", amount, ++pageIndex, int(ranked)),
             [finished](long httpCode, bool error, rapidjson::Document& document) {
                 if (error) {
                     finished(std::nullopt);
@@ -232,7 +236,7 @@ namespace ScoreSaber::API {
                         finished(page);
                     }
                     catch (const std::exception& e) {
-                        LOG_ERROR("%s", e.what());
+                        LOG_ERROR("{}", e.what());
                         exception = e.what();
                         finished(std::nullopt);
                         //// Convert the document into a string and log/write to file for debug purposes
@@ -248,11 +252,16 @@ namespace ScoreSaber::API {
 
     void GetListAsync(ListCategory list, std::function<void(std::optional<ScoreSaber::Leaderboards>)> finished, std::optional<bool> ranked, std::optional<bool> qualified, std::optional<bool> unique, int pageIndex) {
         exception.clear();
-        std::string request = "?category=" + std::to_string(static_cast<int>(list)) + "&page=" + std::to_string(++pageIndex);
-        if (ranked.has_value()) request += "&ranked=" + std::string(ranked.value() ? "true" : "false");
-        if (qualified.has_value()) request += "&qualified=" + std::string(qualified.value() ? "true" : "false");
-        if (unique.has_value()) request += "&unique=" + std::string(unique.value() ? "true" : "false");
-        WebUtils::GetJSONAsync(API_LEADERBOARD + request,
+        std::stringstream requeststream;
+        requeststream << API_LEADERBOARD;
+        requeststream << fmt::format("?category={}", static_cast<int>(list));
+        requeststream << fmt::format("&page={}", ++pageIndex);
+        if (ranked.has_value()) requeststream << fmt::format("&ranked={}", ranked.value());
+        if (qualified.has_value()) requeststream << fmt::format("&qualified={}", qualified.value());
+        if (unique.has_value()) requeststream << fmt::format("&unique={}", unique.value());
+        auto requestURL = requeststream.str();
+        LOG_DEBUG("Request: {}", requestURL);
+        WebUtils::GetJSONAsync(requestURL,
             [finished](long httpCode, bool error, rapidjson::Document& document) {
                 if (error) {
                     finished(std::nullopt);
@@ -268,7 +277,7 @@ namespace ScoreSaber::API {
                         finished(page);
                     }
                     catch (const std::exception& e) {
-                        LOG_ERROR("%s", e.what());
+                        LOG_ERROR("{}", e.what());
                         exception = e.what();
                         finished(std::nullopt);
                         //// Convert the document into a string and log/write to file for debug purposes
@@ -284,7 +293,7 @@ namespace ScoreSaber::API {
 
     void SearchSSAsync(std::string query, SearchType list, std::function<void(std::optional<ScoreSaber::Page>)> finished, bool ranked, int pageIndex, int amount) {
         exception.clear();
-        WebUtils::GetJSONAsync(API_URL_DEPRECATED + "&cat=" + std::to_string(static_cast<int>(list)) + "&limit=" + std::to_string(amount) + "&page=" + std::to_string(++pageIndex) + "&ranked=" + std::to_string(int(ranked)) + "&search=" + query,
+        WebUtils::GetJSONAsync(fmt::format(API_URL_DEPRECATED "&cat={}&limit={}&page={}&ranked={}&search={}", static_cast<int>(list), amount, ++pageIndex, int(ranked), query),
             [finished](long httpCode, bool error, rapidjson::Document& document) {
                 if (error) {
                     finished(std::nullopt);
@@ -296,7 +305,7 @@ namespace ScoreSaber::API {
                         finished(page);
                     }
                     catch (const std::exception& e) {
-                        LOG_ERROR("%s", e.what());
+                        LOG_ERROR("{}", e.what());
                         exception = e.what();
                         finished(std::nullopt);
                         //// Convert the document into a string and log/write to file for debug purposes
@@ -312,13 +321,17 @@ namespace ScoreSaber::API {
 
     void SearchAsync(std::string query, ListCategory list, std::function<void(std::optional<ScoreSaber::Leaderboards>)> finished, std::optional<bool> ranked, std::optional<bool> qualified, std::optional<bool> unique, int pageIndex) {
         exception.clear();
-        std::string request = "?category=" + std::to_string(static_cast<int>(list)) + "&page=" + std::to_string(++pageIndex);
-        if (!query.empty()) request += "&search=" + query;
-        if (ranked.has_value()) request += "&ranked=" + std::string(ranked.value() ? "true" : "false");
-        if (qualified.has_value()) request += "&qualified=" + std::string(qualified.value() ? "true" : "false");
-        if (unique.has_value()) request += "&unique=" + std::string(unique.value() ? "true" : "false");
-        LOG_DEBUG("URL is: %s", (API_LEADERBOARD + request).c_str());
-        WebUtils::GetJSONAsync(API_LEADERBOARD + request,
+        std::stringstream requeststream;
+        requeststream << API_LEADERBOARD;
+        requeststream << fmt::format("?category={}", static_cast<int>(list));
+        requeststream << fmt::format("&page={}", ++pageIndex);
+        if (!query.empty()) requeststream << fmt::format("&search={}", query);
+        if (ranked.has_value()) requeststream << fmt::format("&ranked={}", ranked.value());
+        if (qualified.has_value()) requeststream << fmt::format("&qualified={}", qualified.value());
+        if (unique.has_value()) requeststream << fmt::format("&unique={}", unique.value());
+        auto requestURL = requeststream.str();
+        LOG_DEBUG("URL is: {}", requestURL);
+        WebUtils::GetJSONAsync(requestURL,
             [finished](long httpCode, bool error, rapidjson::Document& document) {
                 if (error) {
                     finished(std::nullopt);
@@ -334,7 +347,7 @@ namespace ScoreSaber::API {
                         finished(page);
                     }
                     catch (const std::exception& e) {
-                        LOG_ERROR("%s", e.what());
+                        LOG_ERROR("{}", e.what());
                         exception = e.what();
                         finished(std::nullopt);
                         // Convert the document into a string and log/write to file for debug purposes

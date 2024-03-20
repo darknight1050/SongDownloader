@@ -4,16 +4,17 @@
 
 #include "libcurl/shared/curl.h"
 #include "libcurl/shared/easy.h"
+#include <sstream>
 
 #define TIMEOUT 10
-#define USER_AGENT (std::string("QuestSongDownloader/") + VERSION + " (+https://github.com/darknight1050/SongDownloader)").c_str()
+#define USER_AGENT "QuestSongDownloader/" VERSION " (+https://github.com/darknight1050/SongDownloader)"
 
 namespace WebUtils {
 
     //https://stackoverflow.com/a/55660581
     std::string query_encode(const std::string& s)
     {
-        std::string ret;
+        std::stringstream ret;
 
         #define IS_BETWEEN(ch, low, high) (ch >= low && ch <= high)
         #define IS_ALPHA(ch) (IS_BETWEEN(ch, 'A', 'Z') || IS_BETWEEN(ch, 'a', 'z'))
@@ -26,11 +27,11 @@ namespace WebUtils {
 
             if (IS_ALPHA(ch) || IS_DIGIT(ch))
             {
-                ret += ch;
+                ret << ch;
             }
             else if ((ch == '%') && IS_HEXDIG(s[i+0]) && IS_HEXDIG(s[i+1]))
             {
-                ret += s.substr(i-1, 3);
+                ret << s.substr(i-1, 3);
                 i += 2;
             }
             else
@@ -58,7 +59,7 @@ namespace WebUtils {
                     case '?':
                     case '[':
                     case ']':
-                        ret += ch;
+                        ret << ch;
                         break;
 
                     default:
@@ -67,14 +68,14 @@ namespace WebUtils {
                         char pct[] = "%  ";
                         pct[1] = hex[(ch >> 4) & 0xF];
                         pct[2] = hex[ch & 0xF];
-                        ret.append(pct, 3);
+                        ret << std::string_view(pct, 3);
                         break;
                     }
                 }
             }
         }
 
-        return ret;
+        return ret.str();
     }
 
 
@@ -85,7 +86,7 @@ namespace WebUtils {
             s->append((char*)contents, newLength);
         } catch(std::bad_alloc &e) {
             //handle memory problem
-            getLogger().critical("Failed to allocate string of size: %lu", newLength);
+            LOG_CRITICAL("Failed to allocate string of size: {}", newLength);
             return 0;
         }
         return newLength;
@@ -111,7 +112,7 @@ namespace WebUtils {
         struct curl_slist *headers = NULL;
         headers = curl_slist_append(headers, "Accept: */*");
         // Set headers
-        curl_easy_setopt(curl, CURLOPT_HTTPHEADER, headers); 
+        curl_easy_setopt(curl, CURLOPT_HTTPHEADER, headers);
 
         curl_easy_setopt(curl, CURLOPT_URL, query_encode(url).c_str());
 
@@ -131,11 +132,11 @@ namespace WebUtils {
         curl_easy_setopt(curl, CURLOPT_SSL_VERIFYPEER, false);
 
         curl_easy_setopt(curl, CURLOPT_VERBOSE, 1L);
-    
+
         auto res = curl_easy_perform(curl);
-        /* Check for errors */ 
+        /* Check for errors */
         if (res != CURLE_OK) {
-            getLogger().critical("curl_easy_perform() failed: %u: %s", res, curl_easy_strerror(res));
+            LOG_CRITICAL("curl_easy_perform() failed: {}: {}", int(res), curl_easy_strerror(res));
         }
         curl_easy_getinfo(curl, CURLINFO_RESPONSE_CODE, &httpCode);
         curl_easy_cleanup(curl);
@@ -160,7 +161,7 @@ namespace WebUtils {
                 struct curl_slist *headers = NULL;
                 headers = curl_slist_append(headers, "Accept: */*");
                 // Set headers
-                curl_easy_setopt(curl, CURLOPT_HTTPHEADER, headers); 
+                curl_easy_setopt(curl, CURLOPT_HTTPHEADER, headers);
 
                 curl_easy_setopt(curl, CURLOPT_URL, query_encode(url).c_str());
 
@@ -179,7 +180,7 @@ namespace WebUtils {
                     curl_easy_setopt(curl, CURLOPT_NOPROGRESS, false);
                     curl_easy_setopt(curl, CURLOPT_XFERINFODATA, wrapper);
                     // Install the callback function
-                    curl_easy_setopt(curl, CURLOPT_XFERINFOFUNCTION, 
+                    curl_easy_setopt(curl, CURLOPT_XFERINFOFUNCTION,
                         +[] (void* clientp, curl_off_t dltotal, curl_off_t dlnow, curl_off_t ultotal, curl_off_t ulnow) {
                             float percentage = (float)dlnow / (float)dltotal * 100.0f;
                             if(isnan(percentage))
@@ -196,11 +197,11 @@ namespace WebUtils {
                 curl_easy_setopt(curl, CURLOPT_SSL_VERIFYPEER, false);
 
                 curl_easy_setopt(curl, CURLOPT_VERBOSE, 1L);
-            
+
                 auto res = curl_easy_perform(curl);
-                /* Check for errors */ 
+                /* Check for errors */
                 if (res != CURLE_OK) {
-                    getLogger().critical("curl_easy_perform() failed: %u: %s", res, curl_easy_strerror(res));
+                    LOG_CRITICAL("curl_easy_perform() failed: {}: {}", int(res), curl_easy_strerror(res));
                 }
                 curl_easy_getinfo(curl, CURLINFO_RESPONSE_CODE, &httpCode);
                 curl_easy_cleanup(curl);
@@ -213,7 +214,7 @@ namespace WebUtils {
 
     void GetJSONAsync(std::string url, std::function<void(long, bool, rapidjson::Document&)> finished) {
         GetAsync(url,
-            [finished] (long httpCode, std::string data) { 
+            [finished] (long httpCode, std::string data) {
                 rapidjson::Document document;
                 document.Parse(data);
                 finished(httpCode, document.HasParseError() || !document.IsObject(), document);

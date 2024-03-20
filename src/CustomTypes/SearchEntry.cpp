@@ -208,7 +208,7 @@ void SearchEntry::UpdateDownloadProgress(bool checkLoaded) {
         }
         std::transform(hash.begin(), hash.end(), hash.begin(), toupper);
         for (auto& song : SongCore::API::Loading::GetAllLevels()) {
-            if (to_utf8(csstrtostr(song->get_levelID())).ends_with(hash)) {
+            if (song->levelID.ends_with(hash)) {
                 downloadProgress = 100.0f;
                 break;
             }
@@ -223,7 +223,7 @@ void SearchEntry::UpdateDownloadProgress(bool checkLoaded) {
         downloadButton->set_interactable(false);
     }
     else {
-        SetButtonText(downloadButton, string_format("%.0f%%", downloadProgress));
+        SetButtonText(downloadButton, fmt::format("{:.0}%", downloadProgress));
         downloadButton->set_interactable(false);
     }
 }
