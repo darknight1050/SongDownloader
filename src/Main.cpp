@@ -12,11 +12,6 @@
 
 modloader::ModInfo modInfo{MOD_ID, VERSION, VERSION_LONG};
 
-Logger& getLogger() {
-    static auto logger = new Logger(modInfo, LoggerOptions(false, true));
-    return *logger;
-}
-
 SONGDOWNLOADER_EXPORT_FUNC void setup(CModInfo* info) {
     info->id = "SongDownloader";
     info->version = VERSION;
