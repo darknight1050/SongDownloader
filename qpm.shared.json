@@ -70,6 +70,11 @@
         "id": "rapidjson-macros",
         "versionRange": "^1.2.0",
         "additionalData": {}
+      },
+      {
+        "id": "paper",
+        "versionRange": "^3.6.1",
+        "additionalData": {}
       }
     ]
   },
@@ -281,6 +286,19 @@
     },
     {
       "dependency": {
+        "id": "scotland2",
+        "versionRange": "=0.1.4",
+        "additionalData": {
+          "soLink": "https://github.com/sc2ad/scotland2/releases/download/v0.1.4/libsl2.so",
+          "debugSoLink": "https://github.com/sc2ad/scotland2/releases/download/v0.1.4/debug_libsl2.so",
+          "overrideSoName": "libsl2.so",
+          "branchName": "version/v0_1_4"
+        }
+      },
+      "version": "0.1.4"
+    },
+    {
+      "dependency": {
         "id": "fmt",
         "versionRange": "=10.0.0",
         "additionalData": {
@@ -297,19 +315,6 @@
         }
       },
       "version": "10.0.0"
-    },
-    {
-      "dependency": {
-        "id": "scotland2",
-        "versionRange": "=0.1.4",
-        "additionalData": {
-          "soLink": "https://github.com/sc2ad/scotland2/releases/download/v0.1.4/libsl2.so",
-          "debugSoLink": "https://github.com/sc2ad/scotland2/releases/download/v0.1.4/debug_libsl2.so",
-          "overrideSoName": "libsl2.so",
-          "branchName": "version/v0_1_4"
-        }
-      },
-      "version": "0.1.4"
     },
     {
       "dependency": {

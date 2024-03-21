@@ -1,4 +1,5 @@
 {
+  "version": "0.1.0",
   "sharedDir": "shared",
   "dependenciesDir": "extern",
   "info": {
@@ -7,8 +8,17 @@
     "version": "0.6.0",
     "url": "https://github.com/darknight1050/SongDownloader",
     "additionalData": {
-      "cmake": true,
-      "overrideSoName": "libsongdownloader.so"
+      "overrideSoName": "libsongdownloader.so",
+      "cmake": true
+    }
+  },
+  "workspace": {
+    "scripts": {
+      "qmod": [
+        "pwsh ./build.ps1 -clean",
+        "qpm qmod build",
+        "pwsh ./createqmod.ps1 SongDownloader"
+      ]
     }
   },
   "dependencies": [
@@ -59,15 +69,11 @@
       "id": "rapidjson-macros",
       "versionRange": "^1.2.0",
       "additionalData": {}
+    },
+    {
+      "id": "paper",
+      "versionRange": "^3.6.1",
+      "additionalData": {}
     }
-  ],
-  "workspace": {
-    "scripts": {
-      "qmod": [
-        "pwsh ./build.ps1 -clean",
-        "qpm qmod build",
-        "pwsh ./createqmod.ps1 SongDownloader"
-      ]
-    }
-  }
+  ]
 }
