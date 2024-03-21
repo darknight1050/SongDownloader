@@ -11,7 +11,7 @@
 
 #include "Exceptions.hpp"
 
-#define BASE_URL std::string("https://bsaber.com/wp-json/bsaber-api/songs/")
+#define BASE_URL "https://bsaber.com/wp-json/bsaber-api/songs/"
 #define FILE_DOWNLOAD_TIMEOUT 64
 
 namespace BeastSaber::API {
@@ -20,7 +20,7 @@ namespace BeastSaber::API {
 
     std::optional<BeastSaber::Page> CuratorRecommended(int pageIndex, int amount) {
         exception.clear();
-        std::string searchPath = BASE_URL + "?bookmarked_by=curatorrecommended&page=" + std::to_string(pageIndex + 1) + "&count=" + std::to_string(amount);
+        std::string searchPath = fmt::format(BASE_URL "?bookmarked_by=curatorrecommended&page={}&count={}", pageIndex++, amount);
         auto json = WebUtils::GetJSON(searchPath);
         if (!json.has_value())
             return std::nullopt;
@@ -39,7 +39,8 @@ namespace BeastSaber::API {
     std::optional<BeastSaber::Page> Bookmarked(std::string username, int pageIndex, int amount) {
         exception.clear();
         std::optional<rapidjson::Document> json;
-        json = WebUtils::GetJSON(BASE_URL + "?bookmarked_by=" + username + "&page=" + std::to_string(pageIndex + 1) + "&count=" + std::to_string(amount));
+        auto searchPath = fmt::format(BASE_URL "?bookmarked_by={}&page={}&count={}", username, pageIndex++, amount);
+        json = WebUtils::GetJSON(searchPath);
         if (!json.has_value())
             return std::nullopt;
         try {
@@ -56,7 +57,7 @@ namespace BeastSaber::API {
 
     void CuratorRecommendedAsync(std::function<void(std::optional<BeastSaber::Page>)> finished, int pageIndex, int amount) {
         exception.clear();
-        std::string searchPath = BASE_URL + "?bookmarked_by=curatorrecommended&page=" + std::to_string(pageIndex + 1) + "&count=" + std::to_string(amount);
+        std::string searchPath = fmt::format(BASE_URL "?bookmarked_by=curatorrecommended&page={}&count={}", pageIndex++, amount);
         //LOG_DEBUG("{}", searchPath);
         WebUtils::GetJSONAsync(searchPath,
             [finished](long httpCode, bool error, rapidjson::Document& document) {
