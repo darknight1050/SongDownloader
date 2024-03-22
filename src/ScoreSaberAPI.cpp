@@ -30,7 +30,7 @@ namespace ScoreSaber::API {
             return std::nullopt;
         try {
             ScoreSaber::Page page;
-            page.Deserialize(json.value().GetObject());
+            page.Deserialize(json.value());
             return page;
         }
         catch (const std::exception& e) {
@@ -47,7 +47,7 @@ namespace ScoreSaber::API {
             return std::nullopt;
         try {
             ScoreSaber::Page page;
-            page.Deserialize(json.value().GetObject());
+            page.Deserialize(json.value());
             return page;
         }
         catch (const std::exception& e) {
@@ -64,7 +64,7 @@ namespace ScoreSaber::API {
             return std::nullopt;
         try {
             ScoreSaber::Page page;
-            page.Deserialize(json.value().GetObject());
+            page.Deserialize(json.value());
             return page;
         }
         catch (const std::exception& e) {
@@ -81,7 +81,7 @@ namespace ScoreSaber::API {
             return std::nullopt;
         try {
             ScoreSaber::Page page;
-            page.Deserialize(json.value().GetObject());
+            page.Deserialize(json.value());
             return page;
         }
         catch (const std::exception& e) {
@@ -105,13 +105,13 @@ namespace ScoreSaber::API {
         auto json = WebUtils::GetJSON(requestURL);
         if (!json.has_value())
             return std::nullopt;
-        if (json.value().GetObject().HasMember("errorMessage") && json.value().GetObject()["errorMessage"].IsString()) {
-            if (strcmp(json.value().GetObject()["errorMessage"].GetString(), "Not Found") != 0) exception = json.value().GetObject()["errorMessage"].GetString();
+        if (json.value().HasMember("errorMessage") && json.value()["errorMessage"].IsString()) {
+            if (strcmp(json.value()["errorMessage"].GetString(), "Not Found") != 0) exception = json.value()["errorMessage"].GetString();
             return std::nullopt;
         }
         try {
             ScoreSaber::Leaderboards page;
-            page.Deserialize(json.value().GetObject());
+            page.Deserialize(json.value());
             return page;
         }
         catch (const std::exception& e) {
@@ -148,7 +148,7 @@ namespace ScoreSaber::API {
                 else {
                     try {
                         ScoreSaber::Page page;
-                        page.Deserialize(document.GetObject());
+                        page.Deserialize(document);
                         finished(page);
                     }
                     catch (const std::exception& e) {
@@ -176,7 +176,7 @@ namespace ScoreSaber::API {
                 else {
                     try {
                         ScoreSaber::Page page;
-                        page.Deserialize(document.GetObject());
+                        page.Deserialize(document);
                         finished(page);
                     }
                     catch (const std::exception& e) {
@@ -204,7 +204,7 @@ namespace ScoreSaber::API {
                 else {
                     try {
                         ScoreSaber::Page page;
-                        page.Deserialize(document.GetObject());
+                        page.Deserialize(document);
                         finished(page);
                     }
                     catch (const std::exception& e) {
@@ -232,7 +232,7 @@ namespace ScoreSaber::API {
                 else {
                     try {
                         ScoreSaber::Page page;
-                        page.Deserialize(document.GetObject());
+                        page.Deserialize(document);
                         finished(page);
                     }
                     catch (const std::exception& e) {
@@ -266,14 +266,14 @@ namespace ScoreSaber::API {
                 if (error) {
                     finished(std::nullopt);
                 }
-                else if (document.IsObject() && document.GetObject().HasMember("errorMessage") && document.GetObject()["errorMessage"].IsString()) {
-                    if (strcmp(document.GetObject()["errorMessage"].GetString(), "Not Found") != 0) exception = document.GetObject()["errorMessage"].GetString();
+                else if (document.IsObject() && document.HasMember("errorMessage") && document["errorMessage"].IsString()) {
+                    if (strcmp(document["errorMessage"].GetString(), "Not Found") != 0) exception = document["errorMessage"].GetString();
                     finished(std::nullopt);
                 }
                 else {
                     try {
                         ScoreSaber::Leaderboards page;
-                        page.Deserialize(document.GetObject());
+                        page.Deserialize(document);
                         finished(page);
                     }
                     catch (const std::exception& e) {
@@ -301,7 +301,7 @@ namespace ScoreSaber::API {
                 else {
                     try {
                         ScoreSaber::Page page;
-                        page.Deserialize(document.GetObject());
+                        page.Deserialize(document);
                         finished(page);
                     }
                     catch (const std::exception& e) {
@@ -336,14 +336,14 @@ namespace ScoreSaber::API {
                 if (error) {
                     finished(std::nullopt);
                 }
-                else if (document.IsObject() && document.GetObject().HasMember("errorMessage") && document.GetObject()["errorMessage"].IsString()) {
-                    if (strcmp(document.GetObject()["errorMessage"].GetString(), "Not Found") != 0) exception = document.GetObject()["errorMessage"].GetString();
+                else if (document.IsObject() && document.HasMember("errorMessage") && document["errorMessage"].IsString()) {
+                    if (strcmp(document["errorMessage"].GetString(), "Not Found") != 0) exception = document["errorMessage"].GetString();
                     finished(std::nullopt);
                 }
                 else {
                     try {
                         ScoreSaber::Leaderboards page;
-                        page.Deserialize(document.GetObject());
+                        page.Deserialize(document);
                         finished(page);
                     }
                     catch (const std::exception& e) {

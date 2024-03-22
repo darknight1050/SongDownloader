@@ -26,7 +26,7 @@ namespace BeastSaber::API {
             return std::nullopt;
         try {
             BeastSaber::Page page;
-            page.Deserialize(json.value().GetObject());
+            page.Deserialize(json.value());
             return page;
         }
         catch (const std::exception& e) {
@@ -45,7 +45,7 @@ namespace BeastSaber::API {
             return std::nullopt;
         try {
             BeastSaber::Page page;
-            page.Deserialize(json.value().GetObject());
+            page.Deserialize(json.value());
             return page;
         }
         catch (const std::exception& e) {
@@ -73,7 +73,7 @@ namespace BeastSaber::API {
                     //writefile("/sdcard/ModData/SearchQuery.json", buffer.GetString());
                     try {
                         BeastSaber::Page page;
-                        page.Deserialize(document.GetObject());
+                        page.Deserialize(document);
                         finished(page);
                     }
                     catch (const std::exception& e) {
@@ -104,7 +104,7 @@ namespace BeastSaber::API {
                     //writefile("/sdcard/ModData/SearchQuery.json", buffer.GetString());
                     try {
                         BeastSaber::Page page;
-                        page.Deserialize(document.GetObject());
+                        page.Deserialize(document);
                         finished(page);
                     }
                     catch (const std::exception& e) {

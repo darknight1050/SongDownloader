@@ -6,7 +6,7 @@
     "info": {
       "name": "SongDownloader",
       "id": "songdownloader",
-      "version": "0.6.0",
+      "version": "0.8.0",
       "url": "https://github.com/darknight1050/SongDownloader",
       "additionalData": {
         "overrideSoName": "libsongdownloader.so",
@@ -97,13 +97,14 @@
     {
       "dependency": {
         "id": "rapidjson-macros",
-        "versionRange": "=1.2.0",
+        "versionRange": "=1.2.1",
         "additionalData": {
           "headersOnly": true,
+          "branchName": "version/v1_2_1",
           "cmake": true
         }
       },
-      "version": "1.2.0"
+      "version": "1.2.1"
     },
     {
       "dependency": {
