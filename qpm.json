@@ -24,12 +24,12 @@
   "dependencies": [
     {
       "id": "beatsaber-hook",
-      "versionRange": "^5.1.2",
+      "versionRange": "^5.1.6",
       "additionalData": {}
     },
     {
       "id": "bsml",
-      "versionRange": "^0.4.14",
+      "versionRange": "^0.4.17",
       "additionalData": {}
     },
     {
@@ -39,12 +39,12 @@
     },
     {
       "id": "custom-types",
-      "versionRange": "^0.17.2",
+      "versionRange": "^0.17.6",
       "additionalData": {}
     },
     {
       "id": "songcore",
-      "versionRange": "^0.2.0",
+      "versionRange": "^1.0.0",
       "additionalData": {}
     },
     {
