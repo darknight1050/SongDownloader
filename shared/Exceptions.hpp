@@ -13,12 +13,12 @@ namespace SongDownloader {
 
     class SONGDOWNLOADER_EXPORT JsonException : public std::exception {
     private:
-        const char* error;
-        std::string message;
+        std::string error;
+        std::string const message;
     public:
         explicit JsonException(SongDownloader::Exceptions key, const std::string& message);
         const char* what() const noexcept override {
-            return error;
+            return error.c_str();
         }
     };
 }

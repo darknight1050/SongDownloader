@@ -11,7 +11,7 @@
 
 #include "Exceptions.hpp"
 
-#define BASE_URL std::string("https://bsaber.com/wp-json/bsaber-api/songs/")
+#define BASE_URL "https://bsaber.com/wp-json/bsaber-api/songs/"
 #define FILE_DOWNLOAD_TIMEOUT 64
 
 namespace BeastSaber::API {
@@ -20,17 +20,17 @@ namespace BeastSaber::API {
 
     std::optional<BeastSaber::Page> CuratorRecommended(int pageIndex, int amount) {
         exception.clear();
-        std::string searchPath = BASE_URL + "?bookmarked_by=curatorrecommended&page=" + std::to_string(pageIndex + 1) + "&count=" + std::to_string(amount);
+        std::string searchPath = fmt::format(BASE_URL "?bookmarked_by=curatorrecommended&page={}&count={}", pageIndex++, amount);
         auto json = WebUtils::GetJSON(searchPath);
         if (!json.has_value())
             return std::nullopt;
         try {
             BeastSaber::Page page;
-            page.Deserialize(json.value().GetObject());
+            page.Deserialize(json.value());
             return page;
         }
         catch (const std::exception& e) {
-            LOG_ERROR("%s", e.what());
+            LOG_ERROR("{}", e.what());
             exception = e.what();
             return std::nullopt;
         }
@@ -39,16 +39,17 @@ namespace BeastSaber::API {
     std::optional<BeastSaber::Page> Bookmarked(std::string username, int pageIndex, int amount) {
         exception.clear();
         std::optional<rapidjson::Document> json;
-        json = WebUtils::GetJSON(BASE_URL + "?bookmarked_by=" + username + "&page=" + std::to_string(pageIndex + 1) + "&count=" + std::to_string(amount));
+        auto searchPath = fmt::format(BASE_URL "?bookmarked_by={}&page={}&count={}", username, pageIndex++, amount);
+        json = WebUtils::GetJSON(searchPath);
         if (!json.has_value())
             return std::nullopt;
         try {
             BeastSaber::Page page;
-            page.Deserialize(json.value().GetObject());
+            page.Deserialize(json.value());
             return page;
         }
         catch (const std::exception& e) {
-            LOG_ERROR("%s", e.what());
+            LOG_ERROR("{}", e.what());
             exception = e.what();
             return std::nullopt;
         }
@@ -56,8 +57,8 @@ namespace BeastSaber::API {
 
     void CuratorRecommendedAsync(std::function<void(std::optional<BeastSaber::Page>)> finished, int pageIndex, int amount) {
         exception.clear();
-        std::string searchPath = BASE_URL + "?bookmarked_by=curatorrecommended&page=" + std::to_string(pageIndex + 1) + "&count=" + std::to_string(amount);
-        //LOG_DEBUG("%s", searchPath.c_str());
+        std::string searchPath = fmt::format(BASE_URL "?bookmarked_by=curatorrecommended&page={}&count={}", pageIndex++, amount);
+        //LOG_DEBUG("{}", searchPath);
         WebUtils::GetJSONAsync(searchPath,
             [finished](long httpCode, bool error, rapidjson::Document& document) {
                 if (error) {
@@ -68,15 +69,15 @@ namespace BeastSaber::API {
                     //rapidjson::StringBuffer buffer;
                     //rapidjson::Writer<rapidjson::StringBuffer> writer(buffer);
                     //document.Accept(writer);
-                    //LOG_DEBUG("%s", buffer.GetString());
+                    //LOG_DEBUG("{}", buffer.GetString());
                     //writefile("/sdcard/ModData/SearchQuery.json", buffer.GetString());
                     try {
                         BeastSaber::Page page;
-                        page.Deserialize(document.GetObject());
+                        page.Deserialize(document);
                         finished(page);
                     }
                     catch (const std::exception& e) {
-                        LOG_ERROR("%s", e.what());
+                        LOG_ERROR("{}", e.what());
                         exception = e.what();
                         finished(std::nullopt);
                     }
@@ -87,9 +88,9 @@ namespace BeastSaber::API {
 
     void BookmarkedAsync(std::string username, std::function<void(std::optional<BeastSaber::Page>)> finished, int pageIndex, int amount) {
         exception.clear();
-        std::string searchPath = BASE_URL + "?bookmarked_by=" + username + "&page=" + std::to_string(pageIndex + 1) + "&count=" + std::to_string(amount);
-        //LOG_DEBUG("%s", searchPath.c_str());
-        WebUtils::GetJSONAsync(searchPath,
+        std::string searchURL = fmt::format(BASE_URL "?bookmarked_by={}&page={}&count={}", username, pageIndex + 1, amount);
+        //LOG_DEBUG("{}", searchURL);
+        WebUtils::GetJSONAsync(searchURL,
             [finished](long httpCode, bool error, rapidjson::Document& document) {
                 if (error) {
                     finished(std::nullopt);
@@ -99,15 +100,15 @@ namespace BeastSaber::API {
                     //rapidjson::StringBuffer buffer;
                     //rapidjson::Writer<rapidjson::StringBuffer> writer(buffer);
                     //document.Accept(writer);
-                    //LOG_DEBUG("%s", buffer.GetString());
+                    //LOG_DEBUG("{}", buffer.GetString());
                     //writefile("/sdcard/ModData/SearchQuery.json", buffer.GetString());
                     try {
                         BeastSaber::Page page;
-                        page.Deserialize(document.GetObject());
+                        page.Deserialize(document);
                         finished(page);
                     }
                     catch (const std::exception& e) {
-                        LOG_ERROR("%s", e.what());
+                        LOG_ERROR("{}", e.what());
                         exception = e.what();
                         finished(std::nullopt);
                     }

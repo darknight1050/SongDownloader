@@ -11,10 +11,10 @@
 
 #include "Exceptions.hpp"
 
-#define BASE_URL std::string("beatsaver.com")
-#define FALLBACK_URL std::string("beatmaps.io")
-#define API_URL std::string("https://api.") + BASE_URL
-#define CDN_URL std::string("https://cdn.") + BASE_URL + "/"
+#define BASE_URL "beatsaver.com"
+#define FALLBACK_URL "beatmaps.io"
+#define API_URL "https://api." BASE_URL
+#define CDN_URL "https://cdn." BASE_URL "/"
 #define FILE_DOWNLOAD_TIMEOUT 64
 
 namespace BeatSaver::API {
@@ -23,16 +23,16 @@ namespace BeatSaver::API {
 
     std::optional<BeatSaver::Beatmap> GetBeatmapByKey(std::string key) {
         exception.clear();
-        auto json = WebUtils::GetJSON(API_URL + "/maps/id/" + key);
+        auto json = WebUtils::GetJSON(fmt::format(API_URL "/maps/id/{}", key));
         if (!json.has_value())
             return std::nullopt;
         try {
             BeatSaver::Beatmap beatmap;
-            beatmap.Deserialize(json.value().GetObject());
+            beatmap.Deserialize(json.value());
             return beatmap;
         }
         catch (const std::exception& e) {
-            LOG_ERROR("%s", e.what());
+            LOG_ERROR("{}", e.what());
             exception = e.what();
             return std::nullopt;
         }
@@ -40,16 +40,16 @@ namespace BeatSaver::API {
 
     std::optional<BeatSaver::Beatmap> GetBeatmapByHash(std::string hash) {
         exception.clear();
-        auto json = WebUtils::GetJSON(API_URL + "/maps/hash/" + hash);
+        auto json = WebUtils::GetJSON(fmt::format(API_URL "/maps/hash/{}", hash));
         if (!json.has_value())
             return std::nullopt;
         try {
             BeatSaver::Beatmap beatmap;
-            beatmap.Deserialize(json.value().GetObject());
+            beatmap.Deserialize(json.value());
             return beatmap;
         }
         catch (const std::exception& e) {
-            LOG_ERROR("%s", e.what());
+            LOG_ERROR("{}", e.what());
             exception = e.what();
             return std::nullopt;
         }
@@ -57,16 +57,16 @@ namespace BeatSaver::API {
 
     std::optional<BeatSaver::UserDetail> GetUserById(int id) {
         exception.clear();
-        auto json = WebUtils::GetJSON(API_URL + "/users/id/" + std::to_string(id));
+        auto json = WebUtils::GetJSON(fmt::format(API_URL "/users/id/{}", id));
         if (!json.has_value())
             return std::nullopt;
         try {
             BeatSaver::UserDetail user;
-            user.Deserialize(json.value().GetObject());
+            user.Deserialize(json.value());
             return user;
         }
         catch (const std::exception& e) {
-            LOG_ERROR("%s", e.what());
+            LOG_ERROR("{}", e.what());
             exception = e.what();
             return std::nullopt;
         }
@@ -74,16 +74,16 @@ namespace BeatSaver::API {
 
     std::optional<BeatSaver::UserDetail> GetUserByName(std::string username) {
         exception.clear();
-        auto json = WebUtils::GetJSON(API_URL + "/users/name/" + username);
+        auto json = WebUtils::GetJSON(fmt::format(API_URL "/users/name/{}", username));
         if (!json.has_value())
             return std::nullopt;
         try {
             BeatSaver::UserDetail user;
-            user.Deserialize(json.value().GetObject());
+            user.Deserialize(json.value());
             return user;
         }
         catch (const std::exception& e) {
-            LOG_ERROR("%s", e.what());
+            LOG_ERROR("{}", e.what());
             exception = e.what();
             return std::nullopt;
         }
@@ -91,22 +91,25 @@ namespace BeatSaver::API {
 
     std::optional<BeatSaver::Page> SearchPaged(std::string query, int pageIndex, std::string sortOrder, std::string automapper, std::string ME, std::string NE, std::string Chroma) {
         exception.clear();
-        std::string searchPath = API_URL + "/search/text/" + std::to_string(pageIndex) + "?sortOrder=" + sortOrder;
-        if (!automapper.empty()) searchPath += "&automapper=" + automapper;
-        if (!query.empty()) searchPath += "&q=" + query;
-        if (!ME.empty()) searchPath += "&me=" + ME;
-        if (!NE.empty()) searchPath += "&noodle=" + NE;
-        if (!Chroma.empty()) searchPath += "&chroma=" + Chroma;
+        std::stringstream searchStream;
+        searchStream << API_URL "/search/text/" << pageIndex;
+        searchStream << "?sortOrder=" << sortOrder;
+        if (!automapper.empty()) searchStream << "&automapper=" << automapper;
+        if (!query.empty()) searchStream << "&q=" << query;
+        if (!ME.empty()) searchStream << "&me=" << ME;
+        if (!NE.empty()) searchStream << "&noodle=" << NE;
+        if (!Chroma.empty()) searchStream << "&chroma=" << Chroma;
+        auto searchPath = searchStream.str();
         auto json = WebUtils::GetJSON(searchPath);
         if (!json.has_value())
             return std::nullopt;
         try {
             BeatSaver::Page page;
-            page.Deserialize(json.value().GetObject());
+            page.Deserialize(json.value());
             return page;
         }
         catch (const std::exception& e) {
-            LOG_ERROR("%s", e.what());
+            LOG_ERROR("{}", e.what());
             exception = e.what();
             return std::nullopt;
         }
@@ -116,20 +119,20 @@ namespace BeatSaver::API {
         exception.clear();
         std::optional<rapidjson::Document> json;
         if (after.empty()) {
-            json = WebUtils::GetJSON(API_URL + "/maps/latest?automapper=" + std::to_string(automapper));
+            json = WebUtils::GetJSON(fmt::format(API_URL "/maps/latest?automapper={}", automapper));
         }
         else {
-            json = WebUtils::GetJSON(API_URL + "/maps/latest?after=" + after + "&automapper=" + std::to_string(automapper));
+            json = WebUtils::GetJSON(fmt::format(API_URL "/maps/latest?after={}&automapper={}", after, automapper));
         }
         if (!json.has_value())
             return std::nullopt;
         try {
             BeatSaver::Page page;
-            page.Deserialize(json.value().GetObject());
+            page.Deserialize(json.value());
             return page;
         }
         catch (const std::exception& e) {
-            LOG_ERROR("%s", e.what());
+            LOG_ERROR("{}", e.what());
             exception = e.what();
             return std::nullopt;
         }
@@ -137,16 +140,16 @@ namespace BeatSaver::API {
 
     std::optional<BeatSaver::Page> PlaysPaged(int pageIndex) {
         exception.clear();
-        auto json = WebUtils::GetJSON(API_URL + "/maps/plays/" + std::to_string(pageIndex));
+        auto json = WebUtils::GetJSON(fmt::format(API_URL "/maps/plays/{}", pageIndex));
         if (!json.has_value())
             return std::nullopt;
         try {
             BeatSaver::Page page;
-            page.Deserialize(json.value().GetObject());
+            page.Deserialize(json.value());
             return page;
         }
         catch (const std::exception& e) {
-            LOG_ERROR("%s", e.what());
+            LOG_ERROR("{}", e.what());
             exception = e.what();
             return std::nullopt;
         }
@@ -183,7 +186,7 @@ namespace BeatSaver::API {
     std::optional<std::vector<uint8_t>> GetCoverImage(std::string hash) {
         std::string data;
         std::transform(hash.begin(), hash.end(), hash.begin(), tolower);
-        WebUtils::Get(CDN_URL + hash + ".jpg", FILE_DOWNLOAD_TIMEOUT, data);
+        WebUtils::Get(fmt::format(CDN_URL "{}.jpg", hash), FILE_DOWNLOAD_TIMEOUT, data);
         if (data.empty()) return std::nullopt;
         std::vector<uint8_t> bytes(data.begin(), data.end());
         return bytes;
@@ -191,7 +194,7 @@ namespace BeatSaver::API {
 
     void GetBeatmapByKeyAsync(std::string key, std::function<void(std::optional<BeatSaver::Beatmap>)> finished) {
         exception.clear();
-        WebUtils::GetJSONAsync(API_URL + "/maps/id/" + key,
+        WebUtils::GetJSONAsync(fmt::format(API_URL "/maps/id/{}", key),
             [finished](long httpCode, bool error, rapidjson::Document& document) {
                 if (error || ++document.MemberBegin() == document.MemberEnd()) {
                     finished(std::nullopt);
@@ -199,11 +202,11 @@ namespace BeatSaver::API {
                 else {
                     try {
                         BeatSaver::Beatmap beatmap;
-                        beatmap.Deserialize(document.GetObject());
+                        beatmap.Deserialize(document);
                         finished(beatmap);
                     }
                     catch (const std::exception& e) {
-                        LOG_ERROR("%s", e.what());
+                        LOG_ERROR("{}", e.what());
                         exception = e.what();
                         finished(std::nullopt);
                         //// Convert the document into a string and log/write to file for debug purposes
@@ -219,7 +222,7 @@ namespace BeatSaver::API {
 
     void GetBeatmapByHashAsync(std::string hash, std::function<void(std::optional<BeatSaver::Beatmap>)> finished) {
         exception.clear();
-        WebUtils::GetJSONAsync(API_URL + "/maps/hash/" + hash,
+        WebUtils::GetJSONAsync(fmt::format(API_URL "/maps/hash/{}", hash),
             [finished](long httpCode, bool error, rapidjson::Document& document) {
                 if (error || ++document.MemberBegin() == document.MemberEnd()) {
                     finished(std::nullopt);
@@ -227,11 +230,11 @@ namespace BeatSaver::API {
                 else {
                     try {
                         BeatSaver::Beatmap beatmap;
-                        beatmap.Deserialize(document.GetObject());
+                        beatmap.Deserialize(document);
                         finished(beatmap);
                     }
                     catch (const std::exception& e) {
-                        LOG_ERROR("%s", e.what());
+                        LOG_ERROR("{}", e.what());
                         exception = e.what();
                         finished(std::nullopt);
                         //// Convert the document into a string and log/write to file for debug purposes
@@ -247,8 +250,8 @@ namespace BeatSaver::API {
 
     void GetBeatmapByUserIdAsync(int userID, int page, std::function<void(std::optional<BeatSaver::Page>)> finished) {
         exception.clear();
-        std::string searchPath = API_URL + "/maps/uploader/" + std::to_string(userID) + "/" + std::to_string(page);
-        LOG_DEBUG("GetBeatmapByUserIdAsync: %s", searchPath.c_str());
+        std::string searchPath = fmt::format(API_URL "/maps/uploader/{}/{}", userID, page);
+        LOG_DEBUG("GetBeatmapByUserIdAsync: {}", searchPath);
         WebUtils::GetJSONAsync(searchPath,
             [finished](long httpCode, bool error, rapidjson::Document& document) {
                 if (error) {
@@ -262,11 +265,11 @@ namespace BeatSaver::API {
                     //writefile("/sdcard/ModData/GetBeatmapByUserIdAsync.json", buffer.GetString());
                     try {
                         BeatSaver::Page page;
-                        page.Deserialize(document.GetObject());
+                        page.Deserialize(document);
                         finished(page);
                     }
                     catch (const std::exception& e) {
-                        LOG_ERROR("%s", e.what());
+                        LOG_ERROR("{}", e.what());
                         exception = e.what();
                         finished(std::nullopt);
                     }
@@ -277,8 +280,8 @@ namespace BeatSaver::API {
 
     void GetUserByNameAsync(std::string username, std::function<void(std::optional<BeatSaver::UserDetail>)> finished) {
         exception.clear();
-        std::string searchPath = API_URL + "/users/name/" + username;
-        LOG_DEBUG("GetUserByNameAsync: %s", searchPath.c_str());
+        std::string searchPath = fmt::format(API_URL "/users/name/{}", username);
+        LOG_DEBUG("GetUserByNameAsync: {}", searchPath);
         WebUtils::GetJSONAsync(searchPath,
             [finished](long httpCode, bool error, rapidjson::Document& document) {
                 if (error) {
@@ -292,11 +295,11 @@ namespace BeatSaver::API {
                     //writefile("/sdcard/ModData/GetUserByNameAsync.json", buffer.GetString());
                     try {
                         BeatSaver::UserDetail user;
-                        user.Deserialize(document.GetObject());
+                        user.Deserialize(document);
                         finished(user);
                     }
                     catch (const std::exception& e) {
-                        LOG_ERROR("%s", e.what());
+                        LOG_ERROR("{}", e.what());
                         exception = e.what();
                         finished(std::nullopt);
                     }
@@ -308,8 +311,9 @@ namespace BeatSaver::API {
 
     void GetUserByIdAsync(int id, std::function<void(std::optional<BeatSaver::UserDetail>)> finished) {
         exception.clear();
-        LOG_DEBUG("GetUserByIdAsync: %s", (API_URL + "/users/id/" + std::to_string(id)).c_str());
-        WebUtils::GetJSONAsync(API_URL + "/users/id/" + std::to_string(id),
+        auto searchPath = fmt::format(API_URL "/users/id/{}", id);
+        LOG_DEBUG("GetUserByIdAsync: {}", searchPath);
+        WebUtils::GetJSONAsync(searchPath,
             [finished](long httpCode, bool error, rapidjson::Document& document) {
                 if (error) {
                     finished(std::nullopt);
@@ -317,11 +321,11 @@ namespace BeatSaver::API {
                 else {
                     try {
                         BeatSaver::UserDetail user;
-                        user.Deserialize(document.GetObject());
+                        user.Deserialize(document);
                         finished(user);
                     }
                     catch (const std::exception& e) {
-                        LOG_ERROR("%s", e.what());
+                        LOG_ERROR("{}", e.what());
                         exception = e.what();
                         finished(std::nullopt);
                         //// Convert the document into a string and log/write to file for debug purposes
@@ -337,14 +341,17 @@ namespace BeatSaver::API {
 
     void SearchPagedAsync(std::string query, int pageIndex, std::function<void(std::optional<BeatSaver::Page>)> finished, std::string sortOrder, std::string automapper, std::string ranked, std::string ME, std::string NE, std::string Chroma) {
         exception.clear();
-        std::string searchPath = API_URL + "/search/text/" + std::to_string(pageIndex) + "?sortOrder=" + sortOrder;
-        if (!query.empty()) searchPath += "&q=" + query;
-        if (!automapper.empty()) searchPath += "&automapper=" + automapper;
-        if (!ranked.empty()) searchPath += "&ranked=" + ranked;
-        if (!ME.empty()) searchPath += "&me=" + ME;
-        if (!NE.empty()) searchPath += "&noodle=" + NE;
-        if (!Chroma.empty()) searchPath += "&chroma=" + Chroma;
-        LOG_DEBUG("%s", searchPath.c_str());
+        std::stringstream searchStream;
+        searchStream << API_URL "/search/text/" << pageIndex;
+        searchStream << "?sortOrder=" << sortOrder;
+        if (!query.empty()) searchStream << "&q=" << query;
+        if (!automapper.empty()) searchStream << "&automapper=" << automapper;
+        if (!ranked.empty()) searchStream << "&ranked=" << ranked;
+        if (!ME.empty()) searchStream << "&me=" << ME;
+        if (!NE.empty()) searchStream << "&noodle=" << NE;
+        if (!Chroma.empty()) searchStream << "&chroma=" << Chroma;
+        auto searchPath = searchStream.str();
+        LOG_DEBUG("SearchPagedAsync: {}", searchPath);
         WebUtils::GetJSONAsync(searchPath,
             [finished](long httpCode, bool error, rapidjson::Document& document) {
                 if (error) {
@@ -355,15 +362,15 @@ namespace BeatSaver::API {
                     //rapidjson::StringBuffer buffer;
                     //rapidjson::Writer<rapidjson::StringBuffer> writer(buffer);
                     //document.Accept(writer);
-                    //LOG_DEBUG("%s", buffer.GetString());
+                    //LOG_DEBUG("{}", buffer.GetString());
                     //writefile("/sdcard/ModData/SearchQuery.json", buffer.GetString());
                     try {
                         BeatSaver::Page page;
-                        page.Deserialize(document.GetObject());
+                        page.Deserialize(document);
                         finished(page);
                     }
                     catch (const std::exception& e) {
-                        LOG_ERROR("%s", e.what());
+                        LOG_ERROR("{}", e.what());
                         exception = e.what();
                         finished(std::nullopt);
                     }
@@ -405,7 +412,7 @@ namespace BeatSaver::API {
 
     void DownloadBeatmapAsync(const BeastSaber::Song& song, std::function<void(bool)> finished, std::function<void(float)> progressUpdate) {
         // Probably a deprecated method of downloading maps, but at least will work if map has isn't up to date https://api.beatsaver.com/download/key/1b236
-        WebUtils::GetAsync(API_URL + "/download/key/" + song.GetSong_key(), FILE_DOWNLOAD_TIMEOUT,
+        WebUtils::GetAsync(fmt::format(API_URL "/download/key/{}", song.GetSong_key()), FILE_DOWNLOAD_TIMEOUT,
             [song, finished](long httpCode, std::string data) {
                 auto levelsPath = SongCore::API::Loading::GetPreferredCustomLevelPath();
                 auto targetFolderName = FileUtils::FixIlegalName(fmt::format("{} ({} - {})", song.GetSong_key(), song.GetTitle(), song.GetLevel_author_name()));
@@ -424,7 +431,7 @@ namespace BeatSaver::API {
         // Probably a deprecated method of downloading maps, but at least will work if map has isn't up to date https://api.beatsaver.com/download/key/1b236
         std::string hash = song.GetId();
         std::transform(hash.begin(), hash.end(), hash.begin(), tolower);
-        WebUtils::GetAsync(CDN_URL + hash + ".zip", FILE_DOWNLOAD_TIMEOUT,
+        WebUtils::GetAsync(fmt::format(CDN_URL "{}.zip", hash), FILE_DOWNLOAD_TIMEOUT,
             [song, finished](long httpCode, std::string data) {
                 auto levelsPath = SongCore::API::Loading::GetPreferredCustomLevelPath();
                 auto targetFolderName = FileUtils::FixIlegalName(fmt::format("{} ({} - {})", song.GetUid(), song.GetName(), song.GetLevelAuthorName()));
@@ -449,7 +456,7 @@ namespace BeatSaver::API {
             }
         );
 
-        //WebUtils::GetAsync(CDN_URL + hash + ".zip", FILE_DOWNLOAD_TIMEOUT,
+        //WebUtils::GetAsync(fmt::format(CDN_URL "{}.zip", hash), FILE_DOWNLOAD_TIMEOUT,
         //    [song, finished](long httpCode, std::string data) {
         //        auto levelsPath = SongCore::API::Loading::GetPreferredCustomLevelPath();
         //        auto targetFolderName = FileUtils::FixIlegalName(fmt::format("{} ({} - {})", song.GetUid(), song.GetName(), song.GetLevelAuthorName()));
@@ -483,11 +490,11 @@ namespace BeatSaver::API {
     }
 
     void GetCoverImageByHashAsync(std::string hash, std::function<void(std::vector<uint8_t>)> finished, std::function<void(float)> progressUpdate) {
-        std::string coverURL = CDN_URL + hash + ".jpg";
-        //LOG_DEBUG("CoverURL: %s", coverURL.c_str());
+        auto coverURL = fmt::format(CDN_URL "{}.jpg", hash);
+        //LOG_DEBUG("CoverURL: {}", coverURL);
         WebUtils::GetAsync(coverURL, FILE_DOWNLOAD_TIMEOUT,
             [hash, finished](long httpCode, std::string data) {
-                //LOG_DEBUG("HTTP Code when loading by hash: %ld", httpCode);
+                //LOG_DEBUG("HTTP Code when loading by hash: {}", httpCode);
                 if (httpCode != 200) return;
                 std::vector<uint8_t> bytes(data.begin(), data.end());
                 finished(bytes);
