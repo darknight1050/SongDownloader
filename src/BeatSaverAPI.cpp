@@ -9,6 +9,9 @@
 
 #include "songcore/shared/SongCore.hpp"
 
+#include "playlistcore/shared/PlaylistCore.hpp"
+#include "playlistcore/shared/Utils.hpp"
+
 #include "Exceptions.hpp"
 
 #define BASE_URL "beatsaver.com"
@@ -511,5 +514,71 @@ namespace BeatSaver::API {
         );
     }
 
+    void DownloadMissingSongsFromPlaylist(PlaylistCore::Playlist* playlist, std::function<void()> finished, std::function<void(int, int)> progressUpdate) {
+        // find number of songs that need to be in the queue before downloading
+        int quantity = PlaylistCore::PlaylistHasMissingSongs(playlist);
+        if(quantity == 0) {
+            if(finished)
+                finished();
+            return;
+        }
+        if(progressUpdate)
+            progressUpdate(0, quantity);
+        // queue songs
+        auto songQueue = std::vector<std::string>{};
+        // track actual downloads
+        auto downloads = new std::atomic_int(0);
+        // add all nonpresent song hashes to queue
+        for(auto& song : playlist->playlistJSON.Songs) {
+            bool hasSong = false;
+            // search in songs in playlist instead of all songs
+            // we need to treat the list as an array because it is initialized as an array elsewhere
+            auto levelList = playlist->playlistCS->beatmapLevels;
+            for(auto& level : levelList) {
+                if(song.Hash == PlaylistCore::Utils::GetLevelHash(level)) {
+                    hasSong = true;
+                    break;
+                }
+            }
+            if(!hasSong)
+                songQueue.emplace_back(song.Hash);
+        }
+        // recursive (because threads) callback for each time a beatmap is recieved from beatsaver
+        static void(*onBeatmap)(std::vector<std::string>, std::optional<Beatmap>, std::function<void()>, std::function<void(int, int)>, int, std::atomic_int*)
+                = *[](std::vector<std::string> songQueue, std::optional<Beatmap> beatmap, std::function<void()> finished, std::function<void(int, int)> progressUpdate, int quantity, std::atomic_int* downloads) mutable {
+            // start next beatmap
+            if(!songQueue.empty()) {
+                GetBeatmapByHashAsync(songQueue.back(), [songQueue = std::move(songQueue), finished, progressUpdate, quantity, downloads](std::optional<Beatmap> beatmap) mutable {
+                    songQueue.pop_back();
+                    onBeatmap(std::move(songQueue), std::move(beatmap), finished, progressUpdate, quantity, downloads);
+                });
+            }
+            // download if beatmap is found, but update downloads and potentially run finish either way
+            if(beatmap.has_value()) {
+                DownloadBeatmapAsync(beatmap.value(), [finished, progressUpdate, quantity, downloads](bool _) {
+                    bool complete = (*downloads)++ == quantity - 1;
+                    if(progressUpdate)
+                        progressUpdate(*downloads, quantity);
+                    if(complete && finished) {
+                        finished();
+                        delete downloads;
+                    }
+                });
+            } else {
+                LOG_INFO("Beatmap not found on beatsaver");
+                bool complete = (*downloads)++ == quantity - 1;
+                if(progressUpdate)
+                    progressUpdate(*downloads, quantity);
+                if(complete && finished) {
+                    finished();
+                    delete downloads;
+                }
+            }
+        };
+        GetBeatmapByHashAsync(songQueue.back(), [songQueue = std::move(songQueue), finished, progressUpdate, quantity, downloads](std::optional<Beatmap> beatmap) mutable {
+            songQueue.pop_back();
+            onBeatmap(std::move(songQueue), std::move(beatmap), finished, progressUpdate, quantity, downloads);
+        });
+    }
 
 }

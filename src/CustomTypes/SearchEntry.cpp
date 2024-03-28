@@ -223,7 +223,7 @@ void SearchEntry::UpdateDownloadProgress(bool checkLoaded) {
         downloadButton->set_interactable(false);
     }
     else {
-        SetButtonText(downloadButton, fmt::format("{:.0}%", downloadProgress));
+        SetButtonText(downloadButton, fmt::format("{}%", (int) downloadProgress));
         downloadButton->set_interactable(false);
     }
 }
