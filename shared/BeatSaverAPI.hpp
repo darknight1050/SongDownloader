@@ -8,6 +8,11 @@
 #include "Types/ScoreSaber/Page.hpp"
 #include "Types/ScoreSaber/Leaderboards.hpp"
 
+// avoid linking to playlistcore in headers
+namespace PlaylistCore {
+    class Playlist;
+};
+
 #include <string>
 
 namespace BeatSaver::API {
@@ -118,6 +123,8 @@ namespace BeatSaver::API {
 
     // Returns mp3 with previewAudio
     SONGDOWNLOADER_EXPORT void GetPreviewAsync(const BeatSaver::Beatmap& beatmap, std::function<void(std::vector<uint8_t>)> finished, std::function<void(float)> progressUpdate = nullptr);
+
+    SONGDOWNLOADER_EXPORT void DownloadMissingSongsFromPlaylist(PlaylistCore::Playlist* playlist, std::function<void()> finished, std::function<void(int, int)> progressUpdate = nullptr);
 
     SONGDOWNLOADER_EXPORT extern std::string exception;
 }

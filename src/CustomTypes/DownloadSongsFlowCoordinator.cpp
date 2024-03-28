@@ -14,13 +14,15 @@ void DownloadSongsFlowCoordinator::Awake(){
         DownloadSongsOptionsViewController = CreateViewController<SongDownloader::DownloadSongsOptionsViewController*>();
     if(!DownloadSongsSearchViewController)
         DownloadSongsSearchViewController = CreateViewController<SongDownloader::DownloadSongsSearchViewController*>();
+    if(!DownloadSongsPlaylistViewController)
+        DownloadSongsPlaylistViewController = CreateViewController<SongDownloader::DownloadSongsPlaylistViewController*>();
 }
 
 void DownloadSongsFlowCoordinator::DidActivate(bool firstActivation, bool addedToHierarchy, bool screenSystemEnabling){
     if(firstActivation){
         SetTitle("Download Songs", HMUI::ViewController::AnimationType::In);
         showBackButton = true;
-        ProvideInitialViewControllers(DownloadSongsSearchViewController, DownloadSongsOptionsViewController, nullptr, nullptr, nullptr);
+        ProvideInitialViewControllers(DownloadSongsSearchViewController, DownloadSongsOptionsViewController, DownloadSongsPlaylistViewController, nullptr, nullptr);
     }
 }
 
