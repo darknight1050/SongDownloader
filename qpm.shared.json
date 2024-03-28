@@ -78,7 +78,7 @@
       },
       {
         "id": "playlistcore",
-        "versionRange": "^1.3.0",
+        "versionRange": "^1.3.1",
         "additionalData": {}
       }
     ]
@@ -215,15 +215,15 @@
     {
       "dependency": {
         "id": "playlistcore",
-        "versionRange": "=1.3.0",
+        "versionRange": "=1.3.1",
         "additionalData": {
-          "soLink": "https://github.com/Metalit/PlaylistCore/releases/download/v1.3.0/libplaylistcore.so",
+          "soLink": "https://github.com/Metalit/PlaylistCore/releases/download/v1.3.1/libplaylistcore.so",
           "overrideSoName": "libplaylistcore.so",
-          "modLink": "https://github.com/Metalit/PlaylistCore/releases/download/v1.3.0/PlaylistCore.qmod",
-          "branchName": "version/v1_3_0"
+          "modLink": "https://github.com/Metalit/PlaylistCore/releases/download/v1.3.1/PlaylistCore.qmod",
+          "branchName": "version/v1_3_1"
         }
       },
-      "version": "1.3.0"
+      "version": "1.3.1"
     },
     {
       "dependency": {
