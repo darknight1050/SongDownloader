@@ -74,6 +74,11 @@
       "id": "paper",
       "versionRange": "^3.6.1",
       "additionalData": {}
+    },
+    {
+      "id": "playlistcore",
+      "versionRange": "^1.3.1",
+      "additionalData": {}
     }
   ]
 }
