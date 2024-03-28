@@ -7,11 +7,13 @@
 
 #include "DownloadSongsOptionsViewController.hpp"
 #include "DownloadSongsSearchViewController.hpp"
+#include "DownloadSongsPlaylistViewController.hpp"
 
 DECLARE_CLASS_CODEGEN(SongDownloader, DownloadSongsFlowCoordinator, HMUI::FlowCoordinator,
 
     DECLARE_INSTANCE_FIELD(SongDownloader::DownloadSongsOptionsViewController*, DownloadSongsOptionsViewController);
     DECLARE_INSTANCE_FIELD(SongDownloader::DownloadSongsSearchViewController*, DownloadSongsSearchViewController);
+    DECLARE_INSTANCE_FIELD(SongDownloader::DownloadSongsPlaylistViewController*, DownloadSongsPlaylistViewController);
 
     DECLARE_INSTANCE_METHOD(void, Awake);
 

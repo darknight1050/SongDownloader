@@ -1,6 +1,7 @@
 #include "CustomTypes/DownloadSongsSearchViewController.hpp"
 
 #include "CustomLogger.hpp"
+#include "CustomTypes/DownloadSongsPlaylistViewController.hpp"
 #include "ModConfig.hpp"
 
 #include "custom-types/shared/delegate.hpp"
@@ -116,8 +117,14 @@ void DownloadSongsSearchViewController::CreateEntries(Transform* parent) {
                 if (entry.MapType == SearchEntry::MapType::BeatSaver) {
                     auto hash = entry.GetBeatmap().GetVersions().front().GetHash();
                     BeatSaver::API::DownloadBeatmapAsync(entry.GetBeatmap(),
-                        [this](bool error) {
+                        [this, hash](bool error) {
                             if (!error) {
+                                if (auto playlist = DownloadSongsPlaylistViewController::GetSelectedPlaylist()) {
+                                    auto& json = playlist->playlistJSON;
+                                    json.Songs.emplace_back().Hash = hash;
+                                    playlist->Save();
+                                    PlaylistCore::MarkPlaylistForReload(playlist);
+                                }
                                 SongCore::API::Loading::RefreshSongs(false);
                             }
                         },
@@ -136,8 +143,14 @@ void DownloadSongsSearchViewController::CreateEntries(Transform* parent) {
                 else if (entry.MapType == SearchEntry::MapType::BeastSaber) {
                     auto hash = entry.GetSongBeastSaber().GetHash();
                     BeatSaver::API::DownloadBeatmapAsync(entry.GetSongBeastSaber(),
-                        [this](bool error) {
+                        [this, hash](bool error) {
                             if (!error) {
+                                if (auto playlist = DownloadSongsPlaylistViewController::GetSelectedPlaylist()) {
+                                    auto& json = playlist->playlistJSON;
+                                    json.Songs.emplace_back().Hash = hash;
+                                    playlist->Save();
+                                    PlaylistCore::MarkPlaylistForReload(playlist);
+                                }
                                 SongCore::API::Loading::RefreshSongs(false);
                             }
                         },
@@ -156,8 +169,14 @@ void DownloadSongsSearchViewController::CreateEntries(Transform* parent) {
                 else {
                     auto hash = entry.GetSongScoreSaber().GetId();
                     BeatSaver::API::DownloadBeatmapAsync(entry.GetSongScoreSaber(),
-                        [this](bool error) {
+                        [this, hash](bool error) {
                             if (!error) {
+                                if (auto playlist = DownloadSongsPlaylistViewController::GetSelectedPlaylist()) {
+                                    auto& json = playlist->playlistJSON;
+                                    json.Songs.emplace_back().Hash = hash;
+                                    playlist->Save();
+                                    PlaylistCore::MarkPlaylistForReload(playlist);
+                                }
                                 SongCore::API::Loading::RefreshSongs(false);
                             }
                         },
