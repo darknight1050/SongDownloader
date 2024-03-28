@@ -12,19 +12,18 @@
 DEFINE_TYPE(SongDownloader, DownloadSongsPlaylistViewController);
 
 using namespace SongDownloader;
-using namespace PlaylistCore;
 
 bool DownloadSongsPlaylistViewController::downloadToPlaylistEnabled = true;
-Playlist* DownloadSongsPlaylistViewController::selectedPlaylist = nullptr;
+PlaylistCore::Playlist* DownloadSongsPlaylistViewController::selectedPlaylist = nullptr;
 
-void DownloadSongsPlaylistViewController::RefreshPlaylists() {
+void DownloadSongsPlaylistViewController::RefreshPlaylistList() {
     if(!list) return;
 
-    loadedPlaylists = GetLoadedPlaylists();
+    loadedPlaylists = PlaylistCore::GetLoadedPlaylists();
     std::vector<UnityEngine::Sprite*> newCovers;
     std::vector<std::string> newHovers;
     for(auto& playlist : loadedPlaylists) {
-        newCovers.emplace_back(GetCoverImage(playlist));
+        newCovers.emplace_back(PlaylistCore::GetCoverImage(playlist));
         newHovers.emplace_back(playlist->name);
     }
     list->replaceSprites(newCovers);
@@ -34,21 +33,18 @@ void DownloadSongsPlaylistViewController::RefreshPlaylists() {
 
 void DownloadSongsPlaylistViewController::DidActivate(bool firstActivation, bool addedToHierarchy, bool screenSystemEnabling) {
 
-    RefreshPlaylists();
+    RefreshPlaylistList();
     if(!firstActivation) return;
 
     gameObject->AddComponent<HMUI::Touchable*>();
 
-    LOG_INFO("creating list");
-    list = BSML::Lite::CreateScrollableCustomSourceList<CustomListSource*>(transform, {-50, -35}, {15, 70}, [this](int idx) {
+    list = BSML::Lite::CreateScrollableCustomSourceList<PlaylistCore::CustomListSource*>(transform, {-50, -35}, {15, 70}, [this](int idx) {
         if (idx < loadedPlaylists.size())
             selectedPlaylist = loadedPlaylists[idx];
     });
-    LOG_INFO("created list {}", fmt::ptr(list));
-    list->setType(csTypeOf(CoverTableCell*));
+    list->setType(csTypeOf(PlaylistCore::CoverTableCell*));
 
-    LOG_INFO("refreshing list");
-    RefreshPlaylists();
+    RefreshPlaylistList();
 
     auto toggle = BSML::Lite::CreateToggle(transform, "Download To Playlist", downloadToPlaylistEnabled, {-50, -70}, [](bool enabled) {
         downloadToPlaylistEnabled = enabled;
@@ -58,7 +54,7 @@ void DownloadSongsPlaylistViewController::DidActivate(bool firstActivation, bool
     sizeFitter->horizontalFit = UnityEngine::UI::ContentSizeFitter::FitMode::PreferredSize;
 }
 
-Playlist* DownloadSongsPlaylistViewController::GetSelectedPlaylist() {
+PlaylistCore::Playlist* DownloadSongsPlaylistViewController::GetSelectedPlaylist() {
     if (!downloadToPlaylistEnabled)
         return nullptr;
     return selectedPlaylist;

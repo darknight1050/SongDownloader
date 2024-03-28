@@ -11,7 +11,7 @@ DECLARE_CLASS_CODEGEN(SongDownloader, DownloadSongsPlaylistViewController, HMUI:
 
     DECLARE_INSTANCE_FIELD_DEFAULT(PlaylistCore::CustomListSource*, list, nullptr);
 
-    DECLARE_INSTANCE_METHOD(void, RefreshPlaylists);
+    DECLARE_INSTANCE_METHOD(void, RefreshPlaylistList);
 
     DECLARE_OVERRIDE_METHOD_MATCH(void, DidActivate, &HMUI::ViewController::DidActivate, bool firstActivation, bool addedToHierarchy, bool screenSystemEnabling);
 

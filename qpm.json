@@ -78,7 +78,9 @@
     {
       "id": "playlistcore",
       "versionRange": "^1.3.1",
-      "additionalData": {}
+      "additionalData": {
+        "private": true
+      }
     }
   ]
 }
