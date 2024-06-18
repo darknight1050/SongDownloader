@@ -540,8 +540,8 @@ namespace BeatSaver::API {
                     break;
                 }
             }
-            if(!hasSong)
-                songQueue.emplace_back(song.Hash);
+            if(!hasSong && song.Hash)
+                songQueue.emplace_back(song.Hash.value());
         }
         // recursive (because threads) callback for each time a beatmap is recieved from beatsaver
         static void(*onBeatmap)(std::vector<std::string>, std::optional<Beatmap>, std::function<void()>, std::function<void(int, int)>, int, std::atomic_int*)

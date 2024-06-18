@@ -19,7 +19,10 @@
         "qpm qmod build",
         "pwsh ./createqmod.ps1 SongDownloader"
       ]
-    }
+    },
+    "qmodIncludeDirs": [],
+    "qmodIncludeFiles": [],
+    "qmodOutput": null
   },
   "dependencies": [
     {
@@ -28,13 +31,8 @@
       "additionalData": {}
     },
     {
-      "id": "bsml",
-      "versionRange": "^0.4.17",
-      "additionalData": {}
-    },
-    {
       "id": "bs-cordl",
-      "versionRange": "^3500.0.0",
+      "versionRange": "^3700.0.0",
       "additionalData": {}
     },
     {
@@ -76,11 +74,14 @@
       "additionalData": {}
     },
     {
+      "id": "bsml",
+      "versionRange": "^0.4.42",
+      "additionalData": {}
+    },
+    {
       "id": "playlistcore",
-      "versionRange": "^1.3.1",
-      "additionalData": {
-        "private": true
-      }
+      "versionRange": "^1.4.1",
+      "additionalData": {}
     }
   ]
 }

@@ -167,7 +167,7 @@ void DownloadSongsSearchViewController::CreateEntries(Transform* parent) {
                     );
                 }
                 else {
-                    auto hash = entry.GetSongScoreSaber().GetId();
+                    auto hash = entry.GetSongScoreSaber().GetSongHash();
                     BeatSaver::API::DownloadBeatmapAsync(entry.GetSongScoreSaber(),
                         [this, hash](bool error) {
                             if (!error) {
@@ -181,7 +181,7 @@ void DownloadSongsSearchViewController::CreateEntries(Transform* parent) {
                             }
                         },
                         [&entry, hash](float percentage) {
-                            if (entry.GetSongScoreSaber().GetId() == hash) {
+                            if (entry.GetSongScoreSaber().GetSongHash() == hash) {
                                 entry.downloadProgress = percentage;
                                 BSML::MainThreadScheduler::Schedule(
                                     [&entry] {
