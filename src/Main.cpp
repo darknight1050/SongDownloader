@@ -18,6 +18,10 @@ SONGDOWNLOADER_EXPORT_FUNC void setup(CModInfo* info) {
     info->version_long = VERSION_LONG;
 
     getModConfig().Init(modInfo);
+    
+    // BeastSaber no longer has an api for songs
+    if(getModConfig().Service.GetValue() == "BeastSaber")
+        getModConfig().Service.SetValue("BeatSaver");
 }
 
 SONGDOWNLOADER_EXPORT_FUNC void late_load() {

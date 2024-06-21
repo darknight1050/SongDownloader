@@ -5,7 +5,6 @@ DECLARE_CONFIG(ModConfig,
 
     CONFIG_VALUE(Service, std::string, "Service", "BeatSaver", "Selected Service to get Information from!");
     CONFIG_VALUE(ListType_BeatSaver, std::string, "List_BeatSaver", "Search", "What Type of Information to display!");
-    CONFIG_VALUE(ListType_BeastSaber, std::string, "ListType_BeastSaber", "Curator Recommended", "What Type of Information to display!");
     CONFIG_VALUE(ListType_ScoreSaber, std::string, "ListType_ScoreSaber", "Top Trending", "What Type of Information to display!");
     CONFIG_VALUE(AutoMapper, std::string, "AutoMapper", "", "Show auto-generated Beatmaps");
     CONFIG_VALUE(SortOrder, std::string, "Sort Order", "Relevance", "How results should be sorted");

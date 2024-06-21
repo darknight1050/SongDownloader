@@ -140,32 +140,6 @@ void DownloadSongsSearchViewController::CreateEntries(Transform* parent) {
                         }
                     );
                 }
-                else if (entry.MapType == SearchEntry::MapType::BeastSaber) {
-                    auto hash = entry.GetSongBeastSaber().GetHash();
-                    BeatSaver::API::DownloadBeatmapAsync(entry.GetSongBeastSaber(),
-                        [this, hash](bool error) {
-                            if (!error) {
-                                if (auto playlist = DownloadSongsPlaylistViewController::GetSelectedPlaylist()) {
-                                    auto& json = playlist->playlistJSON;
-                                    json.Songs.emplace_back().Hash = hash;
-                                    playlist->Save();
-                                    PlaylistCore::MarkPlaylistForReload(playlist);
-                                }
-                                SongCore::API::Loading::RefreshSongs(false);
-                            }
-                        },
-                        [&entry, hash](float percentage) {
-                            if (entry.GetSongBeastSaber().GetHash() == hash) {
-                                entry.downloadProgress = percentage;
-                                BSML::MainThreadScheduler::Schedule(
-                                    [&entry] {
-                                        entry.UpdateDownloadProgress(false);
-                                    }
-                                );
-                            }
-                        }
-                    );
-                }
                 else {
                     auto hash = entry.GetSongScoreSaber().GetSongHash();
                     BeatSaver::API::DownloadBeatmapAsync(entry.GetSongScoreSaber(),
@@ -321,81 +295,6 @@ void DownloadSongsSearchViewController::SearchUser(int currentSearchIndex) {
                 );
             }
         );
-    }
-    else loadingControl->ShowText("Please type in a Username!", false);
-}
-
-void DownloadSongsSearchViewController::GetCuratorRecommended(int currentSearchIndex) {
-        BeastSaber::API::CuratorRecommendedAsync(
-            [this, currentSearchIndex](std::optional<BeastSaber::Page> page) {
-                if (currentSearchIndex == DownloadSongsSearchViewController::searchIndex) {
-                    BSML::MainThreadScheduler::Schedule(
-                        [this, currentSearchIndex, page] {
-                            if (currentSearchIndex == DownloadSongsSearchViewController::searchIndex) {
-                                if (page.has_value()) {
-                                    auto songs = page.value().GetSongs();
-                                    auto songsSize = songs.size();
-                                    int songIndex = 0;
-                                    for (int i = 0; i < ENTRIES_PER_PAGE; i++) {
-                                        auto& searchEntry = searchEntries[i];
-                                        if (songIndex < songsSize) {
-                                            loadingControl->Hide();
-                                            auto& song = songs.at(songIndex);
-                                            searchEntry.SetBeatmap(song);
-                                        }
-                                        else {
-                                            searchEntry.Disable();
-                                        }
-                                        songIndex++;
-                                    }
-                                }
-                                else {
-                                    if (!BeastSaber::API::exception.empty()) loadingControl->ShowText(BeastSaber::API::exception, true);
-                                    else loadingControl->ShowText("Damn, Curators didn't recommend anything!", true);
-                                }
-                            }
-                        }
-                    );
-                }
-            }
-        , DownloadSongsSearchViewController::searchPage);
-}
-
-void DownloadSongsSearchViewController::GetBookmarks(int currentSearchIndex) {
-    if (!DownloadSongsSearchViewController::SearchQuery.empty()) {
-        BeastSaber::API::BookmarkedAsync(DownloadSongsSearchViewController::SearchQuery,
-            [this, currentSearchIndex](std::optional<BeastSaber::Page> page) {
-                if (currentSearchIndex == DownloadSongsSearchViewController::searchIndex) {
-                    BSML::MainThreadScheduler::Schedule(
-                        [this, currentSearchIndex, page] {
-                            if (currentSearchIndex == DownloadSongsSearchViewController::searchIndex) {
-                                if (page.has_value() && !page.value().GetSongs().empty()) {
-                                    auto songs = page.value().GetSongs();
-                                    auto songsSize = songs.size();
-                                    int songIndex = 0;
-                                    for (int i = 0; i < ENTRIES_PER_PAGE; i++) {
-                                        auto& searchEntry = searchEntries[i];
-                                        if (songIndex < songsSize) {
-                                            loadingControl->Hide();
-                                            auto& song = songs.at(songIndex);
-                                            searchEntry.SetBeatmap(song);
-                                        }
-                                        else {
-                                            searchEntry.Disable();
-                                        }
-                                        songIndex++;
-                                    }
-                                }
-                                else {
-                                    if (!BeastSaber::API::exception.empty()) loadingControl->ShowText(BeastSaber::API::exception, true);
-                                    else loadingControl->ShowText("No bookmarks found\nfor given User!", true);
-                                }
-                            }
-                        }
-                    );
-                }
-            },
-        DownloadSongsSearchViewController::searchPage);
     }
     else loadingControl->ShowText("Please type in a Username!", false);
 }
@@ -575,18 +474,6 @@ void DownloadSongsSearchViewController::Search() {
             searchViewController->loadingControl->ShowText("Invalid Selection for\nService BeatSaver!", false);
         }
     }
-    else if (getModConfig().Service.GetValue() == "BeastSaber") {
-        if (getModConfig().ListType_BeastSaber.GetValue() == "Curator Recommended") {
-            searchViewController->SearchField->get_gameObject()->SetActive(false);
-            searchViewController->GetCuratorRecommended(currentSearchIndex);
-        }
-        else if (getModConfig().ListType_BeastSaber.GetValue() == "Bookmarks") {
-            searchViewController->GetBookmarks(currentSearchIndex);
-        }
-        else {
-            searchViewController->loadingControl->ShowText("Invalid Selection for\nService BeastSaber!", false);
-        }
-    }
     else if (getModConfig().Service.GetValue() == "ScoreSaber") {
         if (getModConfig().ListType_ScoreSaber.GetValue() == "Trending") {
             searchViewController->GetTrending(currentSearchIndex);
@@ -624,14 +511,9 @@ void DownloadSongsSearchViewController::DidActivate(bool firstActivation, bool a
         SearchField = CreateStringSetting(get_transform(), "Search", "", UnityEngine::Vector2(0.0f, 0.0f), UnityEngine::Vector3(0.0f, -38.0f, 0.0f),
             [this](StringW value) {
                 DownloadSongsSearchViewController::SearchQuery = static_cast<std::string>(value);
-                if (getModConfig().Service.GetValue() == "BeastSaber" && getModConfig().ListType_BeastSaber.GetValue() == "Bookmarks") getModConfig().BookmarkUsername.SetValue(std::string(value));
                 Search();
             }
         );
-        if (getModConfig().Service.GetValue() == "BeastSaber" && getModConfig().ListType_BeastSaber.GetValue() == "Bookmarks") {
-            DownloadSongsSearchViewController::SearchQuery = getModConfig().BookmarkUsername.GetValue();
-            searchViewController->SearchField->SetText(getModConfig().BookmarkUsername.GetValue());
-        }
         auto container = CreateScrollView(get_transform());
 
         auto externalComponents = container->GetComponent<BSML::ExternalComponents*>();

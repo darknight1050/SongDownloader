@@ -9,7 +9,6 @@ DECLARE_CLASS_CODEGEN(SongDownloader, DownloadSongsOptionsViewController, HMUI::
     DECLARE_INSTANCE_FIELD(BSML::DropdownListSetting*, Automapper);
     DECLARE_INSTANCE_FIELD(BSML::DropdownListSetting*, Service);
     DECLARE_INSTANCE_FIELD(BSML::DropdownListSetting*, ListType_BeatSaver);
-    DECLARE_INSTANCE_FIELD(BSML::DropdownListSetting*, ListType_BeastSaber);
     DECLARE_INSTANCE_FIELD(BSML::DropdownListSetting*, ListType_ScoreSaber);
     DECLARE_INSTANCE_FIELD(BSML::DropdownListSetting*, SortOrder);
     DECLARE_INSTANCE_FIELD(BSML::DropdownListSetting*, NEdropdown);
