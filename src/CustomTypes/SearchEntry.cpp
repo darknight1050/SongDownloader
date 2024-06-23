@@ -153,19 +153,26 @@ void SearchEntry::SetBeatmap(const ScoreSaber::Leaderboard& _song) {
 
 #pragma endregion
 
+std::string SearchEntry::GetSongHash() {
+    std::string hash;
+    if (MapType == SearchEntry::MapType::BeatSaver) {
+        hash = map.GetVersions().front().GetHash();
+    }
+    else {
+        hash = SSsong.GetSongHash();
+    }
+    std::transform(hash.begin(), hash.end(), hash.begin(), toupper);
+
+    return hash;
+} 
+
 void SearchEntry::UpdateDownloadProgress(bool checkLoaded) {
     if (checkLoaded) {
         downloadProgress = -1.0f;
-        std::string hash;
-        if (MapType == SearchEntry::MapType::BeatSaver) {
-            hash = map.GetVersions().front().GetHash();
-        }
-        else {
-            hash = SSsong.GetSongHash();
-        }
-        std::transform(hash.begin(), hash.end(), hash.begin(), toupper);
+        std::string hash = GetSongHash();
         for (auto& song : SongCore::API::Loading::GetAllLevels()) {
             if (song->levelID.ends_with(hash)) {
+                this->status = SearchEntry::DownloadStatus::Downloaded;
                 downloadProgress = 100.0f;
                 break;
             }
@@ -176,8 +183,8 @@ void SearchEntry::UpdateDownloadProgress(bool checkLoaded) {
         downloadButton->set_interactable(true);
     }
     else if (downloadProgress >= 100.0f) {
-        SetButtonText(downloadButton, "Loaded");
-        downloadButton->set_interactable(false);
+        SetButtonText(downloadButton, "Play");
+        downloadButton->set_interactable(true);
     }
     else {
         SetButtonText(downloadButton, fmt::format("{}%", (int) downloadProgress));

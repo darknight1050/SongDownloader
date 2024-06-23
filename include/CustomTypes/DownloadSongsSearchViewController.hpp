@@ -10,7 +10,8 @@
 #include "TMPro/TextMeshProUGUI.hpp"
 
 #include "custom-types/shared/macros.hpp"
-
+#include "GlobalNamespace/LevelSelectionFlowCoordinator.hpp"
+#include "GlobalNamespace/SoloFreePlayFlowCoordinator.hpp"
 #include "Types/BeatSaver/Page.hpp"
 #include "Types/ScoreSaber/Page.hpp"
 #include "Types/ScoreSaber/Leaderboards.hpp"
@@ -44,6 +45,14 @@ namespace SongDownloader {
             BeatSaver,
             ScoreSaber
         };
+        enum DownloadStatus {
+            NotDownloaded = 0,
+            Downloading = 1,
+            Downloaded = 2,
+            Failed = 3,
+        };
+
+        DownloadStatus status = DownloadStatus::NotDownloaded;
 
         float downloadProgress = -1.0f;
 
@@ -63,6 +72,8 @@ namespace SongDownloader {
 
         void UpdateDownloadProgress(bool checkLoaded);
 
+        std::string GetSongHash();
+
         void Disable();
 
         bool IsEnabled();
@@ -77,6 +88,8 @@ DECLARE_CLASS_CODEGEN(SongDownloader, DownloadSongsSearchViewController, HMUI::V
     static void Search();
 
     static void SetPage(int page);
+    void GoToSong(SongDownloader::SearchEntry entry);
+    void EnterSolo(GlobalNamespace::BeatmapLevel* level);
 
     static int searchIndex;
 
@@ -94,6 +107,8 @@ DECLARE_CLASS_CODEGEN(SongDownloader, DownloadSongsSearchViewController, HMUI::V
 
     DECLARE_INSTANCE_FIELD(BSML::IncrementSetting*, pageIncrement);
 
+    DECLARE_INSTANCE_FIELD(UnityW<GlobalNamespace::SoloFreePlayFlowCoordinator>, soloFreePlayFlowCoordinator);
+    
     DECLARE_INSTANCE_METHOD(void, SearchSongs, int);
 
     DECLARE_INSTANCE_METHOD(void, SearchUser, int);
