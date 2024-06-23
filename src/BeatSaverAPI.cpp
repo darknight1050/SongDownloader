@@ -413,23 +413,6 @@ namespace BeatSaver::API {
         );
     }
 
-    void DownloadBeatmapAsync(const BeastSaber::Song& song, std::function<void(bool)> finished, std::function<void(float)> progressUpdate) {
-        // Probably a deprecated method of downloading maps, but at least will work if map has isn't up to date https://api.beatsaver.com/download/key/1b236
-        WebUtils::GetAsync(fmt::format(API_URL "/download/key/{}", song.GetSong_key()), FILE_DOWNLOAD_TIMEOUT,
-            [song, finished](long httpCode, std::string data) {
-                auto levelsPath = SongCore::API::Loading::GetPreferredCustomLevelPath();
-                auto targetFolderName = FileUtils::FixIlegalName(fmt::format("{} ({} - {})", song.GetSong_key(), song.GetTitle(), song.GetLevel_author_name()));
-                auto targetFolder = levelsPath / targetFolderName;
-
-                int args = 2;
-                int statusCode = zip_stream_extract(data.data(), data.length(), targetFolder.c_str(), +[](const char* name, void* arg) -> int {
-                    return 0;
-                    }, &args);
-                finished(statusCode);
-            }, progressUpdate
-        );
-    }
-
     void DownloadBeatmapAsync(const ScoreSaber::Song& song, std::function<void(bool)> finished, std::function<void(float)> progressUpdate) {
         // Probably a deprecated method of downloading maps, but at least will work if map has isn't up to date https://api.beatsaver.com/download/key/1b236
         std::string hash = song.GetId();
@@ -540,8 +523,8 @@ namespace BeatSaver::API {
                     break;
                 }
             }
-            if(!hasSong)
-                songQueue.emplace_back(song.Hash);
+            if(!hasSong && song.Hash)
+                songQueue.emplace_back(song.Hash.value());
         }
         // recursive (because threads) callback for each time a beatmap is recieved from beatsaver
         static void(*onBeatmap)(std::vector<std::string>, std::optional<Beatmap>, std::function<void()>, std::function<void(int, int)>, int, std::atomic_int*)

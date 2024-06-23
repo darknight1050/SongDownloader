@@ -41,30 +41,21 @@ void DownloadSongsOptionsViewController::DidActivate(bool firstActivation, bool 
         contentSizeFitter->set_verticalFit(ContentSizeFitter::FitMode::PreferredSize);
 
         static ConstString emptyString("");
-        std::vector<std::string_view> Service_labels = { "BeatSaver", "BeastSaber", "ScoreSaber" };
+        std::vector<std::string_view> Service_labels = { "BeatSaver", "ScoreSaber" };
         Service = BSML::Lite::CreateDropdown(settingsLayoutTransform, getModConfig().Service.GetName(), getModConfig().Service.GetValue(), Service_labels,
             [this](StringW value) {
-                if (value != "BeatSaver") {
-                    if (value == "ScoreSaber") {
-                        if (getModConfig().ListType_ScoreSaber.GetValue() == "Top Ranked" || getModConfig().ListType_ScoreSaber.GetValue() == "Latest Ranked") {
-                            Ranked->get_gameObject()->SetActive(false);
-                            //RankedToggle->get_gameObject()->SetActive(false);
-                        }
-                        else {
-                            Ranked->get_gameObject()->SetActive(true);
-                            //RankedToggle->get_gameObject()->SetActive(true);
-                        }
-                        //RankedToggle->get_transform()->GetParent()->get_gameObject()->SetActive(true);
-                        //Ranked->get_transform()->GetParent()->get_gameObject()->SetActive(false);
-                        ListType_BeastSaber->get_transform()->GetParent()->get_gameObject()->SetActive(false);
-                        ListType_ScoreSaber->get_transform()->GetParent()->get_gameObject()->SetActive(true);
+                if (value == "ScoreSaber") {
+                    if (getModConfig().ListType_ScoreSaber.GetValue() == "Top Ranked" || getModConfig().ListType_ScoreSaber.GetValue() == "Latest Ranked") {
+                        Ranked->get_gameObject()->SetActive(false);
+                        //RankedToggle->get_gameObject()->SetActive(false);
                     }
-                    else { // if (value == "BeastSaber")
-                        //RankedToggle->get_transform()->GetParent()->get_gameObject()->SetActive(false);
-                        Ranked->get_transform()->GetParent()->get_gameObject()->SetActive(true);
-                        ListType_ScoreSaber->get_transform()->GetParent()->get_gameObject()->SetActive(false);
-                        ListType_BeastSaber->get_transform()->GetParent()->get_gameObject()->SetActive(true);
+                    else {
+                        Ranked->get_gameObject()->SetActive(true);
+                        //RankedToggle->get_gameObject()->SetActive(true);
                     }
+                    //RankedToggle->get_transform()->GetParent()->get_gameObject()->SetActive(true);
+                    //Ranked->get_transform()->GetParent()->get_gameObject()->SetActive(false);
+                    ListType_ScoreSaber->get_transform()->GetParent()->get_gameObject()->SetActive(true);
                     ListType_BeatSaver->get_transform()->GetParent()->get_gameObject()->SetActive(false);
                     Automapper->get_gameObject()->SetActive(false);
                     SortOrder->get_gameObject()->SetActive(false);
@@ -74,7 +65,6 @@ void DownloadSongsOptionsViewController::DidActivate(bool firstActivation, bool 
                     Ranked->get_gameObject()->SetActive(false);
                 }
                 else {
-                    ListType_BeastSaber->get_transform()->GetParent()->get_gameObject()->SetActive(false);
                     ListType_ScoreSaber->get_transform()->GetParent()->get_gameObject()->SetActive(false);
                     ListType_BeatSaver->get_transform()->GetParent()->get_gameObject()->SetActive(true);
                     Automapper->get_gameObject()->SetActive(true);
@@ -86,11 +76,8 @@ void DownloadSongsOptionsViewController::DidActivate(bool firstActivation, bool 
                     Ranked->get_transform()->GetParent()->get_gameObject()->SetActive(true);
                     Ranked->get_gameObject()->SetActive(true);
                 }
-                if (value == "BeastSaber" && getModConfig().ListType_BeastSaber.GetValue() == "Bookmarks") {
-                    DownloadSongsSearchViewController::SearchQuery = getModConfig().BookmarkUsername.GetValue();
-                    searchViewController->SearchField->SetText(getModConfig().BookmarkUsername.GetValue());
-                }
-                else if (LastListType == "Bookmarks") {
+                
+                if (LastListType == "Bookmarks") {
                     DownloadSongsSearchViewController::SearchQuery.clear();
                     searchViewController->SearchField->SetText(emptyString);
                 }
@@ -117,26 +104,6 @@ void DownloadSongsOptionsViewController::DidActivate(bool firstActivation, bool 
         );
         BSML::Lite::AddHoverHint(ListType_BeatSaver->get_gameObject(), getModConfig().ListType_BeatSaver.GetHoverHint());
         ListType_BeatSaver->get_transform()->GetParent()->GetComponent<LayoutElement*>()->set_preferredWidth(50.0f);
-
-        std::vector<std::string_view> ListType_BeastSaber_labels = { "Curator Recommended", "Bookmarks" };
-        ListType_BeastSaber = BSML::Lite::CreateDropdown(settingsLayoutTransform, "List", getModConfig().ListType_BeastSaber.GetValue(), ListType_BeastSaber_labels,
-            [this](StringW value) {
-                if (value == "Bookmarks") {
-                    DownloadSongsSearchViewController::SearchQuery = getModConfig().BookmarkUsername.GetValue();
-                    searchViewController->SearchField->SetText(getModConfig().BookmarkUsername.GetValue());
-                }
-                else if (getModConfig().ListType_BeastSaber.GetValue() == "Bookmarks") {
-                    DownloadSongsSearchViewController::SearchQuery.clear();
-                    searchViewController->SearchField->SetText(emptyString);
-                }
-                LastListType = static_cast<std::string>(value);
-                getModConfig().ListType_BeastSaber.SetValue(LastListType);
-                DownloadSongsSearchViewController::SetPage(0);
-                DownloadSongsSearchViewController::Search();
-            }
-        );
-        BSML::Lite::AddHoverHint(ListType_BeastSaber->get_gameObject(), getModConfig().ListType_BeastSaber.GetHoverHint());
-        ListType_BeastSaber->get_transform()->GetParent()->GetComponent<LayoutElement*>()->set_preferredWidth(50.0f);
 
         std::vector<std::string_view> ScoreSaber_labels = { "Trending", "Latest Ranked", "Top Played", "Top Ranked" };
         ListType_ScoreSaber = BSML::Lite::CreateDropdown(settingsLayoutTransform, "List", getModConfig().ListType_ScoreSaber.GetValue(), ScoreSaber_labels,
@@ -272,19 +239,12 @@ void DownloadSongsOptionsViewController::DidActivate(bool firstActivation, bool 
 
 
         std::string checkValue = getModConfig().Service.GetValue();
-        if (checkValue != "BeatSaver") {
-            if (checkValue == "ScoreSaber") {
-                if (getModConfig().ListType_ScoreSaber.GetValue() == "Top Ranked" || getModConfig().ListType_ScoreSaber.GetValue() == "Latest Ranked") {
-                    Ranked->get_gameObject()->SetActive(false);
-                    //RankedToggle->get_gameObject()->SetActive(false);
-                }
-                //Ranked->get_transform()->GetParent()->get_gameObject()->SetActive(false);
-                ListType_BeastSaber->get_transform()->GetParent()->get_gameObject()->SetActive(false);
+        if (checkValue == "ScoreSaber") {
+            if (getModConfig().ListType_ScoreSaber.GetValue() == "Top Ranked" || getModConfig().ListType_ScoreSaber.GetValue() == "Latest Ranked") {
+                Ranked->get_gameObject()->SetActive(false);
+                //RankedToggle->get_gameObject()->SetActive(false);
             }
-            else {
-                //RankedToggle->get_transform()->GetParent()->get_gameObject()->SetActive(false);
-                ListType_ScoreSaber->get_transform()->GetParent()->get_gameObject()->SetActive(false);
-            }
+            //Ranked->get_transform()->GetParent()->get_gameObject()->SetActive(false);
             ListType_BeatSaver->get_transform()->GetParent()->get_gameObject()->SetActive(false);
             Automapper->get_gameObject()->SetActive(false);
             SortOrder->get_gameObject()->SetActive(false);
@@ -294,7 +254,6 @@ void DownloadSongsOptionsViewController::DidActivate(bool firstActivation, bool 
             //Ranked->get_gameObject()->SetActive(false);
         }
         else {
-            ListType_BeastSaber->get_transform()->GetParent()->get_gameObject()->SetActive(false);
             ListType_ScoreSaber->get_transform()->GetParent()->get_gameObject()->SetActive(false);
             //RankedToggle->get_transform()->GetParent()->get_gameObject()->SetActive(false);
         }

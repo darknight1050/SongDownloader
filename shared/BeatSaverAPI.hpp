@@ -1,7 +1,6 @@
 #pragma once
 
 #include "./_config.h"
-#include "Types/BeastSaber/Song.hpp"
 
 #include "Types/BeatSaver/Page.hpp"
 
@@ -89,14 +88,6 @@ namespace BeatSaver::API {
     SONGDOWNLOADER_EXPORT void DownloadBeatmapAsync(const BeatSaver::Beatmap& beatmap, std::function<void(bool)> finished, std::function<void(float)> progressUpdate = nullptr);
 
     SONGDOWNLOADER_EXPORT void DownloadBeatmapAsync(const BeatSaver::Beatmap& beatmap, const BeatSaver::BeatmapVersion& beatmapVer, std::function<void(bool)> finished, std::function<void(float)> progressUpdate = nullptr);
-
-    /// <summary>
-    /// For downloading maps gotten from the BeastSaberAPI
-    /// </summary>
-    /// <param name="song">BeastSaber Song reference</param>
-    /// <param name="finished">Function to run after finishing to download</param>
-    /// <param name="progressUpdate">Function to run on updating download progress</param>
-    SONGDOWNLOADER_EXPORT void DownloadBeatmapAsync(const BeastSaber::Song& song, std::function<void(bool)> finished, std::function<void(float)> progressUpdate = nullptr);
 
     /// <summary>
     /// For downloading maps gotten from the ScoreSaberAPI

@@ -12,14 +12,12 @@
 #include "custom-types/shared/macros.hpp"
 
 #include "Types/BeatSaver/Page.hpp"
-#include "Types/BeastSaber/Page.hpp"
 #include "Types/ScoreSaber/Page.hpp"
 #include "Types/ScoreSaber/Leaderboards.hpp"
 
 #include "songcore/shared/SongCore.hpp"
 
 #include "BeatSaverAPI.hpp"
-#include "BeastSaberAPI.hpp"
 #include "ScoreSaberAPI.hpp"
 
 #include "bsml/shared/BSML.hpp"
@@ -34,7 +32,6 @@
 namespace SongDownloader {
     class SearchEntry {
         BeatSaver::Beatmap map;
-        BeastSaber::Song BSsong;
         ScoreSaber::Leaderboard SSsong;
         UnityEngine::GameObject* gameObject;
         TMPro::TextMeshProUGUI* line1Component;
@@ -45,7 +42,6 @@ namespace SongDownloader {
     public:
         enum class MapType {
             BeatSaver,
-            BeastSaber,
             ScoreSaber
         };
 
@@ -57,15 +53,11 @@ namespace SongDownloader {
 
         const BeatSaver::Beatmap& GetBeatmap();
 
-        const BeastSaber::Song& GetSongBeastSaber();
-
         const ScoreSaber::Leaderboard& GetSongScoreSaber();
 
         MapType MapType;
 
         void SetBeatmap(const BeatSaver::Beatmap& _map);
-
-        void SetBeatmap(const BeastSaber::Song& _song);
 
         void SetBeatmap(const ScoreSaber::Leaderboard& _song);
 
@@ -107,10 +99,6 @@ DECLARE_CLASS_CODEGEN(SongDownloader, DownloadSongsSearchViewController, HMUI::V
     DECLARE_INSTANCE_METHOD(void, SearchUser, int);
 
     DECLARE_INSTANCE_METHOD(void, SearchKey, int);
-
-    DECLARE_INSTANCE_METHOD(void, GetCuratorRecommended, int);
-
-    DECLARE_INSTANCE_METHOD(void, GetBookmarks, int);
 
     DECLARE_INSTANCE_METHOD(void, GetTrending, int);
 

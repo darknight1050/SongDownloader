@@ -18,10 +18,6 @@ const BeatSaver::Beatmap& SearchEntry::GetBeatmap() {
     return map;
 }
 
-const BeastSaber::Song& SearchEntry::GetSongBeastSaber() {
-    return BSsong;
-}
-
 const ScoreSaber::Leaderboard& SearchEntry::GetSongScoreSaber() {
     return SSsong;
 }
@@ -67,42 +63,6 @@ void SearchEntry::SetBeatmap(const BeatSaver::Beatmap& _map) {
 
     coverImageView->set_enabled(false);
     BeatSaver::API::GetCoverImageAsync(map, [this, currentSearchIndex](std::vector<uint8_t> bytes) {
-        if (currentSearchIndex == DownloadSongsSearchViewController::searchIndex) {
-            BSML::MainThreadScheduler::Schedule([this, currentSearchIndex, bytes] {
-                if (currentSearchIndex == DownloadSongsSearchViewController::searchIndex) {
-                    std::vector<uint8_t> data = bytes;
-
-                    Array<uint8_t>* spriteArray = il2cpp_utils::vectorToArray(data);
-                    Sprite* sprite = ArrayToSprite(spriteArray);
-                    coverImageView->set_sprite(sprite);
-                    coverImageView->set_enabled(true);
-                }
-                });
-        }
-        });
-    UpdateDownloadProgress(true);
-}
-
-void SearchEntry::SetBeatmap(const BeastSaber::Song& _song) {
-    BSsong = _song;
-    gameObject->SetActive(true);
-    MapType = SearchEntry::MapType::BeastSaber;
-
-    line1Component->SetText(BSsong.GetTitle(), true);
-    line1Component->set_color(UnityEngine::Color(1, 1, 1, 1));
-
-    std::stringstream line2;
-    line2 << "<size=90%>[<color=#67c16f><noparse>" << BSsong.GetLevel_author_name() << "</noparse></color>]";
-    if (BSsong.GetCurated_by().has_value()) {
-        line2 << " " << "<color=#FFFFFFFF><size=75%>Curated by:</color> <color=#ADADADFF><size=80%><noparse>" << BSsong.GetCurated_by().value() << "</noparse></color>";
-    }
-
-    line2Component->SetText(line2.str(), true);
-
-    int currentSearchIndex = DownloadSongsSearchViewController::searchIndex;
-
-    coverImageView->set_enabled(false);
-    BeatSaver::API::GetCoverImageByHashAsync(BSsong.GetHash(), [this, currentSearchIndex](std::vector<uint8_t> bytes) {
         if (currentSearchIndex == DownloadSongsSearchViewController::searchIndex) {
             BSML::MainThreadScheduler::Schedule([this, currentSearchIndex, bytes] {
                 if (currentSearchIndex == DownloadSongsSearchViewController::searchIndex) {
@@ -199,9 +159,6 @@ void SearchEntry::UpdateDownloadProgress(bool checkLoaded) {
         std::string hash;
         if (MapType == SearchEntry::MapType::BeatSaver) {
             hash = map.GetVersions().front().GetHash();
-        }
-        else if (MapType == SearchEntry::MapType::BeastSaber) {
-            hash = BSsong.GetHash();
         }
         else {
             hash = SSsong.GetSongHash();
