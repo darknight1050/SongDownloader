@@ -10,6 +10,9 @@
 #include "DownloadSongsPlaylistViewController.hpp"
 
 DECLARE_CLASS_CODEGEN(SongDownloader, DownloadSongsFlowCoordinator, HMUI::FlowCoordinator,
+    public:
+        void GoToSongSelect();
+        void Close(bool immediately);
 
     DECLARE_INSTANCE_FIELD(SongDownloader::DownloadSongsOptionsViewController*, DownloadSongsOptionsViewController);
     DECLARE_INSTANCE_FIELD(SongDownloader::DownloadSongsSearchViewController*, DownloadSongsSearchViewController);
@@ -22,3 +25,5 @@ DECLARE_CLASS_CODEGEN(SongDownloader, DownloadSongsFlowCoordinator, HMUI::FlowCo
     DECLARE_OVERRIDE_METHOD_MATCH(void, BackButtonWasPressed, &HMUI::FlowCoordinator::BackButtonWasPressed, HMUI::ViewController* topViewController);
 
 )
+
+inline UnityW<SongDownloader::DownloadSongsFlowCoordinator> fcInstance;

@@ -2,6 +2,7 @@
 
 #include "CustomLogger.hpp"
 #include "CustomTypes/DownloadSongsPlaylistViewController.hpp"
+#include "CustomTypes/DownloadSongsFlowCoordinator.hpp"
 #include "ModConfig.hpp"
 
 #include "custom-types/shared/delegate.hpp"
@@ -99,7 +100,7 @@ void DownloadSongsSearchViewController::CreateEntries(Transform* parent) {
         backgroundTransform->set_localScale(Vector3(1.5f, 1.0f, 1.0f));
         levelBar->get_transform()->Find(songArtworkName)->set_localScale(Vector3(0.96f, 0.96f, 0.96f));
 
-        Button* prefabDownloadButton = CreateUIButton(levelBarTransform, "Download", "PracticeButton", {0, 0}, {-5, 5}, nullptr);
+        Button* prefabDownloadButton = CreateUIButton(levelBarTransform, "Download", "PracticeButton", {0, 0}, {21.0f, 11.0f}, nullptr);
         prefab->SetActive(false);
     }
     for(int i = 0; i < ENTRIES_PER_PAGE; i++) {
@@ -114,10 +115,15 @@ void DownloadSongsSearchViewController::CreateEntries(Transform* parent) {
         auto& entry = searchEntries[i];
         downloadButton->get_onClick()->AddListener(custom_types::MakeDelegate<UnityAction*>(
             (std::function<void()>) [this, &entry] {
+                if (entry.status == SongDownloader::SearchEntry::DownloadStatus::Downloaded) {
+                    this->GoToSong(entry);
+                    return;
+                }
                 if (entry.MapType == SearchEntry::MapType::BeatSaver) {
                     auto hash = entry.GetBeatmap().GetVersions().front().GetHash();
+                    entry.status = SongDownloader::SearchEntry::DownloadStatus::Downloading;
                     BeatSaver::API::DownloadBeatmapAsync(entry.GetBeatmap(),
-                        [this, hash](bool error) {
+                        [this, hash, &entry](bool error) {
                             if (!error) {
                                 if (auto playlist = DownloadSongsPlaylistViewController::GetSelectedPlaylist()) {
                                     auto& json = playlist->playlistJSON;
@@ -126,6 +132,9 @@ void DownloadSongsSearchViewController::CreateEntries(Transform* parent) {
                                     PlaylistCore::MarkPlaylistForReload(playlist);
                                 }
                                 SongCore::API::Loading::RefreshSongs(false);
+                                entry.status = SongDownloader::SearchEntry::DownloadStatus::Downloaded;
+                            } else {
+                                entry.status = SongDownloader::SearchEntry::DownloadStatus::Failed;
                             }
                         },
                         [&entry, hash](float percentage) {
@@ -142,8 +151,9 @@ void DownloadSongsSearchViewController::CreateEntries(Transform* parent) {
                 }
                 else {
                     auto hash = entry.GetSongScoreSaber().GetSongHash();
+                    entry.status = SongDownloader::SearchEntry::DownloadStatus::Downloading;
                     BeatSaver::API::DownloadBeatmapAsync(entry.GetSongScoreSaber(),
-                        [this, hash](bool error) {
+                        [this, hash, &entry](bool error) {
                             if (!error) {
                                 if (auto playlist = DownloadSongsPlaylistViewController::GetSelectedPlaylist()) {
                                     auto& json = playlist->playlistJSON;
@@ -152,6 +162,9 @@ void DownloadSongsSearchViewController::CreateEntries(Transform* parent) {
                                     PlaylistCore::MarkPlaylistForReload(playlist);
                                 }
                                 SongCore::API::Loading::RefreshSongs(false);
+                                entry.status = SongDownloader::SearchEntry::DownloadStatus::Downloaded;
+                            } else {
+                                entry.status = SongDownloader::SearchEntry::DownloadStatus::Failed;
                             }
                         },
                         [&entry, hash](float percentage) {
@@ -508,6 +521,9 @@ void DownloadSongsSearchViewController::DidActivate(bool firstActivation, bool a
         searchViewController = this;
         get_gameObject()->AddComponent<Touchable*>();
 
+        // Get coordinators
+        soloFreePlayFlowCoordinator = UnityEngine::Object::FindObjectOfType<GlobalNamespace::SoloFreePlayFlowCoordinator *>();
+
         SearchField = CreateStringSetting(get_transform(), "Search", "", UnityEngine::Vector2(0.0f, 0.0f), UnityEngine::Vector3(0.0f, -38.0f, 0.0f),
             [this](StringW value) {
                 DownloadSongsSearchViewController::SearchQuery = static_cast<std::string>(value);
@@ -550,3 +566,93 @@ void DownloadSongsSearchViewController::DidActivate(bool firstActivation, bool a
         Search();
     }
 }
+
+// Lowercase 
+std::string toLower(std::string s) {
+    std::transform(s.begin(), s.end(), s.begin(), ::tolower);
+    return s;
+}
+std::string toLower(std::string_view s) {
+    return toLower(std::string(s));
+}
+std::string toLower(char const* s) {
+    return toLower(std::string(s));
+}
+
+void DownloadSongsSearchViewController::GoToSong(SongDownloader::SearchEntry entry) {
+    auto isLoaded = SongCore::API::Loading::AreSongsLoaded();
+    if (!isLoaded) {
+        LOG_DEBUG("Songs not loaded yet!");
+        return;
+    }
+    
+    auto currentSong = entry.GetBeatmap();
+    std::string songHash = entry.GetSongHash();
+    
+    auto level = SongCore::API::Loading::GetLevelByHash(songHash);
+    // Fallback for rare cases when the hash is different from the hash in our database (e.g. song got updated)
+    if (level == nullptr) {
+        // Get song beatsaver id
+        std::string songKey = currentSong.GetId();
+        LOG_DEBUG("Song key: {}", songKey);
+        songKey = toLower(songKey);
+        level = SongCore::API::Loading::GetLevelByFunction(
+            [mapId = songKey](auto level) {
+                auto levelPath = level->get_customLevelPath();
+                return levelPath.find(mapId) != std::string::npos;
+            }
+        );
+    }
+
+    // If all else fails, cancel
+    if (level == nullptr) {
+        LOG_DEBUG("Song not found!");
+        return;
+    }
+
+    // If we successfully found the level, we can continue
+    BSML::MainThreadScheduler::Schedule(
+        [this, level] {
+            EnterSolo(level);
+        }
+    );
+ 
+}
+
+
+void DownloadSongsSearchViewController::EnterSolo(GlobalNamespace::BeatmapLevel* level) {
+    if (level == nullptr) {
+        LOG_ERROR("Level is empty!");
+        return;
+    }
+    if (!fcInstance) {
+        LOG_ERROR("FlowCoordinator is empty!");
+        return;
+    }
+    fcInstance->Close(true);
+
+    auto customLevelsPack = SongCore::API::Loading::GetCustomLevelPack();
+    if (customLevelsPack == nullptr) {
+        LOG_DEBUG("No CustomLevelsPack found!");
+        return;
+    }
+    if (customLevelsPack->___beatmapLevels->get_Length() == 0) {
+        LOG_DEBUG("No levels in CustomLevelsPack!");
+        return;
+    }
+
+    auto category = SelectLevelCategoryViewController::LevelCategory(
+            SelectLevelCategoryViewController::LevelCategory::All);
+
+    auto levelCategory = System::Nullable_1<SelectLevelCategoryViewController::LevelCategory>();
+    levelCategory.value = category;
+    levelCategory.hasValue = true;
+    auto state = LevelSelectionFlowCoordinator::State::New_ctor(
+            customLevelsPack,
+            static_cast<GlobalNamespace::BeatmapLevel *>(level)
+    );
+    state->___levelCategory = levelCategory;
+    soloFreePlayFlowCoordinator->Setup(state);
+    fcInstance->GoToSongSelect();
+}
+
