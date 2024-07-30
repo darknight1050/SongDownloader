@@ -115,13 +115,13 @@ void DownloadSongsSearchViewController::CreateEntries(Transform* parent) {
         auto& entry = searchEntries[i];
         downloadButton->get_onClick()->AddListener(custom_types::MakeDelegate<UnityAction*>(
             (std::function<void()>) [this, &entry] {
-                if (entry.status == SongDownloader::SearchEntry::DownloadStatus::Downloaded) {
+                if (entry.status == SearchEntry::DownloadStatus::Loaded) {
                     this->GoToSong(entry);
                     return;
                 }
                 if (entry.MapType == SearchEntry::MapType::BeatSaver) {
                     auto hash = entry.GetBeatmap().GetVersions().front().GetHash();
-                    entry.status = SongDownloader::SearchEntry::DownloadStatus::Downloading;
+                    entry.status = SearchEntry::DownloadStatus::Downloading;
                     BeatSaver::API::DownloadBeatmapAsync(entry.GetBeatmap(),
                         [this, hash, &entry](bool error) {
                             if (!error) {
@@ -131,27 +131,28 @@ void DownloadSongsSearchViewController::CreateEntries(Transform* parent) {
                                     playlist->Save();
                                     PlaylistCore::MarkPlaylistForReload(playlist);
                                 }
-                                SongCore::API::Loading::RefreshSongs(false);
-                                entry.status = SongDownloader::SearchEntry::DownloadStatus::Downloaded;
+                                entry.status = SearchEntry::DownloadStatus::Downloaded;
+                                // Update download progress to 100% in GUI
+                                entry.UpdateDownloadProgress(false);
+                                SongCore::API::Loading::RefreshSongs(false).wait();
+                                // Trigger checking for if the song is loaded
+                                entry.UpdateDownloadProgress(true);
+                                   
                             } else {
-                                entry.status = SongDownloader::SearchEntry::DownloadStatus::Failed;
+                                entry.status = SearchEntry::DownloadStatus::Failed;
                             }
                         },
                         [&entry, hash](float percentage) {
                             if (entry.GetBeatmap().GetVersions().front().GetHash() == hash) {
                                 entry.downloadProgress = percentage;
-                                BSML::MainThreadScheduler::Schedule(
-                                    [&entry] {
-                                        entry.UpdateDownloadProgress(false);
-                                    }
-                                );
+                                entry.UpdateDownloadProgress(false);
                             }
                         }
                     );
                 }
                 else {
                     auto hash = entry.GetSongScoreSaber().GetSongHash();
-                    entry.status = SongDownloader::SearchEntry::DownloadStatus::Downloading;
+                    entry.status = SearchEntry::DownloadStatus::Downloading;
                     BeatSaver::API::DownloadBeatmapAsync(entry.GetSongScoreSaber(),
                         [this, hash, &entry](bool error) {
                             if (!error) {
@@ -161,20 +162,20 @@ void DownloadSongsSearchViewController::CreateEntries(Transform* parent) {
                                     playlist->Save();
                                     PlaylistCore::MarkPlaylistForReload(playlist);
                                 }
-                                SongCore::API::Loading::RefreshSongs(false);
-                                entry.status = SongDownloader::SearchEntry::DownloadStatus::Downloaded;
+                                
+                                entry.status = SearchEntry::DownloadStatus::Downloaded;
+                                entry.UpdateDownloadProgress(false);
+                                SongCore::API::Loading::RefreshSongs(false).wait();
+                                entry.status = SearchEntry::DownloadStatus::Loaded;
+                                entry.UpdateDownloadProgress(true);
                             } else {
-                                entry.status = SongDownloader::SearchEntry::DownloadStatus::Failed;
+                                entry.status = SearchEntry::DownloadStatus::Failed;
                             }
                         },
                         [&entry, hash](float percentage) {
                             if (entry.GetSongScoreSaber().GetSongHash() == hash) {
                                 entry.downloadProgress = percentage;
-                                BSML::MainThreadScheduler::Schedule(
-                                    [&entry] {
-                                        entry.UpdateDownloadProgress(false);
-                                    }
-                                );
+                                entry.UpdateDownloadProgress(false);
                             }
                         }
                     );
@@ -579,7 +580,7 @@ std::string toLower(char const* s) {
     return toLower(std::string(s));
 }
 
-void DownloadSongsSearchViewController::GoToSong(SongDownloader::SearchEntry entry) {
+void DownloadSongsSearchViewController::GoToSong(SearchEntry entry) {
     auto isLoaded = SongCore::API::Loading::AreSongsLoaded();
     if (!isLoaded) {
         LOG_DEBUG("Songs not loaded yet!");

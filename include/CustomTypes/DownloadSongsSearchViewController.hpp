@@ -49,7 +49,8 @@ namespace SongDownloader {
             NotDownloaded = 0,
             Downloading = 1,
             Downloaded = 2,
-            Failed = 3,
+            Loaded = 3,
+            Failed = 4,
         };
 
         DownloadStatus status = DownloadStatus::NotDownloaded;
