@@ -27,7 +27,7 @@
   "dependencies": [
     {
       "id": "beatsaber-hook",
-      "versionRange": "^5.1.7",
+      "versionRange": "^5.1.9",
       "additionalData": {}
     },
     {
@@ -42,7 +42,7 @@
     },
     {
       "id": "songcore",
-      "versionRange": "^1.0.0",
+      "versionRange": "^1.1.15",
       "additionalData": {}
     },
     {
@@ -70,17 +70,17 @@
     },
     {
       "id": "paper",
-      "versionRange": "^3.6.1",
+      "versionRange": "^3.6.4",
       "additionalData": {}
     },
     {
       "id": "bsml",
-      "versionRange": "^0.4.42",
+      "versionRange": "^0.4.43",
       "additionalData": {}
     },
     {
       "id": "playlistcore",
-      "versionRange": "^1.4.1",
+      "versionRange": "^1.4.2",
       "additionalData": {}
     }
   ]
