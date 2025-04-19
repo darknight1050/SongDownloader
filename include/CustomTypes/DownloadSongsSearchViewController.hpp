@@ -84,6 +84,8 @@ namespace SongDownloader {
 
 DECLARE_CLASS_CODEGEN(SongDownloader, DownloadSongsSearchViewController, HMUI::ViewController) {
 
+public:
+
     void CreateEntries(UnityEngine::Transform* parent);
 
     static void Search();

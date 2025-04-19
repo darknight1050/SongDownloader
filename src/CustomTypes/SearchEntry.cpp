@@ -72,7 +72,7 @@ void SearchEntry::SetBeatmap(const BeatSaver::Beatmap& _map) {
                 if (currentSearchIndex == DownloadSongsSearchViewController::searchIndex) {
                     std::vector<uint8_t> data = bytes;
 
-                    Array<uint8_t>* spriteArray = il2cpp_utils::vectorToArray(data);
+                    ArrayW<uint8_t> spriteArray(data);
                     Sprite* sprite = ArrayToSprite(spriteArray);
                     coverImageView->set_sprite(sprite);
                     coverImageView->set_enabled(true);
@@ -147,7 +147,7 @@ void SearchEntry::SetBeatmap(const ScoreSaber::Leaderboard& _song) {
                 if (currentSearchIndex == DownloadSongsSearchViewController::searchIndex) {
                     std::vector<uint8_t> data = bytes;
 
-                    Array<uint8_t>* spriteArray = il2cpp_utils::vectorToArray(data);
+                    ArrayW<uint8_t> spriteArray(data);
                     Sprite* sprite = ArrayToSprite(spriteArray);
                     coverImageView->set_sprite(sprite);
                     coverImageView->set_enabled(true);

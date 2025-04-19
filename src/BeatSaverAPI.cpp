@@ -31,7 +31,7 @@ namespace BeatSaver::API {
             return std::nullopt;
         try {
             BeatSaver::Beatmap beatmap;
-            beatmap.Deserialize(json.value());
+            Beatmap::Deserialize(&beatmap, json.value());
             return beatmap;
         }
         catch (const std::exception& e) {
@@ -48,7 +48,7 @@ namespace BeatSaver::API {
             return std::nullopt;
         try {
             BeatSaver::Beatmap beatmap;
-            beatmap.Deserialize(json.value());
+            Beatmap::Deserialize(&beatmap, json.value());
             return beatmap;
         }
         catch (const std::exception& e) {
@@ -65,7 +65,7 @@ namespace BeatSaver::API {
             return std::nullopt;
         try {
             BeatSaver::UserDetail user;
-            user.Deserialize(json.value());
+            UserDetail::Deserialize(&user, json.value());
             return user;
         }
         catch (const std::exception& e) {
@@ -82,7 +82,7 @@ namespace BeatSaver::API {
             return std::nullopt;
         try {
             BeatSaver::UserDetail user;
-            user.Deserialize(json.value());
+            UserDetail::Deserialize(&user, json.value());
             return user;
         }
         catch (const std::exception& e) {
@@ -108,7 +108,7 @@ namespace BeatSaver::API {
             return std::nullopt;
         try {
             BeatSaver::Page page;
-            page.Deserialize(json.value());
+            Page::Deserialize(&page, json.value());
             return page;
         }
         catch (const std::exception& e) {
@@ -131,7 +131,7 @@ namespace BeatSaver::API {
             return std::nullopt;
         try {
             BeatSaver::Page page;
-            page.Deserialize(json.value());
+            Page::Deserialize(&page, json.value());
             return page;
         }
         catch (const std::exception& e) {
@@ -148,7 +148,7 @@ namespace BeatSaver::API {
             return std::nullopt;
         try {
             BeatSaver::Page page;
-            page.Deserialize(json.value());
+            Page::Deserialize(&page, json.value());
             return page;
         }
         catch (const std::exception& e) {
@@ -205,7 +205,7 @@ namespace BeatSaver::API {
                 else {
                     try {
                         BeatSaver::Beatmap beatmap;
-                        beatmap.Deserialize(document);
+                        Beatmap::Deserialize(&beatmap, document);
                         finished(beatmap);
                     }
                     catch (const std::exception& e) {
@@ -233,7 +233,7 @@ namespace BeatSaver::API {
                 else {
                     try {
                         BeatSaver::Beatmap beatmap;
-                        beatmap.Deserialize(document);
+                        Beatmap::Deserialize(&beatmap, document);
                         finished(beatmap);
                     }
                     catch (const std::exception& e) {
@@ -268,7 +268,7 @@ namespace BeatSaver::API {
                     //writefile("/sdcard/ModData/GetBeatmapByUserIdAsync.json", buffer.GetString());
                     try {
                         BeatSaver::Page page;
-                        page.Deserialize(document);
+                        Page::Deserialize(&page, document);
                         finished(page);
                     }
                     catch (const std::exception& e) {
@@ -298,7 +298,7 @@ namespace BeatSaver::API {
                     //writefile("/sdcard/ModData/GetUserByNameAsync.json", buffer.GetString());
                     try {
                         BeatSaver::UserDetail user;
-                        user.Deserialize(document);
+                        UserDetail::Deserialize(&user, document);
                         finished(user);
                     }
                     catch (const std::exception& e) {
@@ -324,7 +324,7 @@ namespace BeatSaver::API {
                 else {
                     try {
                         BeatSaver::UserDetail user;
-                        user.Deserialize(document);
+                        UserDetail::Deserialize(&user, document);
                         finished(user);
                     }
                     catch (const std::exception& e) {
@@ -369,7 +369,7 @@ namespace BeatSaver::API {
                     //writefile("/sdcard/ModData/SearchQuery.json", buffer.GetString());
                     try {
                         BeatSaver::Page page;
-                        page.Deserialize(document);
+                        Page::Deserialize(&page, document);
                         finished(page);
                     }
                     catch (const std::exception& e) {

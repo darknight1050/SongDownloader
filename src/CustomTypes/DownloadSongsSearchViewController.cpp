@@ -637,7 +637,7 @@ void DownloadSongsSearchViewController::EnterSolo(GlobalNamespace::BeatmapLevel*
         LOG_DEBUG("No CustomLevelsPack found!");
         return;
     }
-    if (customLevelsPack->___beatmapLevels->get_Length() == 0) {
+    if (customLevelsPack->_beatmapLevels->get_Length() == 0) {
         LOG_DEBUG("No levels in CustomLevelsPack!");
         return;
     }
