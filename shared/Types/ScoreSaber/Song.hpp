@@ -2,7 +2,7 @@
 #include "../TypeMacros.hpp"
 
 namespace ScoreSaber {
-    DECLARE_JSON_CLASS(Song,
+    DECLARE_JSON_STRUCT(Song) {
         ERROR_CHECK
         GETTER_VALUE(int, Uid, "uid");
         GETTER_VALUE(std::string, Id, "id");
@@ -17,5 +17,5 @@ namespace ScoreSaber {
         GETTER_VALUE(int, Ranked, "ranked");
         GETTER_VALUE(float, Stars, "stars");
         GETTER_VALUE(std::string, Image, "image");
-    )
+    };
 }
