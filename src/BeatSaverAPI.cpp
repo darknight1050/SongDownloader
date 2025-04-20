@@ -516,9 +516,13 @@ namespace BeatSaver::API {
             bool hasSong = false;
             // search in songs in playlist instead of all songs
             // we need to treat the list as an array because it is initialized as an array elsewhere
-            auto levelList = playlist->playlistCS->beatmapLevels;
+            auto levelList = playlist->playlistCS->_beatmapLevels;
             for(auto& level : levelList) {
-                if(song.Hash == PlaylistCore::Utils::GetLevelHash(level)) {
+                std::string hash = level->levelID;
+                if(hash.starts_with("custom_level")) {
+                    hash = hash.substr(13);
+                }
+                if(song.Hash == std::move(hash)) {
                     hasSong = true;
                     break;
                 }
