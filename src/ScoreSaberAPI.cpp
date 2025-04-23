@@ -30,7 +30,7 @@ namespace ScoreSaber::API {
             return std::nullopt;
         try {
             ScoreSaber::Page page;
-            page.Deserialize(json.value());
+            Page::Deserialize(&page, json.value());
             return page;
         }
         catch (const std::exception& e) {
@@ -47,7 +47,7 @@ namespace ScoreSaber::API {
             return std::nullopt;
         try {
             ScoreSaber::Page page;
-            page.Deserialize(json.value());
+            Page::Deserialize(&page, json.value());
             return page;
         }
         catch (const std::exception& e) {
@@ -64,7 +64,7 @@ namespace ScoreSaber::API {
             return std::nullopt;
         try {
             ScoreSaber::Page page;
-            page.Deserialize(json.value());
+            Page::Deserialize(&page, json.value());
             return page;
         }
         catch (const std::exception& e) {
@@ -81,7 +81,7 @@ namespace ScoreSaber::API {
             return std::nullopt;
         try {
             ScoreSaber::Page page;
-            page.Deserialize(json.value());
+            Page::Deserialize(&page, json.value());
             return page;
         }
         catch (const std::exception& e) {
@@ -111,7 +111,7 @@ namespace ScoreSaber::API {
         }
         try {
             ScoreSaber::Leaderboards page;
-            page.Deserialize(json.value());
+            Leaderboards::Deserialize(&page, json.value());
             return page;
         }
         catch (const std::exception& e) {
@@ -148,7 +148,7 @@ namespace ScoreSaber::API {
                 else {
                     try {
                         ScoreSaber::Page page;
-                        page.Deserialize(document);
+                        Page::Deserialize(&page, document);
                         finished(page);
                     }
                     catch (const std::exception& e) {
@@ -176,7 +176,7 @@ namespace ScoreSaber::API {
                 else {
                     try {
                         ScoreSaber::Page page;
-                        page.Deserialize(document);
+                        Page::Deserialize(&page, document);
                         finished(page);
                     }
                     catch (const std::exception& e) {
@@ -204,7 +204,7 @@ namespace ScoreSaber::API {
                 else {
                     try {
                         ScoreSaber::Page page;
-                        page.Deserialize(document);
+                        Page::Deserialize(&page, document);
                         finished(page);
                     }
                     catch (const std::exception& e) {
@@ -232,7 +232,7 @@ namespace ScoreSaber::API {
                 else {
                     try {
                         ScoreSaber::Page page;
-                        page.Deserialize(document);
+                        Page::Deserialize(&page, document);
                         finished(page);
                     }
                     catch (const std::exception& e) {
@@ -273,7 +273,7 @@ namespace ScoreSaber::API {
                 else {
                     try {
                         ScoreSaber::Leaderboards page;
-                        page.Deserialize(document);
+                        Leaderboards::Deserialize(&page, document);
                         finished(page);
                     }
                     catch (const std::exception& e) {
@@ -301,7 +301,7 @@ namespace ScoreSaber::API {
                 else {
                     try {
                         ScoreSaber::Page page;
-                        page.Deserialize(document);
+                        Page::Deserialize(&page, document);
                         finished(page);
                     }
                     catch (const std::exception& e) {
@@ -343,7 +343,7 @@ namespace ScoreSaber::API {
                 else {
                     try {
                         ScoreSaber::Leaderboards page;
-                        page.Deserialize(document);
+                        Leaderboards::Deserialize(&page, document);
                         finished(page);
                     }
                     catch (const std::exception& e) {

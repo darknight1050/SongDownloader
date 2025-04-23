@@ -27,27 +27,27 @@
   "dependencies": [
     {
       "id": "beatsaber-hook",
-      "versionRange": "^5.1.9",
+      "versionRange": "^6.4.1",
       "additionalData": {}
     },
     {
       "id": "bs-cordl",
-      "versionRange": "^3700.0.0",
+      "versionRange": "^4004.0.0",
       "additionalData": {}
     },
     {
       "id": "custom-types",
-      "versionRange": "^0.17.6",
+      "versionRange": "^0.18.2",
       "additionalData": {}
     },
     {
       "id": "songcore",
-      "versionRange": "^1.1.15",
+      "versionRange": "^1.1.20",
       "additionalData": {}
     },
     {
       "id": "config-utils",
-      "versionRange": "^1.4.0",
+      "versionRange": "^2.0.2",
       "additionalData": {}
     },
     {
@@ -65,12 +65,7 @@
     },
     {
       "id": "rapidjson-macros",
-      "versionRange": "^1.2.0",
-      "additionalData": {}
-    },
-    {
-      "id": "paper",
-      "versionRange": "^3.6.4",
+      "versionRange": "^2.1.0",
       "additionalData": {}
     },
     {
@@ -81,6 +76,11 @@
     {
       "id": "playlistcore",
       "versionRange": "^1.4.2",
+      "additionalData": {}
+    },
+    {
+      "id": "paper2_scotland2",
+      "versionRange": "^4.6.1",
       "additionalData": {}
     }
   ]

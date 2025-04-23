@@ -3,7 +3,7 @@
 #include "UserDiffStats.hpp"
 
 namespace BeatSaver {
-    DECLARE_JSON_CLASS(UserStats,
+    DECLARE_JSON_STRUCT(UserStats) {
         ERROR_CHECK
         GETTER_VALUE_DEFAULT(int, TotalUpvotes, 0, "totalUpvotes");
         GETTER_VALUE_DEFAULT(int, TotalDownvotes, 0, "totalDownvotes");
@@ -15,5 +15,5 @@ namespace BeatSaver {
         GETTER_VALUE_OPTIONAL(std::string, FirstUpload, "firstUpload");
         GETTER_VALUE_OPTIONAL(std::string, LastUpload, "lastUpload");
         GETTER_VALUE(BeatSaver::UserDiffStats, DiffStats, "diffStats");
-    )
+    };
 }

@@ -11,7 +11,7 @@ namespace ScoreSaber {
         SONGDOWNLOADER_EXPORT void GetCoverImageAsync(const ScoreSaber::Leaderboard& ldb, std::function<void(std::vector<uint8_t>)> finished, std::function<void(float)> progressUpdate);
     }
 
-    DECLARE_JSON_CLASS(Leaderboard,
+    DECLARE_JSON_STRUCT(Leaderboard) {
         ERROR_CHECK
         GETTER_VALUE(int, Id, "id");
         GETTER_VALUE(std::string, SongHash, "songHash");
@@ -47,5 +47,5 @@ namespace ScoreSaber {
         inline void GetCoverImageAsync(std::function<void(std::vector<uint8_t>)> finished, std::function<void(float)> progressUpdate = nullptr) {
             ScoreSaber::API::GetCoverImageAsync(*this, finished, progressUpdate);
         }
-    )
+    };
 }

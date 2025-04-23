@@ -1,7 +1,7 @@
 #pragma once
 #include "config-utils/shared/config-utils.hpp"
 
-DECLARE_CONFIG(ModConfig,
+DECLARE_CONFIG(ModConfig) {
 
     CONFIG_VALUE(Service, std::string, "Service", "BeatSaver", "Selected Service to get Information from!");
     CONFIG_VALUE(ListType_BeatSaver, std::string, "List_BeatSaver", "Search", "What Type of Information to display!");
@@ -14,4 +14,4 @@ DECLARE_CONFIG(ModConfig,
     CONFIG_VALUE(Ranked, std::string, "Ranked_BeatSaver", "", "If Ranked maps should be included in search results");
 
     CONFIG_VALUE(BookmarkUsername, std::string, "BookmarkUsername", "");
-)
+};

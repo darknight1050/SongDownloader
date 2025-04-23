@@ -12,7 +12,7 @@ namespace BeatSaver {
         SONGDOWNLOADER_EXPORT void GetCoverImageAsync(const BeatSaver::BeatmapVersion& beatmap, std::function<void(std::vector<uint8_t>)> finished, std::function<void(float)> progressUpdate);
     }
 
-    DECLARE_JSON_CLASS(BeatmapVersion,
+    DECLARE_JSON_STRUCT(BeatmapVersion) {
         ERROR_CHECK
         GETTER_VALUE(std::string, CreatedAt, "createdAt");
         GETTER_VALUE_OPTIONAL(int, SageScore, "sageScore");
@@ -32,5 +32,5 @@ namespace BeatSaver {
         inline void GetCoverImageAsync(std::function<void(std::vector<uint8_t>)> finished, std::function<void(float)> progressUpdate) {
             BeatSaver::API::GetCoverImageAsync(*this, finished, progressUpdate);
         }
-    )
+    };
 }

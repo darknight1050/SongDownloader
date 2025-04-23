@@ -7,7 +7,7 @@
 #include "playlistcore/shared/CustomTypes/CustomListSource.hpp"
 #include "playlistcore/shared/PlaylistCore.hpp"
 
-DECLARE_CLASS_CODEGEN(SongDownloader, DownloadSongsPlaylistViewController, HMUI::ViewController,
+DECLARE_CLASS_CODEGEN(SongDownloader, DownloadSongsPlaylistViewController, HMUI::ViewController) {
 
     DECLARE_INSTANCE_FIELD_DEFAULT(PlaylistCore::CustomListSource*, list, nullptr);
 
@@ -24,4 +24,4 @@ DECLARE_CLASS_CODEGEN(SongDownloader, DownloadSongsPlaylistViewController, HMUI:
 
     public:
     static PlaylistCore::Playlist* GetSelectedPlaylist();
-)
+};

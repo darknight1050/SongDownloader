@@ -82,7 +82,9 @@ namespace SongDownloader {
 
 }
 
-DECLARE_CLASS_CODEGEN(SongDownloader, DownloadSongsSearchViewController, HMUI::ViewController,
+DECLARE_CLASS_CODEGEN(SongDownloader, DownloadSongsSearchViewController, HMUI::ViewController) {
+
+public:
 
     void CreateEntries(UnityEngine::Transform* parent);
 
@@ -125,7 +127,7 @@ DECLARE_CLASS_CODEGEN(SongDownloader, DownloadSongsSearchViewController, HMUI::V
     DECLARE_INSTANCE_METHOD(void, GetTopRanked, int);
 
     DECLARE_DEFAULT_CTOR();
-)
+};
 
 namespace SongDownloader {
     extern DownloadSongsSearchViewController* searchViewController;
