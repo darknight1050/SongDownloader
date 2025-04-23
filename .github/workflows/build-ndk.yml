@@ -6,7 +6,7 @@ on:
     tags:
       - "v*"
     branches:
-      - "main"
+      - "master"
       - "dev/*"
       - "feat/*"
       - "fix/*"
@@ -24,7 +24,7 @@ on:
       - "**.md"
       - ".gitignore"
   pull_request:
-    branches: main
+    branches: master
 
 env:
   module_id: songdownloader
