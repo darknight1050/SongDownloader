@@ -6,7 +6,7 @@
   "info": {
     "name": "SongDownloader",
     "id": "songdownloader",
-    "version": "0.8.0",
+    "version": "0.8.7",
     "url": "https://github.com/darknight1050/SongDownloader",
     "additionalData": {
       "overrideSoName": "libsongdownloader.so",
@@ -27,12 +27,13 @@
         "pwsh ./createqmod.ps1 SongDownloader"
       ]
     },
+    "ndk": "^27.2.12479018",
     "qmodIncludeDirs": [
       "build",
       "extern/libs"
     ],
     "qmodIncludeFiles": [],
-    "qmodOutput": null
+    "qmodOutput": "SongDownloader.qmod"
   },
   "dependencies": [
     {
@@ -42,12 +43,12 @@
     },
     {
       "id": "bs-cordl",
-      "versionRange": "^4006.*",
+      "versionRange": "4007.*",
       "additionalData": {}
     },
     {
       "id": "bsml",
-      "versionRange": "^0.4.52",
+      "versionRange": "^0.4.54",
       "additionalData": {}
     },
     {
@@ -57,7 +58,7 @@
     },
     {
       "id": "custom-types",
-      "versionRange": "^0.18.2",
+      "versionRange": "^0.18.3",
       "additionalData": {}
     },
     {
@@ -72,7 +73,7 @@
     },
     {
       "id": "playlistcore",
-      "versionRange": "^1.5.1",
+      "versionRange": "^1.5.3",
       "additionalData": {}
     },
     {
@@ -90,7 +91,7 @@
     },
     {
       "id": "songcore",
-      "versionRange": "^1.1.21",
+      "versionRange": "^1.1.23",
       "additionalData": {}
     }
   ]
