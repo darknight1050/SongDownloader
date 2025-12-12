@@ -6,7 +6,7 @@
   "info": {
     "name": "SongDownloader",
     "id": "songdownloader",
-    "version": "0.8.7",
+    "version": "0.9.0",
     "url": "https://github.com/darknight1050/SongDownloader",
     "additionalData": {
       "overrideSoName": "libsongdownloader.so",
@@ -27,7 +27,7 @@
         "pwsh ./createqmod.ps1 SongDownloader"
       ]
     },
-    "ndk": "^27.2.12479018",
+    "ndk": "^27.3.13750724",
     "qmodIncludeDirs": [
       "build",
       "extern/libs"
@@ -38,27 +38,27 @@
   "dependencies": [
     {
       "id": "beatsaber-hook",
-      "versionRange": "^6.4.2",
+      "versionRange": "^7.4.0",
       "additionalData": {}
     },
     {
       "id": "bs-cordl",
-      "versionRange": "4008.*",
+      "versionRange": "^4100.0",
       "additionalData": {}
     },
     {
       "id": "bsml",
-      "versionRange": "^0.4.54",
+      "versionRange": "^0.6.0",
       "additionalData": {}
     },
     {
       "id": "config-utils",
-      "versionRange": "^2.0.3",
+      "versionRange": "^2.1.0",
       "additionalData": {}
     },
     {
       "id": "custom-types",
-      "versionRange": "^0.18.3",
+      "versionRange": "^0.19.0",
       "additionalData": {}
     },
     {
@@ -73,12 +73,12 @@
     },
     {
       "id": "playlistcore",
-      "versionRange": "^1.5.3",
+      "versionRange": "^1.6.0",
       "additionalData": {}
     },
     {
       "id": "rapidjson-macros",
-      "versionRange": "^2.1.0",
+      "versionRange": "^2.2.0",
       "additionalData": {}
     },
     {
@@ -91,7 +91,7 @@
     },
     {
       "id": "songcore",
-      "versionRange": "^1.1.23",
+      "versionRange": "^1.2.0",
       "additionalData": {}
     }
   ]
