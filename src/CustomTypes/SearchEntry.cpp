@@ -177,12 +177,11 @@ void SearchEntry::UpdateDownloadProgress(bool checkLoaded) {
     if (checkLoaded) {
         downloadProgress = -1.0f;
         std::string hash = GetSongHash();
-        for (auto& song : SongCore::API::Loading::GetAllLevels()) {
-            if (song->levelID.ends_with(hash)) {
-                this->status = SearchEntry::DownloadStatus::Loaded;
-                downloadProgress = 100.0f;
-                break;
-            }
+        if (!hash.empty() && SongCore::API::Loading::GetLevelByHash(hash)) {
+            status = SearchEntry::DownloadStatus::Loaded;
+            downloadProgress = 100.0f;
+        } else if (status == SearchEntry::DownloadStatus::Loaded) {
+            status = SearchEntry::DownloadStatus::NotDownloaded;
         }
     }
     
