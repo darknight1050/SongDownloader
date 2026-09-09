@@ -479,6 +479,8 @@ void DownloadSongsSearchViewController::GetTopRanked(int currentSearchIndex) {
 #pragma endregion
 
 void DownloadSongsSearchViewController::Search() {
+    if (auto scrollView = searchViewController->GetComponentInChildren<HMUI::ScrollView*>())
+        scrollView->ScrollTo(0.0f, false);
     if (getModConfig().Service.GetValue() == "BeatSaver" && getModConfig().ListType_BeatSaver.GetValue() == "Key") {
         lastSearchPage = 0;
         searchPage = 0;
