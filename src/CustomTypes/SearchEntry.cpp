@@ -28,6 +28,10 @@ const ScoreSaber::Leaderboard& SearchEntry::GetSongScoreSaber() {
 #pragma region SetBeatmap
 
 void SearchEntry::SetBeatmap(const BeatSaver::Beatmap& _map) {
+    if (_map.GetVersions().empty()) {
+        Disable();
+        return;
+    }
     map = _map;
     gameObject->SetActive(true);
     MapType = SearchEntry::MapType::BeatSaver;
@@ -163,6 +167,7 @@ void SearchEntry::SetBeatmap(const ScoreSaber::Leaderboard& _song) {
 std::string SearchEntry::GetSongHash() {
     std::string hash;
     if (MapType == SearchEntry::MapType::BeatSaver) {
+        if (map.GetVersions().empty()) return {};
         hash = map.GetVersions().front().GetHash();
     }
     else {
@@ -185,34 +190,31 @@ void SearchEntry::UpdateDownloadProgress(bool checkLoaded) {
         }
     }
     
-    BSML::MainThreadScheduler::Schedule(
-        [this] {
-            // Update the download button text based on the current status
-            switch (status)
-            {
-                case SearchEntry::DownloadStatus::NotDownloaded:
-                    SetButtonText(downloadButton, "Download");
-                    downloadButton->set_interactable(true);
-                    break;
-                case SearchEntry::DownloadStatus::Downloading:
-                    SetButtonText(downloadButton, fmt::format("{}%", (int) downloadProgress));
-                    downloadButton->set_interactable(false);
-                    break;
-                case SearchEntry::DownloadStatus::Downloaded:
-                    SetButtonText(downloadButton, "Loading");
-                    downloadButton->set_interactable(false);
-                    break;
-                case SearchEntry::DownloadStatus::Loaded:
-                    SetButtonText(downloadButton, "Play");
-                    downloadButton->set_interactable(true);
-                    break;
-                case SearchEntry::DownloadStatus::Failed:
-                    SetButtonText(downloadButton, "Failed");
-                    downloadButton->set_interactable(true);
-                    break;
-            }
-        }
-    );
+    // All callers update row state and UI on the main thread.
+    // Update the download button text based on the current status
+    switch (status)
+    {
+        case SearchEntry::DownloadStatus::NotDownloaded:
+            SetButtonText(downloadButton, "Download");
+            downloadButton->set_interactable(true);
+            break;
+        case SearchEntry::DownloadStatus::Downloading:
+            SetButtonText(downloadButton, fmt::format("{}%", (int) downloadProgress));
+            downloadButton->set_interactable(false);
+            break;
+        case SearchEntry::DownloadStatus::Downloaded:
+            SetButtonText(downloadButton, "Loading");
+            downloadButton->set_interactable(false);
+            break;
+        case SearchEntry::DownloadStatus::Loaded:
+            SetButtonText(downloadButton, "Play");
+            downloadButton->set_interactable(true);
+            break;
+        case SearchEntry::DownloadStatus::Failed:
+            SetButtonText(downloadButton, "Failed");
+            downloadButton->set_interactable(true);
+            break;
+    }
 }
 
 void SearchEntry::Disable() {

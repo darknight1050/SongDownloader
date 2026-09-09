@@ -159,6 +159,7 @@ namespace BeatSaver::API {
     }
 
     bool DownloadBeatmap(const BeatSaver::Beatmap& beatmap) {
+        if (beatmap.GetVersions().empty()) return true;
         auto levelsPath = SongCore::API::Loading::GetPreferredCustomLevelPath();
         auto targetFolderName = fmt::format("{} ()[]{{}}%&.:,;=!-_ ({} - {})", beatmap.GetId(), beatmap.GetMetadata().GetSongName(), beatmap.GetMetadata().GetLevelAuthorName());
         auto targetFolder = levelsPath / targetFolderName;
@@ -172,6 +173,7 @@ namespace BeatSaver::API {
     }
 
     std::vector<uint8_t> GetPreview(const BeatSaver::Beatmap& beatmap) {
+        if (beatmap.GetVersions().empty()) return {};
         std::string data;
         WebUtils::Get(beatmap.GetVersions().front().GetPreviewURL(), FILE_DOWNLOAD_TIMEOUT, data);
         std::vector<uint8_t> bytes(data.begin(), data.end());
@@ -179,6 +181,7 @@ namespace BeatSaver::API {
     }
 
     std::vector<uint8_t> GetCoverImage(const BeatSaver::Beatmap& beatmap) {
+        if (beatmap.GetVersions().empty()) return {};
         std::string data;
         WebUtils::Get(beatmap.GetVersions().front().GetCoverURL(), FILE_DOWNLOAD_TIMEOUT, data);
         std::vector<uint8_t> bytes(data.begin(), data.end());
@@ -383,6 +386,10 @@ namespace BeatSaver::API {
     }
 
     void DownloadBeatmapAsync(const BeatSaver::Beatmap& beatmap, std::function<void(bool)> finished, std::function<void(float)> progressUpdate) {
+        if (beatmap.GetVersions().empty()) {
+            if (finished) finished(true);
+            return;
+        }
         WebUtils::GetAsync(beatmap.GetVersions().front().GetDownloadURL(), FILE_DOWNLOAD_TIMEOUT,
             [beatmap, finished](long httpCode, std::string data) {
                 auto levelsPath = SongCore::API::Loading::GetPreferredCustomLevelPath();
@@ -458,6 +465,10 @@ namespace BeatSaver::API {
     }
 
     void GetCoverImageAsync(const BeatSaver::Beatmap& beatmap, std::function<void(std::vector<uint8_t>)> finished, std::function<void(float)> progressUpdate) {
+        if (beatmap.GetVersions().empty()) {
+            if (finished) finished({});
+            return;
+        }
         WebUtils::GetAsync(beatmap.GetVersions().front().GetCoverURL(), FILE_DOWNLOAD_TIMEOUT,
             [beatmap, finished](long httpCode, std::string data) {
                 std::vector<uint8_t> bytes(data.begin(), data.end());
@@ -489,6 +500,10 @@ namespace BeatSaver::API {
     }
 
     void GetPreviewAsync(const BeatSaver::Beatmap& beatmap, std::function<void(std::vector<uint8_t>)> finished, std::function<void(float)> progressUpdate) {
+        if (beatmap.GetVersions().empty()) {
+            if (finished) finished({});
+            return;
+        }
         WebUtils::GetAsync(beatmap.GetVersions().front().GetPreviewURL(), FILE_DOWNLOAD_TIMEOUT,
             [beatmap, finished](long httpCode, std::string data) {
                 std::vector<uint8_t> bytes(data.begin(), data.end());

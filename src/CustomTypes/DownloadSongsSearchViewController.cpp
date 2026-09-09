@@ -30,6 +30,7 @@
 
 #include <algorithm>
 #include <cctype>
+#include <cmath>
 #include <iomanip>
 #include <limits>
 #include <sstream>
@@ -122,81 +123,67 @@ void DownloadSongsSearchViewController::CreateEntries(Transform* parent) {
         HMUI::ImageView* artwork = artworkTransform->GetComponent<HMUI::ImageView*>();
 
         searchEntries[i] = SearchEntry(copy, copyLevelBar->_songNameText, copyLevelBar->_authorNameText, artwork, downloadButton);
-        auto& entry = searchEntries[i];
         downloadButton->get_onClick()->AddListener(custom_types::MakeDelegate<UnityAction*>(
-            (std::function<void()>) [this, &entry] {
+            (std::function<void()>) [this, i] {
+                auto& entry = searchEntries[i];
                 if (entry.status == SearchEntry::DownloadStatus::Loaded) {
                     this->GoToSong(entry);
                     return;
                 }
+                if (!entry.IsEnabled() || entry.status == SearchEntry::DownloadStatus::Downloading ||
+                    entry.status == SearchEntry::DownloadStatus::Downloaded) return;
+                const auto hash = entry.GetSongHash();
+                if (hash.empty()) return;
+                entry.status = SearchEntry::DownloadStatus::Downloading;
+                entry.downloadProgress = 0.0f;
+                entry.UpdateDownloadProgress(false);
+
+                // Workers capture immutable values, and only touch the row on the main thread.
+                auto update = [controller = UnityW<DownloadSongsSearchViewController>(this), hash]
+                    (SearchEntry::DownloadStatus status, float progress, bool checkLoaded = false) {
+                    BSML::MainThreadScheduler::Schedule([controller, hash, status, progress, checkLoaded] {
+                        if (!controller) return;
+                        auto view = controller;
+                        for (auto& row : view->searchEntries) {
+                            if (!row.IsEnabled() || row.GetSongHash() != hash) continue;
+                            if (status == SearchEntry::DownloadStatus::Downloading &&
+                                (row.status == SearchEntry::DownloadStatus::Downloaded ||
+                                 row.status == SearchEntry::DownloadStatus::Loaded ||
+                                 row.status == SearchEntry::DownloadStatus::Failed)) continue;
+                            row.status = status;
+                            row.downloadProgress = progress;
+                            row.UpdateDownloadProgress(checkLoaded);
+                        }
+                    });
+                };
+                auto finished = [update, hash](bool error) {
+                    if (error) {
+                        update(SearchEntry::DownloadStatus::Failed, -1.0f);
+                        return;
+                    }
+                    BSML::MainThreadScheduler::Schedule([hash] {
+                        if (auto playlist = DownloadSongsPlaylistViewController::GetSelectedPlaylist()) {
+                            auto& song = playlist->playlistJSON.songs.emplace_back();
+                            song.hash = hash;
+                            song.levelid = "custom_level_" + hash;
+                            playlist->Save();
+                            PlaylistCore::MarkPlaylistForReload(playlist);
+                        }
+                    });
+                    update(SearchEntry::DownloadStatus::Downloaded, 100.0f);
+                    SongCore::API::Loading::RefreshSongs(false).wait();
+                    update(SearchEntry::DownloadStatus::Loaded, 100.0f, true);
+                };
+                auto progress = [update](float percentage) {
+                    update(SearchEntry::DownloadStatus::Downloading,
+                        std::isfinite(percentage) ? std::clamp(percentage, 0.0f, 100.0f) : 0.0f);
+                };
                 if (entry.MapType == SearchEntry::MapType::BeatSaver) {
-                    auto hash = entry.GetBeatmap().GetVersions().front().GetHash();
-                    entry.status = SearchEntry::DownloadStatus::Downloading;
-                    BeatSaver::API::DownloadBeatmapAsync(entry.GetBeatmap(),
-                        [this, hash, &entry](bool error) {
-                            if (!error) {
-                                if (auto playlist = DownloadSongsPlaylistViewController::GetSelectedPlaylist()) {
-                                    auto& json = playlist->playlistJSON;
-                                    auto& song = json.songs.emplace_back();
-                                    song.hash = hash;
-                                    std::string levelHash = hash;
-                                    std::transform(levelHash.begin(), levelHash.end(), levelHash.begin(), [](unsigned char c) { return std::toupper(c); });
-                                    song.levelid = "custom_level_" + levelHash;
-                                    playlist->Save();
-                                    PlaylistCore::MarkPlaylistForReload(playlist);
-                                }
-                                entry.status = SearchEntry::DownloadStatus::Downloaded;
-                                // Update download progress to 100% in GUI
-                                entry.UpdateDownloadProgress(false);
-                                SongCore::API::Loading::RefreshSongs(false).wait();
-                                // Trigger checking for if the song is loaded
-                                entry.UpdateDownloadProgress(true);
-                                   
-                            } else {
-                                entry.status = SearchEntry::DownloadStatus::Failed;
-                            }
-                        },
-                        [&entry, hash](float percentage) {
-                            if (entry.GetBeatmap().GetVersions().front().GetHash() == hash) {
-                                entry.downloadProgress = percentage;
-                                entry.UpdateDownloadProgress(false);
-                            }
-                        }
-                    );
-                }
-                else {
-                    auto hash = entry.GetSongScoreSaber().GetSongHash();
-                    entry.status = SearchEntry::DownloadStatus::Downloading;
-                    BeatSaver::API::DownloadBeatmapAsync(entry.GetSongScoreSaber(),
-                        [this, hash, &entry](bool error) {
-                            if (!error) {
-                                if (auto playlist = DownloadSongsPlaylistViewController::GetSelectedPlaylist()) {
-                                    auto& json = playlist->playlistJSON;
-                                    auto& song = json.songs.emplace_back();
-                                    song.hash = hash;
-                                    std::string levelHash = hash;
-                                    std::transform(levelHash.begin(), levelHash.end(), levelHash.begin(), [](unsigned char c) { return std::toupper(c); });
-                                    song.levelid = "custom_level_" + levelHash;
-                                    playlist->Save();
-                                    PlaylistCore::MarkPlaylistForReload(playlist);
-                                }
-                                
-                                entry.status = SearchEntry::DownloadStatus::Downloaded;
-                                entry.UpdateDownloadProgress(false);
-                                SongCore::API::Loading::RefreshSongs(false).wait();
-                                entry.status = SearchEntry::DownloadStatus::Loaded;
-                                entry.UpdateDownloadProgress(true);
-                            } else {
-                                entry.status = SearchEntry::DownloadStatus::Failed;
-                            }
-                        },
-                        [&entry, hash](float percentage) {
-                            if (entry.GetSongScoreSaber().GetSongHash() == hash) {
-                                entry.downloadProgress = percentage;
-                                entry.UpdateDownloadProgress(false);
-                            }
-                        }
-                    );
+                    const auto map = entry.GetBeatmap();
+                    BeatSaver::API::DownloadBeatmapAsync(map, finished, progress);
+                } else {
+                    const auto song = entry.GetSongScoreSaber();
+                    BeatSaver::API::DownloadBeatmapAsync(song, finished, progress);
                 }
             }
         ));
