@@ -28,6 +28,8 @@
 #include "bsml/shared/BSML/Components/Backgroundable.hpp"
 #include "bsml/shared/BSML.hpp"
 
+#include <algorithm>
+#include <cctype>
 #include <iomanip>
 #include <sstream>
 #include <stdexcept>
@@ -133,7 +135,11 @@ void DownloadSongsSearchViewController::CreateEntries(Transform* parent) {
                             if (!error) {
                                 if (auto playlist = DownloadSongsPlaylistViewController::GetSelectedPlaylist()) {
                                     auto& json = playlist->playlistJSON;
-                                    json.songs.emplace_back().hash = hash;
+                                    auto& song = json.songs.emplace_back();
+                                    song.hash = hash;
+                                    std::string levelHash = hash;
+                                    std::transform(levelHash.begin(), levelHash.end(), levelHash.begin(), [](unsigned char c) { return std::toupper(c); });
+                                    song.levelid = "custom_level_" + levelHash;
                                     playlist->Save();
                                     PlaylistCore::MarkPlaylistForReload(playlist);
                                 }
@@ -164,7 +170,11 @@ void DownloadSongsSearchViewController::CreateEntries(Transform* parent) {
                             if (!error) {
                                 if (auto playlist = DownloadSongsPlaylistViewController::GetSelectedPlaylist()) {
                                     auto& json = playlist->playlistJSON;
-                                    json.songs.emplace_back().hash = hash;
+                                    auto& song = json.songs.emplace_back();
+                                    song.hash = hash;
+                                    std::string levelHash = hash;
+                                    std::transform(levelHash.begin(), levelHash.end(), levelHash.begin(), [](unsigned char c) { return std::toupper(c); });
+                                    song.levelid = "custom_level_" + levelHash;
                                     playlist->Save();
                                     PlaylistCore::MarkPlaylistForReload(playlist);
                                 }
