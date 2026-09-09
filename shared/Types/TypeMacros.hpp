@@ -30,6 +30,8 @@ public: \
 
 #define ERROR_CHECK \
 DESERIALIZE_FUNCTION(ErrorCheck) { \
+    if (!jsonValue.IsObject()) \
+        throw JSONException("expected a JSON object"); \
     if (jsonValue.HasMember("error") && jsonValue["error"].IsString()) \
         throw SongDownloader::JsonException(SongDownloader::Exceptions::SiteError, jsonValue["error"].GetString()); \
 }

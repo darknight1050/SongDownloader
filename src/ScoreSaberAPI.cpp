@@ -106,7 +106,7 @@ namespace ScoreSaber::API {
         auto json = WebUtils::GetJSON(requestURL);
         if (!json.has_value())
             return std::nullopt;
-        if (json.value().HasMember("errorMessage") && json.value()["errorMessage"].IsString()) {
+        if (json.value().IsObject() && json.value().HasMember("errorMessage") && json.value()["errorMessage"].IsString()) {
             if (strcmp(json.value()["errorMessage"].GetString(), "Not Found") != 0) exception = json.value()["errorMessage"].GetString();
             return std::nullopt;
         }
