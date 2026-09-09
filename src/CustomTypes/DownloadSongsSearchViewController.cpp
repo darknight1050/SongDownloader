@@ -31,6 +31,7 @@
 #include <algorithm>
 #include <cctype>
 #include <iomanip>
+#include <limits>
 #include <sstream>
 #include <stdexcept>
 #include <string>
@@ -55,6 +56,7 @@ DEFINE_TYPE(SongDownloader, DownloadSongsSearchViewController);
 int DownloadSongsSearchViewController::searchIndex = 0;
 
 int DownloadSongsSearchViewController::searchPage = 0;
+int DownloadSongsSearchViewController::lastSearchPage = -1;
 
 std::string DownloadSongsSearchViewController::SearchQuery = "";
 
@@ -245,6 +247,7 @@ void DownloadSongsSearchViewController::SearchSongs(int currentSearchIndex) {
                 BSML::MainThreadScheduler::Schedule(
                     [this, currentSearchIndex, page] {
                         if (currentSearchIndex == DownloadSongsSearchViewController::searchIndex) {
+                            if (page && UpdatePagination(*page)) return;
                             if (page.has_value() && !page.value().GetDocs().empty()) {
                                 auto maps = page.value().GetDocs();
                                 auto mapsSize = maps.size();
@@ -286,12 +289,14 @@ void DownloadSongsSearchViewController::SearchUser(int currentSearchIndex) {
             [this, currentSearchIndex](std::optional<BeatSaver::UserDetail> User) {
                 BSML::MainThreadScheduler::Schedule(
                     [this, currentSearchIndex, User]() {
+                        if (currentSearchIndex != DownloadSongsSearchViewController::searchIndex) return;
                         if (User.has_value()) {
                             BeatSaver::API::GetBeatmapByUserIdAsync(User.value().GetId(), DownloadSongsSearchViewController::searchPage,
                                 [this, currentSearchIndex](std::optional<BeatSaver::Page> page) {
                                     BSML::MainThreadScheduler::Schedule(
                                         [this, currentSearchIndex, page]() {
                                             if (currentSearchIndex == DownloadSongsSearchViewController::searchIndex) {
+                                                if (page && UpdatePagination(*page)) return;
                                                 if (page.has_value() && !page.value().GetDocs().empty()) {
                                                     auto maps = page.value().GetDocs();
                                                     auto mapsSize = maps.size();
@@ -337,6 +342,7 @@ void DownloadSongsSearchViewController::GetTrending(int currentSearchIndex) {
                 BSML::MainThreadScheduler::Schedule(
                     [this, currentSearchIndex, page] {
                         if (currentSearchIndex == DownloadSongsSearchViewController::searchIndex) {
+                            if (page && UpdatePagination(*page)) return;
                             if (page.has_value() && !page.value().GetLeaderboards().empty()) {
                                 auto songs = page.value().GetLeaderboards();
                                 auto songsSize = songs.size();
@@ -375,6 +381,7 @@ void DownloadSongsSearchViewController::GetLatestRanked(int currentSearchIndex) 
                 BSML::MainThreadScheduler::Schedule(
                     [this, currentSearchIndex, page] {
                         if (currentSearchIndex == DownloadSongsSearchViewController::searchIndex) {
+                            if (page && UpdatePagination(*page)) return;
                             if (page.has_value() && !page.value().GetLeaderboards().empty()) {
                                 auto songs = page.value().GetLeaderboards();
                                 auto songsSize = songs.size();
@@ -413,6 +420,7 @@ void DownloadSongsSearchViewController::GetTopPlayed(int currentSearchIndex) {
                 BSML::MainThreadScheduler::Schedule(
                     [this, currentSearchIndex, page] {
                         if (currentSearchIndex == DownloadSongsSearchViewController::searchIndex) {
+                            if (page && UpdatePagination(*page)) return;
                             if (page.has_value() && !page.value().GetLeaderboards().empty()) {
                                 auto songs = page.value().GetLeaderboards();
                                 auto songsSize = songs.size();
@@ -451,6 +459,7 @@ void DownloadSongsSearchViewController::GetTopRanked(int currentSearchIndex) {
                 BSML::MainThreadScheduler::Schedule(
                     [this, currentSearchIndex, page] {
                         if (currentSearchIndex == DownloadSongsSearchViewController::searchIndex) {
+                            if (page && UpdatePagination(*page)) return;
                             if (page.has_value() && !page.value().GetLeaderboards().empty()) {
                                 auto songs = page.value().GetLeaderboards();
                                 auto songsSize = songs.size();
@@ -483,6 +492,12 @@ void DownloadSongsSearchViewController::GetTopRanked(int currentSearchIndex) {
 #pragma endregion
 
 void DownloadSongsSearchViewController::Search() {
+    if (getModConfig().Service.GetValue() == "BeatSaver" && getModConfig().ListType_BeatSaver.GetValue() == "Key") {
+        lastSearchPage = 0;
+        searchPage = 0;
+    }
+    searchViewController->pageIncrement->maxValue = lastSearchPage >= 0 ? lastSearchPage + 1 : std::numeric_limits<float>::infinity();
+    searchViewController->pageIncrement->set_Value(searchPage + 1);
     for (int i = 0; i < ENTRIES_PER_PAGE; i++) {
         searchViewController->searchEntries[i].Disable();
     }
@@ -528,9 +543,48 @@ void DownloadSongsSearchViewController::Search() {
 }
 
 void DownloadSongsSearchViewController::SetPage(int page) {
-    DownloadSongsSearchViewController::searchPage = page;
+    if (page == 0) lastSearchPage = -1;
+    searchPage = std::max(0, page);
+    if (lastSearchPage >= 0) searchPage = std::min(searchPage, lastSearchPage);
 
-    searchViewController->pageIncrement->set_Value(page + 1);
+    searchViewController->pageIncrement->maxValue = lastSearchPage >= 0 ? lastSearchPage + 1 : std::numeric_limits<float>::infinity();
+    searchViewController->pageIncrement->set_Value(searchPage + 1);
+}
+
+bool DownloadSongsSearchViewController::UpdatePagination(const BeatSaver::Page& page) {
+    const auto info = page.GetInfo();
+    return UpdatePagination(page.GetDocs().size(), info ? std::optional<int>(info->GetPages()) : std::nullopt);
+}
+
+bool DownloadSongsSearchViewController::UpdatePagination(const ScoreSaber::Leaderboards& page) {
+    const auto metadata = page.GetMetadata();
+    std::optional<int> pageCount;
+    if (metadata && metadata->GetItemsPerPage() > 0) {
+        const auto total = metadata->GetTotal();
+        pageCount = total == 0 ? 0 : static_cast<int>((total - 1) / metadata->GetItemsPerPage()) + 1;
+    }
+    return UpdatePagination(page.GetLeaderboards().size(), pageCount);
+}
+
+bool DownloadSongsSearchViewController::UpdatePagination(std::size_t resultCount, std::optional<int> pageCount) {
+    if (pageCount && *pageCount >= 0) {
+        lastSearchPage = std::max(0, *pageCount - 1);
+    }
+    else if (resultCount < ENTRIES_PER_PAGE) {
+        lastSearchPage = std::max(0, searchPage - (resultCount == 0 ? 1 : 0));
+    }
+
+    // A response can establish the limit after the user has already advanced.
+    // Responses without totals still infer the boundary from an empty page.
+    if (lastSearchPage >= 0 && searchPage > lastSearchPage) {
+        searchPage = lastSearchPage;
+        Search();
+        return true;
+    }
+
+    pageIncrement->maxValue = lastSearchPage >= 0 ? lastSearchPage + 1 : std::numeric_limits<float>::infinity();
+    pageIncrement->set_Value(searchPage + 1);
+    return false;
 }
 
 void DownloadSongsSearchViewController::DidActivate(bool firstActivation, bool addedToHierarchy, bool screenSystemEnabling) {
@@ -544,6 +598,7 @@ void DownloadSongsSearchViewController::DidActivate(bool firstActivation, bool a
         SearchField = CreateStringSetting(get_transform(), "Search", "", UnityEngine::Vector2(0.0f, 0.0f), UnityEngine::Vector3(0.0f, -38.0f, 0.0f),
             [this](StringW value) {
                 DownloadSongsSearchViewController::SearchQuery = static_cast<std::string>(value);
+                SetPage(0);
                 Search();
             }
         );
@@ -557,8 +612,11 @@ void DownloadSongsSearchViewController::DidActivate(bool firstActivation, bool a
 
         pageIncrement = CreateIncrementSetting(get_transform(), "", 0, 1, DownloadSongsSearchViewController::searchPage + 1, true, false, 1, 0, UnityEngine::Vector2(-60.0f, -72.0f),
             [this](float newValue){
-                if(newValue - 1 != DownloadSongsSearchViewController::searchPage) {
-                    DownloadSongsSearchViewController::searchPage = newValue - 1;
+                int page = std::max(0, static_cast<int>(newValue) - 1);
+                if (lastSearchPage >= 0) page = std::min(page, lastSearchPage);
+                pageIncrement->set_Value(page + 1);
+                if(page != DownloadSongsSearchViewController::searchPage) {
+                    DownloadSongsSearchViewController::searchPage = page;
                     Search();
                 }
             }

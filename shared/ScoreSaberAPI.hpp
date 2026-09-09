@@ -173,7 +173,7 @@ namespace ScoreSaber::API {
     /// <param name="unique">If return value should contain each leaderboard only once or not default: std::nullopt</param>
     /// <param name="pageIndex">Index of the pages search results default: 0</param>
     /// <param name="amount">Amount of Songs to get default: 20</param>
-    SONGDOWNLOADER_EXPORT void SearchAsync(std::string query, ListCategory list, std::function<void(std::optional<ScoreSaber::Leaderboards>)> finished, std::optional<bool> ranked =  std::nullopt, std::optional<bool> qualified = std::nullopt, std::optional<bool> unique = std::nullopt, int pageIndex = 1);
+    SONGDOWNLOADER_EXPORT void SearchAsync(std::string query, ListCategory list, std::function<void(std::optional<ScoreSaber::Leaderboards>)> finished, std::optional<bool> ranked =  std::nullopt, std::optional<bool> qualified = std::nullopt, std::optional<bool> unique = std::nullopt, int pageIndex = 0);
 
     /// <summary>
     /// Gets CoverImage from ScoreSaber song

@@ -91,12 +91,16 @@ public:
     static void Search();
 
     static void SetPage(int page);
+    bool UpdatePagination(const BeatSaver::Page& page);
+    bool UpdatePagination(const ScoreSaber::Leaderboards& page);
+    bool UpdatePagination(std::size_t resultCount, std::optional<int> pageCount);
     void GoToSong(SongDownloader::SearchEntry entry);
     void EnterSolo(GlobalNamespace::BeatmapLevel* level);
 
     static int searchIndex;
 
     static int searchPage;
+    static int lastSearchPage;
 
     static std::string SearchQuery;
 

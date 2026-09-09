@@ -13,7 +13,7 @@
 
 #define BASE_URL "https://scoresaber.com"
 #define API_URL_DEPRECATED BASE_URL "/api.php?function=get-leaderboards"
-#define API_URL BASE_URL "/api"
+#define API_URL BASE_URL "/api/v1"
 #define API_LEADERBOARD API_URL "/leaderboards"
 #define FILE_DOWNLOAD_TIMEOUT 64
 
@@ -97,6 +97,7 @@ namespace ScoreSaber::API {
         requeststream << API_LEADERBOARD;
         requeststream << fmt::format("?category={}", static_cast<int>(list));
         requeststream << fmt::format("&page={}", ++pageIndex);
+        requeststream << "&withMetadata=true";
         if (ranked.has_value()) requeststream << fmt::format("&ranked={}", ranked.value());
         if (qualified.has_value()) requeststream << fmt::format("&qualified={}", qualified.value());
         if (unique.has_value()) requeststream << fmt::format("&unique={}", unique.value());
@@ -256,6 +257,7 @@ namespace ScoreSaber::API {
         requeststream << API_LEADERBOARD;
         requeststream << fmt::format("?category={}", static_cast<int>(list));
         requeststream << fmt::format("&page={}", ++pageIndex);
+        requeststream << "&withMetadata=true";
         if (ranked.has_value()) requeststream << fmt::format("&ranked={}", ranked.value());
         if (qualified.has_value()) requeststream << fmt::format("&qualified={}", qualified.value());
         if (unique.has_value()) requeststream << fmt::format("&unique={}", unique.value());
@@ -325,6 +327,7 @@ namespace ScoreSaber::API {
         requeststream << API_LEADERBOARD;
         requeststream << fmt::format("?category={}", static_cast<int>(list));
         requeststream << fmt::format("&page={}", ++pageIndex);
+        requeststream << "&withMetadata=true";
         if (!query.empty()) requeststream << fmt::format("&search={}", query);
         if (ranked.has_value()) requeststream << fmt::format("&ranked={}", ranked.value());
         if (qualified.has_value()) requeststream << fmt::format("&qualified={}", qualified.value());

@@ -21,18 +21,25 @@ namespace ScoreSaber {
         GETTER_VALUE(std::string, LevelAuthorName, "levelAuthorName");
         GETTER_VALUE(Difficulty_t, Difficulty, "difficulty");
         GETTER_VALUE(int, MaxScore, "maxScore");
+        GETTER_VALUE_OPTIONAL(int, MaxScoreEx, "maxScoreEx");
         GETTER_VALUE(std::string, CreatedDate, "createdDate");
-        GETTER_VALUE_OPTIONAL(int, RankedDate, "rankedDate");
-        GETTER_VALUE_OPTIONAL(int, QualifiedDate, "qualifiedDate");
-        GETTER_VALUE_OPTIONAL(int, LovedDate, "lovedDate");
+        GETTER_VALUE_OPTIONAL(std::string, RankedDate, "rankedDate");
+        GETTER_VALUE_OPTIONAL(std::string, QualifiedDate, "qualifiedDate");
+        GETTER_VALUE_OPTIONAL(std::string, LovedDate, "lovedDate");
         GETTER_VALUE(bool, Ranked, "ranked");
         GETTER_VALUE(bool, Qualified, "qualified");
         GETTER_VALUE(bool, Loved, "loved");
-        GETTER_VALUE(int, MaxPP, "maxPP");
         private:
+            using MaxPPTypes = TypeOptions<float, int>;
+            NAMED_VALUE(MaxPPTypes, MaxPP, "maxPP");
             using StarsTypes = TypeOptions<float, int>;
             NAMED_VALUE(StarsTypes, Stars, "stars");
         public:
+            float GetMaxPP() const {
+                if (auto value = MaxPP.GetValue<float>())
+                    return *value;
+                return *MaxPP.GetValue<int>();
+            }
             float GetStars() const {
                 if(auto flt = Stars.GetValue<float>())
                     return *flt;
@@ -43,7 +50,7 @@ namespace ScoreSaber {
         GETTER_VALUE(bool, PositiveModifiers, "positiveModifiers");
         //GETTER_VALUE_OPTIONAL(PlayerScore, playerScore, Int, "int");
         GETTER_VALUE(std::string, CoverImage, "coverImage");
-        //GETTER_VALUE_OPTIONAL(Difficulties, difficulties, );
+        GETTER_VALUE_OPTIONAL(std::vector<Difficulty_t>, Difficulties, "difficulties");
         inline void GetCoverImageAsync(std::function<void(std::vector<uint8_t>)> finished, std::function<void(float)> progressUpdate = nullptr) {
             ScoreSaber::API::GetCoverImageAsync(*this, finished, progressUpdate);
         }
