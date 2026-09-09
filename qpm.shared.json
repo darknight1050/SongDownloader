@@ -73,7 +73,7 @@
       },
       {
         "id": "playlistcore",
-        "versionRange": "^1.6.0",
+        "versionRange": "^1.7.0",
         "additionalData": {}
       },
       {
@@ -153,20 +153,6 @@
         }
       },
       "version": "4500.1.0"
-    },
-    {
-      "dependency": {
-        "id": "metacore-bs",
-        "versionRange": "=1.0.0",
-        "additionalData": {
-          "soLink": "https://github.com/Metalit/MetaCoreBS/releases/download/v1.0.0/libmetacore-bs.so",
-          "overrideSoName": "libmetacore-bs.so",
-          "modLink": "https://github.com/Metalit/MetaCoreBS/releases/download/v1.0.0/MetaCoreBS.qmod",
-          "branchName": "version/v1_0_0",
-          "cmake": true
-        }
-      },
-      "version": "1.0.0"
     },
     {
       "dependency": {
@@ -328,16 +314,16 @@
     {
       "dependency": {
         "id": "playlistcore",
-        "versionRange": "=1.6.0",
+        "versionRange": "=1.7.0",
         "additionalData": {
-          "soLink": "https://github.com/Metalit/PlaylistCore/releases/download/v1.6.0/libplaylistcore.so",
+          "soLink": "https://github.com/Metalit/PlaylistCore/releases/download/v1.7.0/libplaylistcore.so",
           "overrideSoName": "libplaylistcore.so",
-          "modLink": "https://github.com/Metalit/PlaylistCore/releases/download/v1.6.0/PlaylistCore.qmod",
-          "branchName": "version/v1_6_0",
+          "modLink": "https://github.com/Metalit/PlaylistCore/releases/download/v1.7.0/PlaylistCore.qmod",
+          "branchName": "version/v1_7_0",
           "cmake": true
         }
       },
-      "version": "1.6.0"
+      "version": "1.7.0"
     },
     {
       "dependency": {
