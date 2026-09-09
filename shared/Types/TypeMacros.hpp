@@ -1,4 +1,5 @@
 #pragma once
+#include <vector>
 #include "rapidjson-macros/shared/macros.hpp"
 
 #include "../Exceptions.hpp"

@@ -1,4 +1,6 @@
 #include "Utils/FileUtils.hpp"
+#include <algorithm>
+#include <iterator>
 
 namespace FileUtils {
 

@@ -17,17 +17,9 @@ if ($help -eq $true) {
 
 $mod = "./mod.json"
 
-if (-not (Test-Path -Path $mod)) {
-    if (Test-Path -Path ".\mod.template.json") {
-        & qpm qmod build
-        if ($LASTEXITCODE -ne 0) {
-            exit $LASTEXITCODE
-        }
-    }
-    else {
-        Write-Output "Error: mod.json and mod.template.json were not present"
-        exit 1
-    }
+& qpm qmod build
+if ($LASTEXITCODE -ne 0) {
+    exit $LASTEXITCODE
 }
 
 $modJson = Get-Content $mod -Raw | ConvertFrom-Json
@@ -82,5 +74,5 @@ foreach ($lib in $modJson.libraryFiles) {
 $zip = $qmodName + ".zip"
 $qmod = $qmodName + ".qmod"
 
-Compress-Archive -Path $filelist -DestinationPath $zip -Update
-Move-Item $zip $qmod -Force
+Compress-Archive -Path $filelist -DestinationPath $zip -Force -ErrorAction Stop
+Move-Item -LiteralPath $zip -Destination $qmod -Force -ErrorAction Stop

@@ -30,6 +30,7 @@
 
 #include <iomanip>
 #include <sstream>
+#include <stdexcept>
 #include <string>
 #include <vector>
 
@@ -70,10 +71,15 @@ void DownloadSongsSearchViewController::CreateEntries(Transform* parent) {
         levelBarLayoutElement->set_minHeight(15.0f);
         levelBarLayoutElement->set_minWidth(90.0f);
 
-        GameObject* existingLevelBar = Resources::FindObjectsOfTypeAll<LevelBar*>()->First(
+        auto levelBars = Resources::FindObjectsOfTypeAll<LevelBar*>();
+        auto levelBarIt = levelBars.find_if(
             [](LevelBar* x) {
                 return x->get_name() == "LevelBarBig";
-            })->get_gameObject();
+            });
+        if (levelBarIt == levelBars.end()) {
+            throw std::runtime_error("LevelBarBig prefab was not found");
+        }
+        GameObject* existingLevelBar = (*levelBarIt)->get_gameObject();
         GameObject* levelBarGameObject = UnityEngine::GameObject::Instantiate(existingLevelBar, levelBarLayout->get_transform());
         auto levelBarTransform = levelBarGameObject->get_transform();
 
@@ -127,7 +133,7 @@ void DownloadSongsSearchViewController::CreateEntries(Transform* parent) {
                             if (!error) {
                                 if (auto playlist = DownloadSongsPlaylistViewController::GetSelectedPlaylist()) {
                                     auto& json = playlist->playlistJSON;
-                                    json.Songs.emplace_back().Hash = hash;
+                                    json.songs.emplace_back().hash = hash;
                                     playlist->Save();
                                     PlaylistCore::MarkPlaylistForReload(playlist);
                                 }
@@ -158,7 +164,7 @@ void DownloadSongsSearchViewController::CreateEntries(Transform* parent) {
                             if (!error) {
                                 if (auto playlist = DownloadSongsPlaylistViewController::GetSelectedPlaylist()) {
                                     auto& json = playlist->playlistJSON;
-                                    json.Songs.emplace_back().Hash = hash;
+                                    json.songs.emplace_back().hash = hash;
                                     playlist->Save();
                                     PlaylistCore::MarkPlaylistForReload(playlist);
                                 }
@@ -551,7 +557,7 @@ void DownloadSongsSearchViewController::DidActivate(bool firstActivation, bool a
         Object::Destroy(pageIncrement->GetComponentInChildren<LayoutElement*>());
 
         // LoadingControl has to be added after the ScrollView, as otherwise it will be behind it and the RefreshButton unselectable
-        GameObject* existingLoadingControl = Resources::FindObjectsOfTypeAll<LoadingControl*>()->First()->get_gameObject();
+        GameObject* existingLoadingControl = Resources::FindObjectsOfTypeAll<LoadingControl*>().at(0)->get_gameObject();
         GameObject* loadingControlGameObject = UnityEngine::GameObject::Instantiate(existingLoadingControl, get_transform());
         auto loadingControlTransform = loadingControlGameObject->get_transform();
         loadingControlTransform->set_localPosition(Vector3(0.f, 0.0f, 0.0f));
@@ -637,7 +643,7 @@ void DownloadSongsSearchViewController::EnterSolo(GlobalNamespace::BeatmapLevel*
         LOG_DEBUG("No CustomLevelsPack found!");
         return;
     }
-    if (customLevelsPack->_beatmapLevels->get_Length() == 0) {
+    if (customLevelsPack->_beatmapLevels.empty()) {
         LOG_DEBUG("No levels in CustomLevelsPack!");
         return;
     }

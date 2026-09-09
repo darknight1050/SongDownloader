@@ -37,9 +37,9 @@ void DownloadSongsFlowCoordinator::Close(bool immediately) {
 }
 
 void DownloadSongsFlowCoordinator::GoToSongSelect() {
-    SafePtrUnity<UnityEngine::GameObject> songSelectButton = UnityEngine::GameObject::Find(il2cpp_utils::newcsstr("SoloButton")).unsafePtr();
+    auto songSelectButton = UnityEngine::GameObject::Find("SoloButton");
     if (!songSelectButton) {
-        songSelectButton = UnityEngine::GameObject::Find(il2cpp_utils::newcsstr("Wrapper/BeatmapWithModifiers/BeatmapSelection/EditButton"));
+        songSelectButton = UnityEngine::GameObject::Find("Wrapper/BeatmapWithModifiers/BeatmapSelection/EditButton");
     }
     if (!songSelectButton) {
         return;

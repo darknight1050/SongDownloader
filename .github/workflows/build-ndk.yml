@@ -43,11 +43,6 @@ jobs:
 
       - uses: seanmiddleditch/gha-setup-ninja@v3
 
-      - name: Create ndkpath.txt
-        run: |
-          echo $ANDROID_NDK_HOME > ${GITHUB_WORKSPACE}/ndkpath.txt
-          cat ${GITHUB_WORKSPACE}/ndkpath.txt
-
       # get version from pushed tag
       - name: Extract version
         if: startsWith(github.ref, 'refs/tags/v')
@@ -63,6 +58,7 @@ jobs:
         with:
           workflow_token: ${{ secrets.GITHUB_TOKEN }}
           restore: true
+          resolve_ndk: true
           cache: true
           publish: false
 
@@ -73,6 +69,7 @@ jobs:
         with:
           workflow_token: ${{ secrets.GITHUB_TOKEN }}
           restore: true
+          resolve_ndk: true
           cache: true
           publish: true
           publish_token: ${{ secrets.QPM_PUBLISH_KEY }}

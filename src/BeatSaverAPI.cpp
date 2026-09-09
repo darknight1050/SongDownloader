@@ -512,7 +512,7 @@ namespace BeatSaver::API {
         // track actual downloads
         auto downloads = new std::atomic_int(0);
         // add all nonpresent song hashes to queue
-        for(auto& song : playlist->playlistJSON.Songs) {
+        for(auto& song : playlist->playlistJSON.songs) {
             bool hasSong = false;
             // search in songs in playlist instead of all songs
             // we need to treat the list as an array because it is initialized as an array elsewhere
@@ -522,13 +522,13 @@ namespace BeatSaver::API {
                 if(hash.starts_with("custom_level")) {
                     hash = hash.substr(13);
                 }
-                if(song.Hash == std::move(hash)) {
+                if(song.hash == std::move(hash)) {
                     hasSong = true;
                     break;
                 }
             }
-            if(!hasSong && song.Hash)
-                songQueue.emplace_back(song.Hash.value());
+            if(!hasSong && song.hash)
+                songQueue.emplace_back(song.hash.value());
         }
         // recursive (because threads) callback for each time a beatmap is recieved from beatsaver
         static void(*onBeatmap)(std::vector<std::string>, std::optional<Beatmap>, std::function<void()>, std::function<void(int, int)>, int, std::atomic_int*)

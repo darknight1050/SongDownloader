@@ -42,7 +42,7 @@ void DownloadSongsPlaylistViewController::DidActivate(bool firstActivation, bool
         if (idx < loadedPlaylists.size())
             selectedPlaylist = loadedPlaylists[idx];
     });
-    list->setType(csTypeOf(PlaylistCore::CoverTableCell*));
+    list->setType(i2c::cs_type_of<PlaylistCore::CoverTableCell*>());
 
     RefreshPlaylistList();
 

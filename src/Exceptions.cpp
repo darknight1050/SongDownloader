@@ -1,4 +1,4 @@
-#include "beatsaber-hook/shared/utils/utils-functions.h"
+#include "fmt/format.h"
 #include "Exceptions.hpp"
 
 namespace SongDownloader {

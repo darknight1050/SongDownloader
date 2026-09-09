@@ -1,6 +1,6 @@
 #pragma once
 
-#include "beatsaber-hook/shared/utils/utils.h"
+#include "beatsaber-hook/shared/utils.hpp"
 #include "paper2_scotland2/shared/logger.hpp"
 
 //#define LOG_INFO(value...)

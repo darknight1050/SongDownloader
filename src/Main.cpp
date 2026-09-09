@@ -1,4 +1,4 @@
-#include "beatsaber-hook/shared/utils/il2cpp-utils.hpp"
+#include "beatsaber-hook/shared/api.hpp"
 #include "_config.h"
 
 #include "custom-types/shared/register.hpp"
@@ -26,7 +26,7 @@ SONGDOWNLOADER_EXPORT_FUNC void setup(CModInfo* info) {
 
 SONGDOWNLOADER_EXPORT_FUNC void late_load() {
     LOG_INFO("Starting SongDownloader installation...");
-    il2cpp_functions::Init();
+    i2c::functions::initialize();
     BSML::Init();
     custom_types::Register::AutoRegister();
     BSML::Register::RegisterMainMenu<SongDownloader::DownloadSongsFlowCoordinator*>("SongDownloader", "More Songs");

@@ -1,6 +1,6 @@
 {
   "$schema": "https://raw.githubusercontent.com/QuestPackageManager/QPM.Package/refs/heads/main/qpm.schema.json",
-  "version": "0.1.0",
+  "version": "0.4.0",
   "sharedDir": "shared",
   "dependenciesDir": "extern",
   "info": {
@@ -23,11 +23,10 @@
       ],
       "qmod": [
         "pwsh ./build.ps1 -clean",
-        "qpm qmod build",
         "pwsh ./createqmod.ps1 SongDownloader"
       ]
     },
-    "ndk": "^27.2.12479018",
+    "ndk": "^29.0.14206865",
     "qmodIncludeDirs": [
       "build",
       "extern/libs"
@@ -38,27 +37,27 @@
   "dependencies": [
     {
       "id": "beatsaber-hook",
-      "versionRange": "^6.4.2",
+      "versionRange": "^8.2.1",
       "additionalData": {}
     },
     {
       "id": "bs-cordl",
-      "versionRange": "4008.*",
+      "versionRange": "4500.*",
       "additionalData": {}
     },
     {
       "id": "bsml",
-      "versionRange": "^0.4.54",
+      "versionRange": "^0.5.8",
       "additionalData": {}
     },
     {
       "id": "config-utils",
-      "versionRange": "^2.0.3",
+      "versionRange": "^3.0.0",
       "additionalData": {}
     },
     {
       "id": "custom-types",
-      "versionRange": "^0.18.3",
+      "versionRange": "^0.20.1",
       "additionalData": {}
     },
     {
@@ -68,22 +67,27 @@
     },
     {
       "id": "paper2_scotland2",
-      "versionRange": "^4.6.4",
+      "versionRange": "^4.8.0",
       "additionalData": {}
     },
     {
       "id": "playlistcore",
-      "versionRange": "^1.5.3",
+      "versionRange": "^1.6.0",
       "additionalData": {}
     },
     {
       "id": "rapidjson-macros",
-      "versionRange": "^2.1.0",
+      "versionRange": "^3.0.0",
+      "additionalData": {}
+    },
+    {
+      "id": "reflectcpp",
+      "versionRange": "^0.25.0",
       "additionalData": {}
     },
     {
       "id": "scotland2",
-      "versionRange": "^0.1.6",
+      "versionRange": "^0.1.7",
       "additionalData": {
         "includeQmod": false,
         "private": true
@@ -91,7 +95,7 @@
     },
     {
       "id": "songcore",
-      "versionRange": "^1.1.23",
+      "versionRange": "^1.3.2",
       "additionalData": {}
     }
   ]
