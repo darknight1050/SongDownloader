@@ -3,6 +3,7 @@
 #include "bsml/shared/BSML/MainThreadScheduler.hpp"
 #include "bsml/shared/BSML-Lite/Creation/Image.hpp"
 #include "CustomLogger.hpp"
+#include "UnityEngine/Texture2D.hpp"
 
 using namespace UnityEngine;
 using namespace UnityEngine::UI;
@@ -11,6 +12,38 @@ using namespace TMPro;
 using namespace SongDownloader;
 
 SearchEntry::SearchEntry(GameObject* _gameObject, TextMeshProUGUI* _line1Component, TextMeshProUGUI* _line2Component, HMUI::ImageView* _coverImageView, Button* _downloadButton) : gameObject(_gameObject), line1Component(_line1Component), line2Component(_line2Component), coverImageView(_coverImageView), downloadButton(_downloadButton) {
+}
+
+void SearchEntry::ClearCover() {
+    ++coverRequest;
+    // The initial artwork belongs to the cloned game UI; release only images
+    // this row created from a download.
+    if (!ownedCover) return;
+    if (UnityW<HMUI::ImageView>(coverImageView)) coverImageView->set_sprite(nullptr);
+    auto texture = ownedCover->get_texture();
+    Object::Destroy(ownedCover.ptr());
+    if (texture) Object::Destroy(texture);
+    ownedCover = nullptr;
+}
+
+void SearchEntry::ApplyCoverImage(std::vector<uint8_t> const& bytes) {
+    if (bytes.empty()) return;
+    ArrayW<uint8_t> spriteArray(bytes);
+    auto sprite = ArrayToSprite(spriteArray);
+    if (!sprite) return;
+    ClearCover();
+    ownedCover = sprite;
+    coverImageView->set_sprite(sprite);
+    coverImageView->set_enabled(true);
+}
+
+void DownloadSongsSearchViewController::OnDestroy() {
+    for (auto& row : searchEntries) row.ClearCover();
+    // Resolve the base metadata directly: the generated virtual wrapper would
+    // dispatch back to this override.
+    cordl_internals::RunMethodRethrow<void>(
+        static_cast<HMUI::ViewController*>(this),
+        i2c::metadata_getter<&HMUI::ViewController::OnDestroy>::method_info());
 }
 
 #pragma region Map/Song Getters
@@ -69,21 +102,16 @@ void SearchEntry::SetBeatmap(const BeatSaver::Beatmap& _map) {
 
     int currentSearchIndex = DownloadSongsSearchViewController::searchIndex;
 
+    ClearCover();
     coverImageView->set_enabled(false);
-    BeatSaver::API::GetCoverImageAsync(map, [this, currentSearchIndex](std::vector<uint8_t> bytes) {
-        if (currentSearchIndex == DownloadSongsSearchViewController::searchIndex) {
-            BSML::MainThreadScheduler::Schedule([this, currentSearchIndex, bytes] {
-                if (currentSearchIndex == DownloadSongsSearchViewController::searchIndex) {
-                    std::vector<uint8_t> data = bytes;
-
-                    ArrayW<uint8_t> spriteArray(data);
-                    Sprite* sprite = ArrayToSprite(spriteArray);
-                    coverImageView->set_sprite(sprite);
-                    coverImageView->set_enabled(true);
-                }
-                });
-        }
+    const auto request = coverRequest;
+    UnityW<GameObject> owner = gameObject;
+    BeatSaver::API::GetCoverImageAsync(map, [this, owner, request, currentSearchIndex](std::vector<uint8_t> bytes) {
+        BSML::MainThreadScheduler::Schedule([this, owner, request, currentSearchIndex, bytes = std::move(bytes)] {
+            if (owner && request == coverRequest && currentSearchIndex == DownloadSongsSearchViewController::searchIndex)
+                ApplyCoverImage(bytes);
         });
+    });
     UpdateDownloadProgress(true);
 }
 
@@ -144,21 +172,16 @@ void SearchEntry::SetBeatmap(const ScoreSaber::Leaderboard& _song) {
 
     int currentSearchIndex = DownloadSongsSearchViewController::searchIndex;
 
+    ClearCover();
     coverImageView->set_enabled(false);
-    ScoreSaber::API::GetCoverImageAsync(SSsong, [this, currentSearchIndex](std::vector<uint8_t> bytes) {
-        if (currentSearchIndex == DownloadSongsSearchViewController::searchIndex) {
-            BSML::MainThreadScheduler::Schedule([this, currentSearchIndex, bytes] {
-                if (currentSearchIndex == DownloadSongsSearchViewController::searchIndex) {
-                    std::vector<uint8_t> data = bytes;
-
-                    ArrayW<uint8_t> spriteArray(data);
-                    Sprite* sprite = ArrayToSprite(spriteArray);
-                    coverImageView->set_sprite(sprite);
-                    coverImageView->set_enabled(true);
-                }
-                });
-        }
+    const auto request = coverRequest;
+    UnityW<GameObject> owner = gameObject;
+    ScoreSaber::API::GetCoverImageAsync(SSsong, [this, owner, request, currentSearchIndex](std::vector<uint8_t> bytes) {
+        BSML::MainThreadScheduler::Schedule([this, owner, request, currentSearchIndex, bytes = std::move(bytes)] {
+            if (owner && request == coverRequest && currentSearchIndex == DownloadSongsSearchViewController::searchIndex)
+                ApplyCoverImage(bytes);
         });
+    });
     UpdateDownloadProgress(true);
 }
 
@@ -218,6 +241,7 @@ void SearchEntry::UpdateDownloadProgress(bool checkLoaded) {
 }
 
 void SearchEntry::Disable() {
+    ClearCover();
     gameObject->SetActive(false);
 }
 

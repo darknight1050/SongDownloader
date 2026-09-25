@@ -24,6 +24,7 @@
 #include "bsml/shared/BSML.hpp"
 #include "bsml/shared/BSML/MainThreadScheduler.hpp"
 
+#include <cstdint>
 #include <vector>
 
 #define MAX_SPRITES 150
@@ -34,11 +35,15 @@ namespace SongDownloader {
     class SearchEntry {
         BeatSaver::Beatmap map;
         ScoreSaber::Leaderboard SSsong;
-        UnityEngine::GameObject* gameObject;
+        UnityEngine::GameObject* gameObject = nullptr;
         TMPro::TextMeshProUGUI* line1Component;
         TMPro::TextMeshProUGUI* line2Component;
-        HMUI::ImageView* coverImageView;
+        HMUI::ImageView* coverImageView = nullptr;
         UnityEngine::UI::Button* downloadButton;
+        UnityW<UnityEngine::Sprite> ownedCover;
+        uint64_t coverRequest = 0;
+
+        void ApplyCoverImage(std::vector<uint8_t> const& bytes);
 
     public:
         enum class MapType {
@@ -77,6 +82,8 @@ namespace SongDownloader {
 
         void Disable();
 
+        void ClearCover();
+
         bool IsEnabled();
     };
 
@@ -107,6 +114,8 @@ public:
     SearchEntry searchEntries[ENTRIES_PER_PAGE];
 
     DECLARE_OVERRIDE_METHOD_MATCH(void, DidActivate, &HMUI::ViewController::DidActivate, bool firstActivation, bool addedToHierarchy, bool screenSystemEnabling);
+
+    DECLARE_OVERRIDE_METHOD_MATCH(void, OnDestroy, &HMUI::ViewController::OnDestroy);
 
     DECLARE_INSTANCE_FIELD(GlobalNamespace::LoadingControl*, loadingControl);
 
