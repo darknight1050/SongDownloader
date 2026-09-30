@@ -322,16 +322,15 @@ void DownloadSongsSearchViewController::SearchUser(int currentSearchIndex) {
 }
 
 void DownloadSongsSearchViewController::GetTrending(int currentSearchIndex) {
-    ScoreSaber::API::SearchAsync(DownloadSongsSearchViewController::SearchQuery, ScoreSaber::API::ListCategory::TopRanked,
-    //ScoreSaber::API::GetTrendingAsync(
-        [this, currentSearchIndex](std::optional<ScoreSaber::Leaderboards> page) {
+    ScoreSaber::API::SearchAsync(DownloadSongsSearchViewController::SearchQuery, ScoreSaber::API::ListCategory::Trending,
+        [this, currentSearchIndex](std::optional<ScoreSaber::Maps> page) {
             if (currentSearchIndex == DownloadSongsSearchViewController::searchIndex) {
                 BSML::MainThreadScheduler::Schedule(
                     [this, currentSearchIndex, page] {
                         if (currentSearchIndex == DownloadSongsSearchViewController::searchIndex) {
                             if (page && UpdatePagination(*page)) return;
-                            if (page.has_value() && !page.value().GetLeaderboards().empty()) {
-                                auto songs = page.value().GetLeaderboards();
+                            if (page.has_value() && !page.value().GetData().empty()) {
+                                auto songs = page.value().GetData();
                                 auto songsSize = songs.size();
                                 int songIndex = 0;
                                 for (int i = 0; i < ENTRIES_PER_PAGE; i++) {
@@ -362,15 +361,14 @@ void DownloadSongsSearchViewController::GetTrending(int currentSearchIndex) {
 
 void DownloadSongsSearchViewController::GetLatestRanked(int currentSearchIndex) {
     ScoreSaber::API::SearchAsync(DownloadSongsSearchViewController::SearchQuery, ScoreSaber::API::ListCategory::LatestRanked,
-    //ScoreSaber::API::SearchSSAsync(DownloadSongsSearchViewController::SearchQuery, ScoreSaber::API::SearchType::LatestRanked,
-        [this, currentSearchIndex](std::optional<ScoreSaber::Leaderboards> page) {
+        [this, currentSearchIndex](std::optional<ScoreSaber::Maps> page) {
             if (currentSearchIndex == DownloadSongsSearchViewController::searchIndex) {
                 BSML::MainThreadScheduler::Schedule(
                     [this, currentSearchIndex, page] {
                         if (currentSearchIndex == DownloadSongsSearchViewController::searchIndex) {
                             if (page && UpdatePagination(*page)) return;
-                            if (page.has_value() && !page.value().GetLeaderboards().empty()) {
-                                auto songs = page.value().GetLeaderboards();
+                            if (page.has_value() && !page.value().GetData().empty()) {
+                                auto songs = page.value().GetData();
                                 auto songsSize = songs.size();
                                 int songIndex = 0;
                                 for (int i = 0; i < ENTRIES_PER_PAGE; i++) {
@@ -400,16 +398,15 @@ void DownloadSongsSearchViewController::GetLatestRanked(int currentSearchIndex) 
 }
 
 void DownloadSongsSearchViewController::GetTopPlayed(int currentSearchIndex) {
-    ScoreSaber::API::GetListAsync(ScoreSaber::API::ListCategory::TopPlayed, /*)
-    ScoreSaber::API::SearchSSAsync(DownloadSongsSearchViewController::SearchQuery, ScoreSaber::API::SearchType::TopPlayed,*/
-        [this, currentSearchIndex](std::optional<ScoreSaber::Leaderboards> page) {
+    ScoreSaber::API::SearchAsync(DownloadSongsSearchViewController::SearchQuery, ScoreSaber::API::ListCategory::TopPlayed,
+        [this, currentSearchIndex](std::optional<ScoreSaber::Maps> page) {
             if (currentSearchIndex == DownloadSongsSearchViewController::searchIndex) {
                 BSML::MainThreadScheduler::Schedule(
                     [this, currentSearchIndex, page] {
                         if (currentSearchIndex == DownloadSongsSearchViewController::searchIndex) {
                             if (page && UpdatePagination(*page)) return;
-                            if (page.has_value() && !page.value().GetLeaderboards().empty()) {
-                                auto songs = page.value().GetLeaderboards();
+                            if (page.has_value() && !page.value().GetData().empty()) {
+                                auto songs = page.value().GetData();
                                 auto songsSize = songs.size();
                                 int songIndex = 0;
                                 for (int i = 0; i < ENTRIES_PER_PAGE; i++) {
@@ -440,15 +437,14 @@ void DownloadSongsSearchViewController::GetTopPlayed(int currentSearchIndex) {
 
 void DownloadSongsSearchViewController::GetTopRanked(int currentSearchIndex) {
     ScoreSaber::API::SearchAsync(DownloadSongsSearchViewController::SearchQuery, ScoreSaber::API::ListCategory::TopRanked,
-    //ScoreSaber::API::SearchSSAsync(DownloadSongsSearchViewController::SearchQuery, ScoreSaber::API::SearchType::TopRanked,
-        [this, currentSearchIndex](std::optional<ScoreSaber::Leaderboards> page) {
+        [this, currentSearchIndex](std::optional<ScoreSaber::Maps> page) {
             if (currentSearchIndex == DownloadSongsSearchViewController::searchIndex) {
                 BSML::MainThreadScheduler::Schedule(
                     [this, currentSearchIndex, page] {
                         if (currentSearchIndex == DownloadSongsSearchViewController::searchIndex) {
                             if (page && UpdatePagination(*page)) return;
-                            if (page.has_value() && !page.value().GetLeaderboards().empty()) {
-                                auto songs = page.value().GetLeaderboards();
+                            if (page.has_value() && !page.value().GetData().empty()) {
+                                auto songs = page.value().GetData();
                                 auto songsSize = songs.size();
                                 int songIndex = 0;
                                 for (int i = 0; i < ENTRIES_PER_PAGE; i++) {
@@ -516,7 +512,6 @@ void DownloadSongsSearchViewController::Search() {
             searchViewController->GetLatestRanked(currentSearchIndex);
         }
         else if (getModConfig().ListType_ScoreSaber.GetValue() == "Top Played") {
-            searchViewController->SearchField->get_gameObject()->SetActive(false);
             searchViewController->GetTopPlayed(currentSearchIndex);
         }
         else if (getModConfig().ListType_ScoreSaber.GetValue() == "Top Ranked") {
@@ -545,14 +540,8 @@ bool DownloadSongsSearchViewController::UpdatePagination(const BeatSaver::Page& 
     return UpdatePagination(page.GetDocs().size(), info ? std::optional<int>(info->GetPages()) : std::nullopt);
 }
 
-bool DownloadSongsSearchViewController::UpdatePagination(const ScoreSaber::Leaderboards& page) {
-    const auto metadata = page.GetMetadata();
-    std::optional<int> pageCount;
-    if (metadata && metadata->GetItemsPerPage() > 0) {
-        const auto total = metadata->GetTotal();
-        pageCount = total == 0 ? 0 : static_cast<int>((total - 1) / metadata->GetItemsPerPage()) + 1;
-    }
-    return UpdatePagination(page.GetLeaderboards().size(), pageCount);
+bool DownloadSongsSearchViewController::UpdatePagination(const ScoreSaber::Maps& page) {
+    return UpdatePagination(page.GetData().size(), page.GetMetadata().GetTotalPages());
 }
 
 bool DownloadSongsSearchViewController::UpdatePagination(std::size_t resultCount, std::optional<int> pageCount) {

@@ -62,7 +62,6 @@ void DownloadSongsOptionsViewController::DidActivate(bool firstActivation, bool 
                     NEdropdown->get_gameObject()->SetActive(false);
                     MEdropdown->get_gameObject()->SetActive(false);
                     Chroma->get_gameObject()->SetActive(false);
-                    Ranked->get_gameObject()->SetActive(false);
                 }
                 else {
                     ListType_ScoreSaber->get_transform()->GetParent()->get_gameObject()->SetActive(false);

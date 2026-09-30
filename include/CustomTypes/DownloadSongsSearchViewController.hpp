@@ -14,7 +14,7 @@
 #include "GlobalNamespace/SoloFreePlayFlowCoordinator.hpp"
 #include "Types/BeatSaver/Page.hpp"
 #include "Types/ScoreSaber/Page.hpp"
-#include "Types/ScoreSaber/Leaderboards.hpp"
+#include "Types/ScoreSaber/Maps.hpp"
 
 #include "songcore/shared/SongCore.hpp"
 
@@ -33,7 +33,7 @@
 namespace SongDownloader {
     class SearchEntry {
         BeatSaver::Beatmap map;
-        ScoreSaber::Leaderboard SSsong;
+        ScoreSaber::Map SSsong;
         UnityEngine::GameObject* gameObject;
         TMPro::TextMeshProUGUI* line1Component;
         TMPro::TextMeshProUGUI* line2Component;
@@ -63,13 +63,13 @@ namespace SongDownloader {
 
         const BeatSaver::Beatmap& GetBeatmap();
 
-        const ScoreSaber::Leaderboard& GetSongScoreSaber();
+        const ScoreSaber::Map& GetSongScoreSaber();
 
         MapType MapType;
 
         void SetBeatmap(const BeatSaver::Beatmap& _map);
 
-        void SetBeatmap(const ScoreSaber::Leaderboard& _song);
+        void SetBeatmap(const ScoreSaber::Map& _song);
 
         void UpdateDownloadProgress(bool checkLoaded);
 
@@ -92,7 +92,7 @@ public:
 
     static void SetPage(int page);
     bool UpdatePagination(const BeatSaver::Page& page);
-    bool UpdatePagination(const ScoreSaber::Leaderboards& page);
+    bool UpdatePagination(const ScoreSaber::Maps& page);
     bool UpdatePagination(std::size_t resultCount, std::optional<int> pageCount);
     void GoToSong(SongDownloader::SearchEntry entry);
     void EnterSolo(GlobalNamespace::BeatmapLevel* level);

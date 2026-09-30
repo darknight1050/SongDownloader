@@ -19,7 +19,7 @@ const BeatSaver::Beatmap& SearchEntry::GetBeatmap() {
     return map;
 }
 
-const ScoreSaber::Leaderboard& SearchEntry::GetSongScoreSaber() {
+const ScoreSaber::Map& SearchEntry::GetSongScoreSaber() {
     return SSsong;
 }
 
@@ -123,7 +123,7 @@ void SearchEntry::SetBeatmap(const BeatSaver::Beatmap& _map) {
 //    UpdateDownloadProgress(true);
 //}
 
-void SearchEntry::SetBeatmap(const ScoreSaber::Leaderboard& _song) {
+void SearchEntry::SetBeatmap(const ScoreSaber::Map& _song) {
     SSsong = _song;
     gameObject->SetActive(true);
     MapType = SearchEntry::MapType::ScoreSaber;
@@ -146,6 +146,7 @@ void SearchEntry::SetBeatmap(const ScoreSaber::Leaderboard& _song) {
 
     coverImageView->set_enabled(false);
     ScoreSaber::API::GetCoverImageAsync(SSsong, [this, currentSearchIndex](std::vector<uint8_t> bytes) {
+        if (bytes.empty()) return;
         if (currentSearchIndex == DownloadSongsSearchViewController::searchIndex) {
             BSML::MainThreadScheduler::Schedule([this, currentSearchIndex, bytes] {
                 if (currentSearchIndex == DownloadSongsSearchViewController::searchIndex) {
@@ -171,7 +172,7 @@ std::string SearchEntry::GetSongHash() {
         hash = map.GetVersions().front().GetHash();
     }
     else {
-        hash = SSsong.GetSongHash();
+        hash = SSsong.GetHash();
     }
     std::transform(hash.begin(), hash.end(), hash.begin(), toupper);
 

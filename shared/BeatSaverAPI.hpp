@@ -5,7 +5,7 @@
 #include "Types/BeatSaver/Page.hpp"
 
 #include "Types/ScoreSaber/Page.hpp"
-#include "Types/ScoreSaber/Leaderboards.hpp"
+#include "Types/ScoreSaber/Maps.hpp"
 
 // avoid linking to playlistcore in headers
 namespace PlaylistCore {
@@ -95,16 +95,16 @@ namespace BeatSaver::API {
     /// <param name="song">ScoreSaber Song reference</param>
     /// <param name="finished">Function to run after finishing to download</param>
     /// <param name="progressUpdate">Function to run on updating download progress</param>
-    [[deprecated("Downloading with ScoreSaber::Song will not be supported in the future use ScoreSaber::Leaderboard!")]]
+    [[deprecated("Use the ScoreSaber::Map overload instead.")]]
     SONGDOWNLOADER_EXPORT void DownloadBeatmapAsync(const ScoreSaber::Song& song, std::function<void(bool)> finished, std::function<void(float)> progressUpdate = nullptr);
 
     /// <summary>
     /// For downloading maps gotten from the ScoreSaberAPI
     /// </summary>
-    /// <param name="ldb">ScoreSaber Leaderboard reference</param>
+    /// <param name="map">ScoreSaber v2 map reference</param>
     /// <param name="finished">Function to run after finishing to download</param>
     /// <param name="progressUpdate">Function to run on updating download progress</param>
-    SONGDOWNLOADER_EXPORT void DownloadBeatmapAsync(const ScoreSaber::Leaderboard& ldb, std::function<void(bool)> finished, std::function<void(float)> progressUpdate = nullptr);
+    SONGDOWNLOADER_EXPORT void DownloadBeatmapAsync(const ScoreSaber::Map& map, std::function<void(bool)> finished, std::function<void(float)> progressUpdate = nullptr);
 
     SONGDOWNLOADER_EXPORT void GetCoverImageAsync(const BeatSaver::Beatmap& beatmap, std::function<void(std::vector<uint8_t>)> finished, std::function<void(float)> progressUpdate = nullptr);
 

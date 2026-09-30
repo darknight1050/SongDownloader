@@ -3,23 +3,14 @@
 #include "CustomLogger.hpp"
 
 #include "Utils/WebUtils.hpp"
-#include "Utils/FileUtils.hpp"
-
-#include "zip.h"
-
-#include "songcore/shared/SongCore.hpp"
-
-#include "Exceptions.hpp"
+#include "Utils/ScoreSaberRequest.hpp"
+#include "Utils/ScoreSaberResponse.hpp"
 
 #define BASE_URL "https://scoresaber.com"
 #define API_URL_DEPRECATED BASE_URL "/api.php?function=get-leaderboards"
-#define API_URL BASE_URL "/api/v1"
-#define API_LEADERBOARD API_URL "/leaderboards"
 #define FILE_DOWNLOAD_TIMEOUT 64
 
 namespace ScoreSaber::API {
-
-    // TODO: Add search option
 
     std::string exception;
 
@@ -91,37 +82,28 @@ namespace ScoreSaber::API {
         }
     }
 
-    std::optional<ScoreSaber::Leaderboards> GetList(ListCategory list, std::optional<bool> ranked, std::optional<bool> qualified, std::optional<bool> unique, int pageIndex) {
+    std::optional<ScoreSaber::Maps> GetMaps(ListCategory list, std::optional<bool> ranked, std::optional<bool> qualified, std::optional<bool> unique, int pageIndex) {
         exception.clear();
-        std::stringstream requeststream;
-        requeststream << API_LEADERBOARD;
-        requeststream << fmt::format("?category={}", static_cast<int>(list));
-        requeststream << fmt::format("&page={}", ++pageIndex);
-        requeststream << "&withMetadata=true";
-        if (ranked.has_value()) requeststream << fmt::format("&ranked={}", ranked.value());
-        if (qualified.has_value()) requeststream << fmt::format("&qualified={}", qualified.value());
-        if (unique.has_value()) requeststream << fmt::format("&unique={}", unique.value());
-        auto requestURL = requeststream.str();
-        LOG_DEBUG("Request: {}", requestURL);
-        auto json = WebUtils::GetJSON(requestURL);
-        if (!json.has_value())
-            return std::nullopt;
-        if (json.value().IsObject() && json.value().HasMember("errorMessage") && json.value()["errorMessage"].IsString()) {
-            if (strcmp(json.value()["errorMessage"].GetString(), "Not Found") != 0) exception = json.value()["errorMessage"].GetString();
-            return std::nullopt;
-        }
         try {
-            ScoreSaber::Leaderboards page;
-            Leaderboards::Deserialize(&page, json.value());
-            return page;
-        }
-        catch (const std::exception& e) {
-            LOG_ERROR("{}", e.what());
+            auto url = Detail::MapsURL(list, {}, ranked, qualified, pageIndex);
+            LOG_DEBUG("Request: {}", url);
+            std::string data;
+            const auto httpCode = WebUtils::Get(url, data);
+            rapidjson::Document document;
+            document.Parse(data);
+            return Detail::ParseMapsResponse(httpCode, document.HasParseError(), document, exception);
+        } catch (const std::exception& e) {
             exception = e.what();
             return std::nullopt;
         }
     }
 
+    std::vector<uint8_t> GetCoverImage(const ScoreSaber::Map& map) {
+        std::string data;
+        const auto httpCode = WebUtils::Get(map.GetCoverUrl(), FILE_DOWNLOAD_TIMEOUT, data);
+        if (httpCode < 200 || httpCode >= 300) return {};
+        return {data.begin(), data.end()};
+    }
 
     std::vector<uint8_t> GetCoverImage(const ScoreSaber::Song& song) {
         std::string data;
@@ -251,46 +233,8 @@ namespace ScoreSaber::API {
         );
     }
 
-    void GetListAsync(ListCategory list, std::function<void(std::optional<ScoreSaber::Leaderboards>)> finished, std::optional<bool> ranked, std::optional<bool> qualified, std::optional<bool> unique, int pageIndex) {
-        exception.clear();
-        std::stringstream requeststream;
-        requeststream << API_LEADERBOARD;
-        requeststream << fmt::format("?category={}", static_cast<int>(list));
-        requeststream << fmt::format("&page={}", ++pageIndex);
-        requeststream << "&withMetadata=true";
-        if (ranked.has_value()) requeststream << fmt::format("&ranked={}", ranked.value());
-        if (qualified.has_value()) requeststream << fmt::format("&qualified={}", qualified.value());
-        if (unique.has_value()) requeststream << fmt::format("&unique={}", unique.value());
-        auto requestURL = requeststream.str();
-        LOG_DEBUG("Request: {}", requestURL);
-        WebUtils::GetJSONAsync(requestURL,
-            [finished](long httpCode, bool error, rapidjson::Document& document) {
-                if (error) {
-                    finished(std::nullopt);
-                }
-                else if (document.IsObject() && document.HasMember("errorMessage") && document["errorMessage"].IsString()) {
-                    if (strcmp(document["errorMessage"].GetString(), "Not Found") != 0) exception = document["errorMessage"].GetString();
-                    finished(std::nullopt);
-                }
-                else {
-                    try {
-                        ScoreSaber::Leaderboards page;
-                        Leaderboards::Deserialize(&page, document);
-                        finished(page);
-                    }
-                    catch (const std::exception& e) {
-                        LOG_ERROR("{}", e.what());
-                        exception = e.what();
-                        finished(std::nullopt);
-                        //// Convert the document into a string and log/write to file for debug purposes
-                        //rapidjson::StringBuffer buffer;
-                        //rapidjson::Writer<rapidjson::StringBuffer> writer(buffer);
-                        //document.Accept(writer);
-                        //writefile("/sdcard/ModData/GetBeatmapByHashAsync.json", buffer.GetString());
-                    }
-                }
-            }
-        );
+    void GetListAsync(ListCategory list, std::function<void(std::optional<ScoreSaber::Maps>)> finished, std::optional<bool> ranked, std::optional<bool> qualified, std::optional<bool> unique, int pageIndex) {
+        SearchAsync({}, list, finished, ranked, qualified, unique, pageIndex);
     }
 
     void SearchSSAsync(std::string query, SearchType list, std::function<void(std::optional<ScoreSaber::Page>)> finished, bool ranked, int pageIndex, int amount) {
@@ -321,46 +265,35 @@ namespace ScoreSaber::API {
         );
     }
 
-    void SearchAsync(std::string query, ListCategory list, std::function<void(std::optional<ScoreSaber::Leaderboards>)> finished, std::optional<bool> ranked, std::optional<bool> qualified, std::optional<bool> unique, int pageIndex) {
+    void SearchAsync(std::string query, ListCategory list, std::function<void(std::optional<ScoreSaber::Maps>)> finished, std::optional<bool> ranked, std::optional<bool> qualified, std::optional<bool> unique, int pageIndex) {
         exception.clear();
-        std::stringstream requeststream;
-        requeststream << API_LEADERBOARD;
-        requeststream << fmt::format("?category={}", static_cast<int>(list));
-        requeststream << fmt::format("&page={}", ++pageIndex);
-        requeststream << "&withMetadata=true";
-        if (!query.empty()) requeststream << fmt::format("&search={}", query);
-        if (ranked.has_value()) requeststream << fmt::format("&ranked={}", ranked.value());
-        if (qualified.has_value()) requeststream << fmt::format("&qualified={}", qualified.value());
-        if (unique.has_value()) requeststream << fmt::format("&unique={}", unique.value());
-        auto requestURL = requeststream.str();
-        LOG_DEBUG("URL is: {}", requestURL);
-        WebUtils::GetJSONAsync(requestURL,
+        std::string url;
+        try {
+            url = Detail::MapsURL(list, query, ranked, qualified, pageIndex);
+        } catch (const std::exception& e) {
+            exception = e.what();
+            finished(std::nullopt);
+            return;
+        }
+        LOG_DEBUG("Request: {}", url);
+        WebUtils::GetJSONAsync(url,
             [finished](long httpCode, bool error, rapidjson::Document& document) {
-                if (error) {
-                    finished(std::nullopt);
-                }
-                else if (document.IsObject() && document.HasMember("errorMessage") && document["errorMessage"].IsString()) {
-                    if (strcmp(document["errorMessage"].GetString(), "Not Found") != 0) exception = document["errorMessage"].GetString();
-                    finished(std::nullopt);
-                }
-                else {
-                    try {
-                        ScoreSaber::Leaderboards page;
-                        Leaderboards::Deserialize(&page, document);
-                        finished(page);
-                    }
-                    catch (const std::exception& e) {
-                        LOG_ERROR("{}", e.what());
-                        exception = e.what();
-                        finished(std::nullopt);
-                        // Convert the document into a string and log/write to file for debug purposes
-                        rapidjson::StringBuffer buffer;
-                        rapidjson::Writer<rapidjson::StringBuffer> writer(buffer);
-                        document.Accept(writer);
-                        writefile("/sdcard/ModData/SearchSSAsync.json", buffer.GetString());
-                    }
-                }
+                auto maps = Detail::ParseMapsResponse(httpCode, error, document, exception);
+                if (!maps) LOG_ERROR("{}", exception);
+                finished(maps);
             }
+        );
+    }
+
+    void GetCoverImageAsync(const ScoreSaber::Map& map, std::function<void(std::vector<uint8_t>)> finished, std::function<void(float)> progressUpdate) {
+        WebUtils::GetAsync(map.GetCoverUrl(), FILE_DOWNLOAD_TIMEOUT,
+            [finished](long httpCode, std::string data) {
+                if (httpCode < 200 || httpCode >= 300) {
+                    finished({});
+                    return;
+                }
+                finished(std::vector<uint8_t>(data.begin(), data.end()));
+            }, progressUpdate
         );
     }
 

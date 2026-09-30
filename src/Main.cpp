@@ -18,6 +18,10 @@ SONGDOWNLOADER_EXPORT_FUNC void setup(CModInfo* info) {
     info->version_long = VERSION_LONG;
 
     getModConfig().Init(modInfo);
+
+    // Normalize the old default to the name used by the dropdown and search dispatch.
+    if (getModConfig().ListType_ScoreSaber.GetValue() == "Top Trending")
+        getModConfig().ListType_ScoreSaber.SetValue("Trending");
     
     // BeastSaber no longer has an api for songs
     if(getModConfig().Service.GetValue() == "BeastSaber")
