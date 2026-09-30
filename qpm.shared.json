@@ -48,7 +48,7 @@
       },
       {
         "id": "bsml",
-        "versionRange": "^0.5.8",
+        "versionRange": "^0.6.0",
         "additionalData": {}
       },
       {
@@ -219,13 +219,13 @@
     {
       "dependency": {
         "id": "custom-types",
-        "versionRange": "=0.20.1",
+        "versionRange": "=0.20.2",
         "additionalData": {
-          "soLink": "https://github.com/QuestPackageManager/Il2CppQuestTypePatching/releases/download/v0.20.1/libcustom-types.so",
-          "debugSoLink": "https://github.com/QuestPackageManager/Il2CppQuestTypePatching/releases/download/v0.20.1/debug_libcustom-types.so",
+          "soLink": "https://github.com/QuestPackageManager/Il2CppQuestTypePatching/releases/download/v0.20.2/libcustom-types.so",
+          "debugSoLink": "https://github.com/QuestPackageManager/Il2CppQuestTypePatching/releases/download/v0.20.2/debug_libcustom-types.so",
           "overrideSoName": "libcustom-types.so",
-          "modLink": "https://github.com/QuestPackageManager/Il2CppQuestTypePatching/releases/download/v0.20.1/CustomTypes.qmod",
-          "branchName": "version/v0_20_1",
+          "modLink": "https://github.com/QuestPackageManager/Il2CppQuestTypePatching/releases/download/v0.20.2/CustomTypes.qmod",
+          "branchName": "version/v0_20_2",
           "compileOptions": {
             "cppFlags": [
               "-Wno-invalid-offsetof"
@@ -234,7 +234,7 @@
           "cmake": true
         }
       },
-      "version": "0.20.1"
+      "version": "0.20.2"
     },
     {
       "dependency": {
@@ -314,16 +314,16 @@
     {
       "dependency": {
         "id": "playlistcore",
-        "versionRange": "=1.7.0",
+        "versionRange": "=1.7.1",
         "additionalData": {
-          "soLink": "https://github.com/Metalit/PlaylistCore/releases/download/v1.7.0/libplaylistcore.so",
+          "soLink": "https://github.com/Metalit/PlaylistCore/releases/download/v1.7.1/libplaylistcore.so",
           "overrideSoName": "libplaylistcore.so",
-          "modLink": "https://github.com/Metalit/PlaylistCore/releases/download/v1.7.0/PlaylistCore.qmod",
-          "branchName": "version/v1_7_0",
+          "modLink": "https://github.com/Metalit/PlaylistCore/releases/download/v1.7.1/PlaylistCore.qmod",
+          "branchName": "version/v1_7_1",
           "cmake": true
         }
       },
-      "version": "1.7.0"
+      "version": "1.7.1"
     },
     {
       "dependency": {
@@ -348,17 +348,17 @@
     {
       "dependency": {
         "id": "bsml",
-        "versionRange": "=0.5.8",
+        "versionRange": "=0.6.0",
         "additionalData": {
-          "soLink": "https://github.com/bsq-ports/Quest-BSML/releases/download/v0.5.8/libbsml.so",
-          "debugSoLink": "https://github.com/bsq-ports/Quest-BSML/releases/download/v0.5.8/debug_libbsml.so",
+          "soLink": "https://github.com/bsq-ports/Quest-BSML/releases/download/v0.6.0/libbsml.so",
+          "debugSoLink": "https://github.com/bsq-ports/Quest-BSML/releases/download/v0.6.0/debug_libbsml.so",
           "overrideSoName": "libbsml.so",
-          "modLink": "https://github.com/bsq-ports/Quest-BSML/releases/download/v0.5.8/BSML.qmod",
-          "branchName": "version/v0_5_8",
+          "modLink": "https://github.com/bsq-ports/Quest-BSML/releases/download/v0.6.0/BSML.qmod",
+          "branchName": "version/v0_6_0",
           "cmake": true
         }
       },
-      "version": "0.5.8"
+      "version": "0.6.0"
     },
     {
       "dependency": {
