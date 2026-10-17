@@ -63,7 +63,7 @@ std::string DownloadSongsSearchViewController::SearchQuery = "";
 
 void DownloadSongsSearchViewController::CreateEntries(Transform* parent) {
     static ConstString songArtworkName("SongArtwork");
-    static GameObject* prefab = nullptr;
+    static safe_ptr<GameObject*> prefab;
     if(!prefab) {
         GameObject* holder = GameObject::New_ctor();
         Object::DontDestroyOnLoad(holder);
@@ -115,7 +115,7 @@ void DownloadSongsSearchViewController::CreateEntries(Transform* parent) {
         prefab->SetActive(false);
     }
     for(int i = 0; i < ENTRIES_PER_PAGE; i++) {
-        auto copy = Object::Instantiate(prefab, parent);
+        auto copy = Object::Instantiate(prefab.ptr(), parent);
         LevelBar* copyLevelBar = copy->GetComponentInChildren<LevelBar*>();
         Button* downloadButton = copy->GetComponentInChildren<Button*>();
         downloadButton->get_transform()->set_localPosition(Vector3(36.5f, -7.0f, 0.0f));
@@ -618,6 +618,13 @@ void DownloadSongsSearchViewController::DidActivate(bool firstActivation, bool a
 
         Search();
     }
+}
+
+void DownloadSongsSearchViewController::OnDestroy() {
+    ++searchIndex;
+    for (auto& entry : searchEntries) entry = SearchEntry{};
+    if (searchViewController == this) searchViewController = nullptr;
+    i2c::run_method(this, i2c::metadata_getter<&HMUI::ViewController::OnDestroy>::method_info());
 }
 
 // Lowercase 

@@ -10,6 +10,7 @@
 #include "TMPro/TextMeshProUGUI.hpp"
 
 #include "custom-types/shared/macros.hpp"
+#include "beatsaber-hook/shared/safeptr.hpp"
 #include "GlobalNamespace/LevelSelectionFlowCoordinator.hpp"
 #include "GlobalNamespace/SoloFreePlayFlowCoordinator.hpp"
 #include "Types/BeatSaver/Page.hpp"
@@ -34,11 +35,12 @@ namespace SongDownloader {
     class SearchEntry {
         BeatSaver::Beatmap map;
         ScoreSaber::Map SSsong;
-        UnityEngine::GameObject* gameObject;
-        TMPro::TextMeshProUGUI* line1Component;
-        TMPro::TextMeshProUGUI* line2Component;
-        HMUI::ImageView* coverImageView;
-        UnityEngine::UI::Button* downloadButton;
+        // Native row storage is not described by the controller's managed fields.
+        safe_ptr<UnityEngine::GameObject*> gameObject;
+        safe_ptr<TMPro::TextMeshProUGUI*> line1Component;
+        safe_ptr<TMPro::TextMeshProUGUI*> line2Component;
+        safe_ptr<HMUI::ImageView*> coverImageView;
+        safe_ptr<UnityEngine::UI::Button*> downloadButton;
 
     public:
         enum class MapType {
@@ -107,6 +109,7 @@ public:
     SearchEntry searchEntries[ENTRIES_PER_PAGE];
 
     DECLARE_OVERRIDE_METHOD_MATCH(void, DidActivate, &HMUI::ViewController::DidActivate, bool firstActivation, bool addedToHierarchy, bool screenSystemEnabling);
+    DECLARE_OVERRIDE_METHOD_MATCH(void, OnDestroy, &HMUI::ViewController::OnDestroy);
 
     DECLARE_INSTANCE_FIELD(GlobalNamespace::LoadingControl*, loadingControl);
 

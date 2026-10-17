@@ -196,23 +196,23 @@ void SearchEntry::UpdateDownloadProgress(bool checkLoaded) {
     switch (status)
     {
         case SearchEntry::DownloadStatus::NotDownloaded:
-            SetButtonText(downloadButton, "Download");
+            SetButtonText(downloadButton.ptr(), "Download");
             downloadButton->set_interactable(true);
             break;
         case SearchEntry::DownloadStatus::Downloading:
-            SetButtonText(downloadButton, fmt::format("{}%", (int) downloadProgress));
+            SetButtonText(downloadButton.ptr(), fmt::format("{}%", (int) downloadProgress));
             downloadButton->set_interactable(false);
             break;
         case SearchEntry::DownloadStatus::Downloaded:
-            SetButtonText(downloadButton, "Loading");
+            SetButtonText(downloadButton.ptr(), "Loading");
             downloadButton->set_interactable(false);
             break;
         case SearchEntry::DownloadStatus::Loaded:
-            SetButtonText(downloadButton, "Play");
+            SetButtonText(downloadButton.ptr(), "Play");
             downloadButton->set_interactable(true);
             break;
         case SearchEntry::DownloadStatus::Failed:
-            SetButtonText(downloadButton, "Failed");
+            SetButtonText(downloadButton.ptr(), "Failed");
             downloadButton->set_interactable(true);
             break;
     }
